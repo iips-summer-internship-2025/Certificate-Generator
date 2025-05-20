@@ -1,0 +1,86 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    margin: 0;
+    padding: 0;
+}
+.Inner_Login {
+    text-align: center;
+    padding: 100px 0;
+}
+.Login_form .Google {
+    display: inline-block;
+}
+.Login_form h2 {
+    font-weight: 100;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+span.or {
+    margin: 10px 0;
+    position: relative;
+}
+span.or:before {
+    position: absolute;
+    content: '';
+    top: 14px;
+    left: 42%;
+    height: 1px;
+    width: 89px;
+    background: #000;
+}
+span.or:after {
+    position: absolute;
+    content: '';
+    height: 1px;
+    width: 89px;
+    background: #000;
+    top: 14px;
+    right: 42%;
+}
+.Inner_Login h1 {
+    font-size: 50px;
+    font-weight: 900;
+    color: mediumpurple;
+    font-family: Lucida Handwriting;
+    margin-bottom: 30px;
+}
+p.Google_p_design {
+    align-items: center;
+    border: 1px solid #000;
+    border-radius: 12px;
+    padding: 1px 35px;
+}
+p.Google_p_design div {
+    display: inline-block;
+}
+.Login_form span {
+    display: block;
+}
+.Login_form .Google .Text {
+    margin-left: 10px;
+    color: grey;
+}
+.Continue_with_mail svg {
+    margin-right: 20px;
+}
+.Continue_with_mail div {
+    border-radius: 15px;
+    margin-bottom: 25px;
+    margin-right: 29px;
+}
+.Continue_with_mail input {
+    padding: 10px 20px;
+    border-radius: 15px;
+}  
+.Login_form button {
+    color: #FFF;
+    background: mediumpurple;
+    padding: 6px 20px;
+    border-radius: 15px;
+    border: none;
+    font-weight: 900;
+}
+    
