@@ -1,37 +1,53 @@
 import React, { useState } from 'react';
 import './Login.css';
 import  LoginBackground  from '../../../public/assets/LoginBackground.jpg';
+import { useNavigate } from 'react-router-dom'
+
 function Login() {
-    // 1. Form state
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
+  // 1. Form state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate()
+
+  // Email validation regex
+  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
     // 2. Handle form submit
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/token/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password })
-            });
+    // Check email format
+    if (!emailRegex.test(email)) {
+      setMessage('Invalid email format');
+      return;
+    }
 
-            const data = await response.json();
+    try {
+      // Send login request to the backend API
+      const response = await fetch('http://127.0.0.1:8000/api/token/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }) // Sending user credentials
+      });
 
-            if (response.ok) {
-                setMessage('Login successful!');
-                // Optionally store the token: localStorage.setItem('token', data.token);
-            } else {
-                setMessage(data.detail || 'Login failed');
-            }
-        } catch (error) {
-            setMessage('Network error: ' + error.message);
-        }
-    };
+      const data = await response.json(); // Parse the JSON response
+
+      if (response.ok) {
+        setMessage('Login successful!');
+        navigate('/upload') // Redirect to upload page
+        
+      } else {
+        // Show error message from backend or fallback message
+        setMessage(data.detail || 'Login failed');
+      }
+    } catch (error) {
+      // Handle network or unexpected errors
+      setMessage('Network error: ' + error.message);
+    }
+  };
 
     return (
         <>
