@@ -6,12 +6,33 @@ body{
     margin: 0;
     padding: 0;
 }
+/* login Info */
+.Login img {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+}
 .Inner_Login {
     text-align: center;
     padding: 100px 0;
 }
-.Login_form .Google {
-    display: inline-block;
+.Inner_parent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.Inner_Login {
+    backdrop-filter: blur(15px);
+    padding: 50px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+}
+.Continue_with_mail input {
+    padding: 10px 20px;
+    border-radius: 15px;
+    background: transparent;
+    border: 2px solid grey;
 }
 .Login_form h2 {
     font-weight: 100;
