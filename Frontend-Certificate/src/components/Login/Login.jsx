@@ -1,34 +1,49 @@
 import React, { useState } from 'react';
 import './Login.css';
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
   // 1. Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate()
+
+  // Email validation regex
+  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
   // 2. Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check email format
+    if (!emailRegex.test(email)) {
+      setMessage('Invalid email format');
+      return;
+    }
+
     try {
+      // Send login request to the backend API
       const response = await fetch('http://127.0.0.1:8000/api/token/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }) // Sending user credentials
       });
 
-      const data = await response.json();
+      const data = await response.json(); // Parse the JSON response
 
       if (response.ok) {
         setMessage('Login successful!');
-        // Optionally store the token: localStorage.setItem('token', data.token);
+        navigate('/upload') // Redirect to upload page
+        
       } else {
+        // Show error message from backend or fallback message
         setMessage(data.detail || 'Login failed');
       }
     } catch (error) {
+      // Handle network or unexpected errors
       setMessage('Network error: ' + error.message);
     }
   };
@@ -44,8 +59,7 @@ function Login() {
           <div className="Login_form">
             <form onSubmit={handleSubmit}>
               <h2>Log in</h2>
-              <div className="Google"></div>
-              <span className="or">or</span>
+
               <div className="Continue_with_mail">
                 <div>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="20px" height="20px" viewBox="0 0 1920 1920">
