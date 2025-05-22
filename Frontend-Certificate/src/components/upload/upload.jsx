@@ -71,6 +71,62 @@ function Upload() {
         }
     };
 
+    // Inside your Upload component
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+
+      const handleSubmit = async () => {
+        if (!csvFile || !imageFile) {
+          alert('Please upload both files.');
+          return;
+        }
+      
+        const formData = new FormData();
+        formData.append('csvfile', csvFile);
+        formData.append('imagefile', imageFile);
+        formData.append('userType', userType);
+      
+        try {
+          const response = await fetch('http://localhost:8000/api/upload/', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: formData,
+          });
+      
+          if (response.ok) {
+            const data = await response.json();
+            alert('Upload successful!');
+            console.log('Response:', data);
+            setCsvFile(null);
+            setImageFile(null);
+          } else {
+            const err = await response.text();
+            alert('Upload failed: ' + err);
+          }
+        } catch (error) {
+          alert('Error uploading files: ' + error.message);
+        }
+      };
+      
+  
     return (
         <>
             <div className="min-h-screen flex flex-col items-center justify-center bg-black relative p-6">
@@ -165,18 +221,13 @@ function Upload() {
 
                 {/* Submit Button */}
                 <div className="z-10 mt-8">
-                    <button
-                        className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition w-80 "
-                        onClick={() => {
-                            if (csvFile && imageFile) {
-                                alert('Files are ready to be uploaded!');
-                            } else {
-                                alert('Please upload both files.');
-                            }
-                        }}
-                    >
-                        Submit
-                    </button>
+                <button
+  className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition w-80 "
+  onClick={handleSubmit}
+>
+  Submit
+</button>
+
                 </div>
             </div>
         </>
