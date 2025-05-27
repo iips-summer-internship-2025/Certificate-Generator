@@ -7,13 +7,14 @@ import Editor from './components/Editor/Editor'
 
 function App() {
   //const [count, setCount] = useState(0)
-
+  const token=localStorage.getItem('token');
   return (
     <>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/upload" element={<Upload />} />
-        <Route path="/editor" element={<Editor />} />
+        {/* {token && <Route path="/upload" element={<Upload />}/>} */}
+        <Route path="/editor" element={<Editor/>}/>
       </Routes>
     </>
   )

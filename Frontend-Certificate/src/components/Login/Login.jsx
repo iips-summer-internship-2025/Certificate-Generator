@@ -38,19 +38,20 @@ function Login() {
 
         const data = await response.json(); // Parse the JSON response
 
-        if (response.ok) {
-          setMessage('Login successful!');
-          navigate('/upload') // Redirect to upload page
-          
-        } else {
-          // Show error message from backend or fallback message
-          setMessage(data.detail + 'Login failed');
-        }
-      } catch (error) {
-        // Handle network or unexpected errors
-        setMessage('Network error: ' + error.message);
+      if (response.ok) {
+        localStorage.setItem('token', data.access);
+        setMessage('Login successful!');
+        navigate('/upload') // Redirect to upload page
+        
+      } else {
+        // Show error message from backend or fallback message
+        setMessage(data.detail || 'Login failed');
       }
-    };
+    } catch (error) {
+      // Handle network or unexpected errors
+      setMessage('Enter Correct Credentials ');
+    }
+  };
 
     return (
         <>
