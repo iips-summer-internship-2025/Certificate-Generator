@@ -20,37 +20,37 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-    // Check email format
-    if (!emailRegex.test(email)) {
-      setMessage('Invalid email format');
+      // Check email format
+      if (!emailRegex.test(email)) {
+        setMessage('Invalid email format');
       return;
-    }
-
-    try {
-      // Send login request to the backend API
-      const response = await fetch('http://127.0.0.1:8000/api/token/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }) // Sending user credentials
-      });
-
-      const data = await response.json(); // Parse the JSON response
-
-      if (response.ok) {
-        setMessage('Login successful!');
-        navigate('/upload') // Redirect to upload page
-        
-      } else {
-        // Show error message from backend or fallback message
-        setMessage(data.detail || 'Login failed');
       }
-    } catch (error) {
-      // Handle network or unexpected errors
-      setMessage('Network error: ' + error.message);
-    }
-  };
+
+      try {
+        // Send login request to the backend API
+        const response = await fetch('http://127.0.0.1:8000/api/token/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }) // Sending user credentials
+        });
+
+        const data = await response.json(); // Parse the JSON response
+
+        if (response.ok) {
+          setMessage('Login successful!');
+          navigate('/upload') // Redirect to upload page
+          
+        } else {
+          // Show error message from backend or fallback message
+          setMessage(data.detail + 'Login failed');
+        }
+      } catch (error) {
+        // Handle network or unexpected errors
+        setMessage('Network error: ' + error.message);
+      }
+    };
 
     return (
         <>

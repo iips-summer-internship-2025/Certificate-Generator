@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Upload() {
     const [csvFile, setCsvFile] = useState(null);
@@ -6,6 +7,28 @@ function Upload() {
     const [userType, setUserType] = useState('merit');
     const [csvDragActive, setCsvDragActive] = useState(false);
     const [imgDragActive, setImgDragActive] = useState(false);
+
+
+    // Handle submit 
+    const navigate = useNavigate();
+
+    const handleSubmit = () => {
+
+         if (!csvFile || !imageFile) {
+          alert('Please upload both files.');
+          return;
+        }
+      
+        const formData = new FormData();
+        formData.append('csvfile', csvFile);
+        formData.append('imagefile', imageFile);
+        formData.append('userType', userType);
+
+
+        navigate("/editor", {
+        state: { csvFile, imageFile, userType }
+        });
+    };
 
     const handleCsvChange = (e) => {
         const file = e.target.files[0];
@@ -31,11 +54,14 @@ function Upload() {
         e.stopPropagation();
         setCsvDragActive(true);
     };
+
     const handleCsvDragLeave = (e) => {
         e.preventDefault();
         e.stopPropagation();
         setCsvDragActive(false);
     };
+
+
     const handleCsvDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -90,41 +116,41 @@ function Upload() {
       }
       
 
-      const handleSubmit = async () => {
-        if (!csvFile || !imageFile) {
-          alert('Please upload both files.');
-          return;
-        }
+    //   const handleSubmit = async () => {
+    //     if (!csvFile || !imageFile) {
+    //       alert('Please upload both files.');
+    //       return;
+    //     }
       
-        const formData = new FormData();
-        formData.append('csvfile', csvFile);
-        formData.append('imagefile', imageFile);
-        formData.append('userType', userType);
+    //     const formData = new FormData();
+    //     formData.append('csvfile', csvFile);
+    //     formData.append('imagefile', imageFile);
+    //     formData.append('userType', userType);
       
-        try {
-          const response = await fetch('http://localhost:8000/api/upload/', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: formData,
-          });
+    //     try {
+    //       const response = await fetch('http://localhost:8000/api/upload/', {
+    //         method: 'POST',
+    //         credentials: 'include',
+    //         headers: {
+    //           'X-CSRFToken': getCookie('csrftoken'),
+    //         },
+    //         body: formData,
+    //       });
       
-          if (response.ok) {
-            const data = await response.json();
-            alert('Upload successful!');
-            console.log('Response:', data);
-            setCsvFile(null);
-            setImageFile(null);
-          } else {
-            const err = await response.text();
-            alert('Upload failed: ' + err);
-          }
-        } catch (error) {
-          alert('Error uploading files: ' + error.message);
-        }
-      };
+    //       if (response.ok) {
+    //         const data = await response.json();
+    //         alert('Upload successful!');
+    //         console.log('Response:', data);
+    //         setCsvFile(null);
+    //         setImageFile(null);
+    //       } else {
+    //         const err = await response.text();
+    //         alert('Upload failed: ' + err);
+    //       }
+    //     } catch (error) {
+    //       alert('Error uploading files: ' + error.message);
+    //     }
+    //   };
       
   
     return (
@@ -134,7 +160,7 @@ function Upload() {
                 <h1 className="text-white text-4xl md:text-5xl font-bold uppercase ">Upload your Files Here</h1>
                 {/* Header */}
                 <div className="z-10 text-center mt-8">
-                    <div className='mb-4 mt-4 gap-5 rounded-lg p-4 '>
+                    <div className='mb-4 mt-4 gap-5 rounded-lg p-4'>
                         <p className="text-white text-2xl mb-2 pb-2">Select the category</p>
                         {/* Radio Buttons */}
                         <div className="flex gap-6 justify-center mb-4 text-white">
@@ -221,12 +247,12 @@ function Upload() {
 
                 {/* Submit Button */}
                 <div className="z-10 mt-8">
-                <button
-  className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition w-80 "
-  onClick={handleSubmit}
->
-  Submit
-</button>
+                    <button
+                        className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition w-80 "
+                        onClick={handleSubmit}
+                        >
+                        Submit
+                    </button>
 
                 </div>
             </div>
