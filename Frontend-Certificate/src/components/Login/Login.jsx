@@ -39,6 +39,7 @@ function Login() {
       const data = await response.json(); // Parse the JSON response
 
       if (response.ok) {
+        localStorage.setItem('token', data.access);
         setMessage('Login successful!');
         navigate('/upload') // Redirect to upload page
         
@@ -48,7 +49,7 @@ function Login() {
       }
     } catch (error) {
       // Handle network or unexpected errors
-      setMessage('Network error: ' + error.message);
+      setMessage('Enter Correct Credentials ');
     }
   };
 
