@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import path
 from authority.views import CustomTokenObtainPairView, CustomTokenRefreshView, RegisterView
 from authority import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
