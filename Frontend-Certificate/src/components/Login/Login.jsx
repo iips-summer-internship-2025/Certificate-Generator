@@ -3,6 +3,9 @@ import './Login.css';
 import  LoginBackground  from '../../../public/assets/LoginBackground.jpg';
 import { useNavigate } from 'react-router-dom'
 
+
+
+
 function Login() {
   // 1. Form state
   const [email, setEmail] = useState('');
@@ -17,23 +20,23 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-    // Check email format
-    if (!emailRegex.test(email)) {
-      setMessage('Invalid email format');
+      // Check email format
+      if (!emailRegex.test(email)) {
+        setMessage('Invalid email format');
       return;
-    }
+      }
 
-    try {
-      // Send login request to the backend API
-      const response = await fetch('http://127.0.0.1:8000/api/token/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }) // Sending user credentials
-      });
+      try {
+        // Send login request to the backend API
+        const response = await fetch('http://127.0.0.1:8000/api/token/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }) // Sending user credentials
+        });
 
-      const data = await response.json(); // Parse the JSON response
+        const data = await response.json(); // Parse the JSON response
 
       if (response.ok) {
         localStorage.setItem('token', data.access);
