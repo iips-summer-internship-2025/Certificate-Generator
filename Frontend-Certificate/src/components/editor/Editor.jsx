@@ -1,97 +1,4 @@
-// import React, { useEffect, useRef, useState } from "react"; 
-// import "../../index.css";
-// import { useLocation } from "react-router-dom";
-// import Papa from "papaparse";
 
-// export default function Editor() {
-//   // Handling files from upload page here
-//   const { state } = useLocation();
-//   const imageFile = state?.imageFile;
-//   const csvFile = state?.csvFile;
-
-//   if (!imageFile || !csvFile) {
-//     return <p>Missing files</p>;
-//   }
-
-//   const imageUrl = URL.createObjectURL(imageFile);
-
-
-
-
-//   // reading csv
-//   const [columns, setColumns] = useState([]);
-
-//   useEffect(() => {
-//     if (csvFile) {
-//       Papa.parse(csvFile, {
-//         header: true,
-//         complete: (results) => {
-//           if (results.meta.fields) {
-//             setColumns(results.meta.fields); // Array of column names
-//           }
-//         },
-//       });
-//     }
-//   }, [csvFile]);
-
-
-
-
-//   // Handling variable drop and coordinate values
-//   const imageRef = useRef(null);
-//   const [droppedVariables, setDroppedVariables] = useState([]);
-
-//   const handleDrop = (e) => {
-//   e.preventDefault();
-//   const variable = e.dataTransfer.getData("text/plain");
-
-//   const rect = imageRef.current.getBoundingClientRect();
-//   const x = e.clientX - rect.left;
-//   const y = e.clientY - rect.top;
-
-//   console.log(`Dropped variable ${variable} at:`, x, y);
-
-//   setDroppedVariables((prev) => [...prev, { name: variable, x, y }]);
-// };
-
-
-
-  
-//   return (
-//     <div className=" h-[100dvh] w-screen bg-black overflow-hidden ">
-
-
-
-
-//       {/* here are the variables to be drag and dropped */}
-//       <div className=" h-2/5 w-full flex justify-around items-center gap-2 text-amber-100">
-//         {columns.map((title) => {
-//           return (
-//             <div className=" p-2 relative bg-slate-700 h-fit rounded-md border-2 border-slate-400 border-dashed"
-//               draggable
-//               onDragStart={(e) => e.dataTransfer.setData("text/plain", title)}
-//             >
-//              {title}
-//             </div>
-//           )
-//         })}
-//       </div>
-
-
-
-//         {/* image here */}
-//       <div className=" h-3/5 flex justify-center p-4">
-//         <img
-//           src={imageUrl}
-//           className=" bg-slate-700 h-full  border-4 border-amber-400 border-dashed relative"
-//           ref={imageRef}
-//           onDragOver={(e) => e.preventDefault()} // Allow drop
-//           onDrop={handleDrop}
-//         />
-//       </div>
-//     </div>
-//   );
-// }
 import React, { useEffect, useRef, useState } from "react";
 import "../../index.css";
 import { useLocation } from "react-router-dom";
@@ -132,32 +39,72 @@ export default function Editor() {
     e.preventDefault();
     const variable = e.dataTransfer.getData("text/plain");
 
+    // Exclude variables whose name starts with "blob" ==> exclude image drag and drop
+    if (variable.startsWith("blob")) return;
+    
     const rect = imageRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    setDroppedVariables((prev) => [...prev, { name: variable, x, y, size, color }]);
+    setDroppedVariables((prev) => [
+        ...prev.filter((item) => item.name !== variable),
+        { name: variable, x, y }
+    ]);
+
+    // put the div of column at the position
+    let d = document.getElementById(variable);
+    if (d) {
+        d.style.position = "absolute";
+        d.style.left = `${e.clientX}px`;
+        d.style.top = `${e.clientY}px`;
+        d.style.zIndex = '99';
+    }  
+
+    // status for variable
+    let d_status = document.getElementById(`${variable}-status`);
+    if(d_status){
+        d_status.style.backgroundColor='green';
+    }
   };
   console.log(droppedVariables)
+
+
+
+  const handleRemove = (title) => {
+    document.getElementById(title).style.display='none';
+    setDroppedVariables((prev) => [
+        ...prev.filter((item) => item.name != title)
+    ])
+  }
+
+
   return (
-    <div className="h-[100dvh] w-screen bg-black overflow-hidden text-white">
+    <div className="h-[100dvh] w-screen bg-slate-900 overflow-hidden text-white">
 
       {/* Draggable Variables */}
       <div className="h-2/5 w-full flex justify-around items-center gap-2 text-amber-100">
         {columns.map((title, index) => (
           <div
+            id={title}
             key={index}
             draggable
             onDragStart={(e) => e.dataTransfer.setData("text/plain", title)}
-            className="p-2 bg-slate-700 rounded-md border-2 border-slate-400 border-dashed cursor-grab"
+            className=" relative bg-slate-700 rounded-md border-2 border-slate-400 border-dashed"
           >
-            {title}
+            <span id={`${title}-status`} className=" h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"></span>
+            <p className=" m-2">{title}</p>
+            
+            <span onClick={() => handleRemove(title)} className=" bg-slate-200 h-3 w-3 rounded-full absolute -top-1 -right-1 cursor-pointer"></span>
           </div>
         ))}
       </div>
 
+
+
       {/* Image with Droppable Area */}
-      <div className="h-3/5 flex justify-center p-4 relative">
+      <div className="h-3/5 flex p-4 relative justify-around">
+
+
         {/* Image Container */}
         <div
           className="relative border-4 border-amber-400 border-dashed"
@@ -168,8 +115,10 @@ export default function Editor() {
           {/* Certificate Image */}
           <img src={imageUrl} alt="Certificate" className="h-full" />
 
+
+
           {/* Render Dropped Texts */}
-          {droppedVariables.map((item, index) => (
+          {/* {droppedVariables.map((item, index) => (
             <div
               key={index}
               className="absolute text-black font-bold text-lg"
@@ -181,7 +130,12 @@ export default function Editor() {
             >
               {item.name}
             </div>
-          ))}
+          ))} */}
+        </div>
+
+        <div className=" relative flex flex-col justify-around h-fit w-fit gap-5 self-end">
+            <button onClick={() => window.location.reload()} className=" border-4 border-cyan-600 border-dashed shadow-md rounded-md   px-4 py-2 bg-cyan-900 text-slate-300">Reset changes</button>
+            <button className=" border-4 border-cyan-600 border-dashed shadow-md rounded-[4px]   px-4 py-2 bg-cyan-900 text-slate-300">Submit</button>
         </div>
       </div>
     </div>

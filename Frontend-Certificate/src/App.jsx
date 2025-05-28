@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Login from './components/Login/Login'
 import Upload from './components/upload/upload'
-import Editor from './components/editor/Editor'
+import Editor from './components/Editor/Editor'
 
 function App() {
   //const [count, setCount] = useState(0)
