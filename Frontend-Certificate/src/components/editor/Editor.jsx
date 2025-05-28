@@ -136,7 +136,7 @@ export default function Editor() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    setDroppedVariables((prev) => [...prev, { name: variable, x, y }]);
+    setDroppedVariables((prev) => [...prev, { name: variable, x, y, size, color }]);
   };
   console.log(droppedVariables)
   return (
