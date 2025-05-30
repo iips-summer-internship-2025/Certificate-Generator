@@ -10,95 +10,113 @@ from PIL import Image, ImageDraw, ImageFont
 import pytesseract
 import csv
 import os
-import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt 
 from .serializers import CustomTokenObtainPairSerializer, UserSerializer
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import csv
+import os
 
 
-
-PLACEHOLDERS = {'name', 'class', 'event', 'rank'}
-UPLOAD_DIR = 'uploads'
-CERT_DIR = 'certificates'
-DEFAULT_FONT = ImageFont.load_default()
-
-
-def generate_certificate(template_path: str, output_path: str, data: dict) -> None:
-    """Generate a certificate image with user data."""
+def generate_certificate_dynamic(template_path, output_path, data, user_type):
     image = Image.open(template_path).convert("RGB")
     draw = ImageDraw.Draw(image)
+    
+    # Perform OCR and get bounding boxes for each word
     boxes = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)
 
-    for i in range(len(boxes['level'])):
+    font = ImageFont.load_default()
+    
+    # Loop over each detected word
+    n_boxes = len(boxes['level'])
+    for i in range(n_boxes):
         word = boxes['text'][i].strip().lower()
-        if word in PLACEHOLDERS:
-            x, y, w, h = boxes['left'][i], boxes['top'][i], boxes['width'][i], boxes['height'][i]
-            draw.rectangle([x, y, x + w, y + h], fill='white')
-            text = data.get(word.capitalize(), '')  # Match CSV headers like "Name", "Class", etc.
-            draw.text((x, y), text, fill='black', font=DEFAULT_FONT)
+        if word in ['name', 'class', 'event', 'rank']:
+            # Get box coordinates
+            (x, y, w, h) = (boxes['left'][i], boxes['top'][i], boxes['width'][i], boxes['height'][i])
+
+            # Erase placeholder by drawing a white rectangle over it
+            draw.rectangle([x, y, x+w, y+h], fill='white')
+
+            # Write the actual data text next to or inside that box
+            # You can adjust text position as needed here
+            if word == 'name':
+                text = data.get('Name', '')
+            elif word == 'class':
+                text = data.get('class', '')
+            elif word == 'event':
+                text = data.get('event', '')
+            elif word == 'rank':
+                text = data.get('rank', '')
+
+            draw.text((x, y), text, fill='black', font=font)
 
     image.save(output_path)
 
-
-def save_uploaded_file(uploaded_file, path: str) -> None:
-    """Save uploaded file to disk."""
-    with open(path, 'wb+') as f:
-        for chunk in uploaded_file.chunks():
-            f.write(chunk)
-
-
-def handle_csv_upload(csv_file, output_csv_path: str) -> list[dict]:
-    """Append new CSV rows and return all rows for processing."""
-    csv_data = csv_file.read().decode('utf-8').splitlines()
-    reader = csv.reader(csv_data)
-    is_new_file = not os.path.exists(output_csv_path)
-
-    rows = []
-    with open(output_csv_path, 'a', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        header = next(reader, None)
-        if is_new_file and header:
-            writer.writerow(header)
-        else:
-            next(reader, None)  # Skip header if appending
-
-        for row in reader:
-            writer.writerow(row)
-            rows.append(dict(zip(header, row)))
-
-    return rows
-
-
 def upload_files(request):
     if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+        return JsonResponse({'error': 'Invalid method'}, status=405)
 
     csv_file = request.FILES.get('csvfile')
     image_file = request.FILES.get('imagefile')
-    user_type = request.POST.get('userType', '').lower()
+    user_type = request.POST.get('userType')
 
-    if not all([csv_file, image_file, user_type]):
-        return JsonResponse({'error': 'Missing required fields'}, status=400)
+    if not csv_file or not image_file or not user_type:
+        return JsonResponse({'error': 'Missing files or userType'}, status=400)
 
+    user_type = user_type.lower()
     if user_type not in ('merit', 'participant'):
         return JsonResponse({'error': 'Invalid userType'}, status=400)
 
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-    os.makedirs(os.path.join(CERT_DIR, user_type), exist_ok=True)
+    upload_dir = 'uploads'
+    os.makedirs(upload_dir, exist_ok=True)
 
-    image_path = os.path.join(UPLOAD_DIR, image_file.name)
-    csv_path = os.path.join(UPLOAD_DIR, f"{user_type}.csv")
+    # Save the image file
+    img_path = os.path.join(upload_dir, image_file.name)
+    with open(img_path, 'wb+') as f:
+        for chunk in image_file.chunks():
+            f.write(chunk)
 
-    save_uploaded_file(image_file, image_path)
-    new_rows = handle_csv_upload(csv_file, csv_path)
+    # Define CSV path based on user type
+    final_csv_path = os.path.join(upload_dir, f'{user_type}.csv')
 
-    for row in new_rows:
-        name_slug = row.get('Name', '').replace(" ", "_")
-        if name_slug:
-            cert_path = os.path.join(CERT_DIR, user_type, f"{name_slug}.jpg")
-            generate_certificate(image_path, cert_path, row)
+    # Read uploaded CSV content
+    csv_file_data = csv_file.read().decode('utf-8').splitlines()
+    csv_reader = csv.reader(csv_file_data)
 
-    return JsonResponse({'message': 'Certificates generated successfully'})
+    # Append or create the CSV file with appropriate header handling
+    file_exists = os.path.isfile(final_csv_path)
+    with open(final_csv_path, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+
+        if not file_exists:
+            header = next(csv_reader, None)
+            if header:
+                writer.writerow(header)
+        else:
+            # Skip header if file already exists
+            next(csv_reader, None)
+
+        for row in csv_reader:
+            writer.writerow(row)
+
+    # Prepare certificate output directory
+    cert_dir = os.path.join('certificates', user_type)
+    os.makedirs(cert_dir, exist_ok=True)
+
+    # Generate certificates from the updated CSV file
+    with open(final_csv_path, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            name_slug = row.get('Name', '').replace(" ", "_")
+            if not name_slug:
+                continue  # Skip if no name found
+
+            cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
+            generate_certificate_dynamic(img_path, cert_path, row, user_type)
+
+    return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -112,12 +130,13 @@ class CustomTokenRefreshView(TokenRefreshView):
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if user:
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 

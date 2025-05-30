@@ -1,17 +1,21 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Login from './components/Login/Login'
+import Upload from './components/upload/upload'
+import Editor from './components/Editor/Editor'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  //const [count, setCount] = useState(0)
+  const token=localStorage.getItem('token');
   return (
     <>
-      <div>
-        <Login></Login>
-      </div>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/upload" element={<Upload />} />
+        {/* {token && <Route path="/upload" element={<Upload />}/>} */}
+        <Route path="/editor" element={<Editor/>}/>
+      </Routes>
     </>
   )
 }

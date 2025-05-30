@@ -51,11 +51,28 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     # Add other trusted origins if needed
     
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+SESSION_COOKIE_SAMESITE = None
+CSRF_COOKIE_SAMESITE = None
+
+SESSION_COOKIE_SECURE = False  # only True for HTTPS
+CSRF_COOKIE_SECURE = False     # only True for HTTPS
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    # Add other trusted origins if needed
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -95,10 +112,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'certificatedb',       
+        'USER': 'postgres',      
+        'PASSWORD': 7911,
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
