@@ -12,62 +12,14 @@ import csv
 import os
 from PIL import Image, ImageDraw, ImageFont
 import pytesseract
+from io import StringIO
+from .models import Certificate
 
-
-def upload_files(request):
-    if request.method == 'POST':
-        csv_file = request.FILES.get('csvfile')
-        image_file = request.FILES.get('imagefile')
-        user_type = request.POST.get('userType')
-        print(user_type)
-
-        if not csv_file or not image_file:
-            return JsonResponse({'error': 'Missing files'}, status=400)
-
-        upload_dir = 'uploads'
-        os.makedirs(upload_dir, exist_ok=True)  # <== Add this line to create folder if missing
-
-        csv_path = os.path.join(upload_dir, csv_file.name)
-        img_path = os.path.join(upload_dir, image_file.name)
-
-        with open(csv_path, 'wb+') as f:
-            for chunk in csv_file.chunks():
-                f.write(chunk)
-
-        with open(img_path, 'wb+') as f:
-            for chunk in image_file.chunks():
-                f.write(chunk)
-
-        # You can do something with user_type here
-
-        return JsonResponse({'message': 'Files uploaded successfully'})
-
-    return JsonResponse({'error': 'Invalid method'}, status=405)
 
 
 def handle_files(request):
     user_type = request.session.get('user_type')
 
-
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-
-class CustomTokenRefreshView(TokenRefreshView):
-    pass
-
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            if user:
-                json = serializer.data
-                return Response(json, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def generate_certificate_dynamic(template_path, output_path, data,user_type):
     image = Image.open(template_path).convert("RGB")
@@ -128,45 +80,40 @@ def upload_files(request):
         for chunk in image_file.chunks():
             f.write(chunk)
 
-    # Define CSV path based on user type
-    final_csv_path = os.path.join(upload_dir, f'{user_type}.csv')
-
     # Read uploaded CSV content
     csv_file_data = csv_file.read().decode('utf-8').splitlines()
-    csv_reader = csv.reader(csv_file_data)
-
-    # Append or create the CSV file with appropriate header handling
-    file_exists = os.path.isfile(final_csv_path)
-    with open(final_csv_path, 'a', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-
-        if not file_exists:
-            header = next(csv_reader, None)
-            if header:
-                writer.writerow(header)
-        else:
-            # Skip header if file already exists
-            next(csv_reader, None)
-
-        for row in csv_reader:
-            writer.writerow(row)
+    csv_reader = csv.DictReader(csv_file_data)
 
     # Prepare certificate output directory
     cert_dir = os.path.join('certificates', user_type)
     os.makedirs(cert_dir, exist_ok=True)
 
-    # Generate certificates from the updated CSV file
-    with open(final_csv_path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            name_slug = row.get('Name', '').replace(" ", "_")
-            if not name_slug:
-                continue  # Skip if no name found
+    # Generate certificates from the CSV reader
+    for row in csv_reader:
+        # Generate certificates for each row
+        name_slug = row.get('Name', '').replace(" ", "_")
+        if not name_slug:
+            continue  # Skip if no name found
+        cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
+        generate_certificate_dynamic(img_path, cert_path, row, user_type)
 
-            cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
-            generate_certificate_dynamic(img_path, cert_path, row, user_type)
+        name = row.get('Name', '').strip()
+        roll_no = row.get('roll_no', '').strip()
+        email_id = row.get('email_id', '').strip()
+        status = row.get('status', '').strip()
+        if not name:
+            continue  
+
+        # Save certificate data to the database
+        Certificate.objects.create(
+            name=name,
+            roll_no=roll_no,
+            email_id=email_id,
+            status=status.lower() == 'true',  # Convert to boolean
+        )
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
+
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
