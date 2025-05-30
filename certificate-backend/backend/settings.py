@@ -53,6 +53,22 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    # Add other trusted origins if needed
+    
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+SESSION_COOKIE_SAMESITE = None
+CSRF_COOKIE_SAMESITE = None
+
+SESSION_COOKIE_SECURE = False  # only True for HTTPS
+CSRF_COOKIE_SECURE = False     # only True for HTTPS
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
