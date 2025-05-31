@@ -138,6 +138,8 @@ class RegisterView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+def test_id_generation(request):
+    obj = MyModel.objects.create(name="Example via view")
+    return JsonResponse({'unique_id': obj.unique_id})
 
 
