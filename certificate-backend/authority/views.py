@@ -109,7 +109,7 @@ def upload_files(request):
             roll_no=roll_no,
             email_id=email_id,
             status=status.lower() == 'true',  # Convert to boolean
-            certificate_url=cloudinary_result.get('secure_url') #certificate_url 
+            certificate=cloudinary_result.get('secure_url') #certificate_url 
         )
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
