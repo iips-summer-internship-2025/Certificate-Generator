@@ -17,6 +17,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import csv
 import os
+from .models import MyModel
+
 
 
 def generate_certificate_dynamic(template_path, output_path, data, user_type):
@@ -113,6 +115,7 @@ def upload_files(request):
             if not name_slug:
                 continue  # Skip if no name found
 
+            certificate_obj = MyModel.objects.create(name=name_slug)  
             cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
             generate_certificate_dynamic(img_path, cert_path, row, user_type)
 
@@ -138,5 +141,8 @@ class RegisterView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+def test_id_generation(request):
+    obj = MyModel.objects.create(name="Example via view")
+    return JsonResponse({'unique_id': obj.unique_id})
 
 
