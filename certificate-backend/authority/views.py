@@ -1,5 +1,4 @@
 # users/views.py
-
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,12 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .serializers import CustomTokenObtainPairSerializer, UserSerializer
 from io import StringIO
 from .models import Certificate
-
-
-
-def handle_files(request):
-    user_type = request.session.get('user_type')
-
+import cloudinary
+import cloudinary.uploader
 
 def generate_certificate_dynamic(template_path, output_path, data, user_type):
     image = Image.open(template_path).convert("RGB")
@@ -56,6 +51,7 @@ def generate_certificate_dynamic(template_path, output_path, data, user_type):
 
     image.save(output_path)
 
+
 def upload_files(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method'}, status=405)
@@ -82,9 +78,9 @@ def upload_files(request):
 
     # Read uploaded CSV content
     csv_file_data = csv_file.read().decode('utf-8').splitlines()
-    csv_reader = csv.DictReader(csv_file_data)
+    csv_reader = csv.DictReader(StringIO(csv_file_data))
 
-    # Prepare certificate output directory
+    # Prepares certificate output directory
     cert_dir = os.path.join('certificates', user_type)
     os.makedirs(cert_dir, exist_ok=True)
 
@@ -96,6 +92,9 @@ def upload_files(request):
             continue  # Skip if no name found
         cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
         generate_certificate_dynamic(img_path, cert_path, row, user_type)
+        
+        #  Upload to Cloudinary
+        cloudinary_result = cloudinary.uploader.upload(cert_path)
 
         name = row.get('Name', '').strip()
         roll_no = row.get('roll_no', '').strip()
@@ -110,6 +109,7 @@ def upload_files(request):
             roll_no=roll_no,
             email_id=email_id,
             status=status.lower() == 'true',  # Convert to boolean
+            certificate_url=cloudinary_result.get('secure_url') #certificate_url 
         )
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
@@ -135,11 +135,8 @@ class RegisterView(APIView):
             user = serializer.save()
             if user:
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def test_id_generation(request):
     obj = MyModel.objects.create(name="Example via view")
     return JsonResponse({'unique_id': obj.unique_id})
-
-
