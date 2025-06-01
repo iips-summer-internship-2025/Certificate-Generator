@@ -24,7 +24,7 @@ class Certificate(models.Model):
     name = models.CharField(max_length=150)
     roll_no = models.CharField(max_length=50)           # e.g., IC-2K22-89
     certificate = models.URLField(max_length=200, blank=True, null=True)  # URL to the certificate image
-    certificate_id = models.CharField(max_length=6, primary_key=True)    # e.g., afs234
+    certificate_id = models.CharField(max_length=6, primary_key=True,default=generate_unique_id, editable=False)
     email_id = models.EmailField(max_length=150)
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
@@ -41,6 +41,7 @@ def generate_unique_id():
         unique_id = prefix + suffix                                    # e.g., 'AB1234'
 
         if not MyModel.objects.filter(unique_id=unique_id).exists():
+        #if not Certificate_id.objects.filter(certificate_id=unique_id).exists():
             return unique_id
 
 class MyModel(models.Model):
