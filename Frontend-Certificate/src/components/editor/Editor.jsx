@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "../../index.css";
 import { useLocation } from "react-router-dom";
 import Papa from "papaparse";
+import ErrorPage from "../Error page/ErrorPage";
 
 export default function Editor() {
   const { state } = useLocation();
@@ -10,7 +11,11 @@ export default function Editor() {
   const csvFile = state?.csvFile;
 
   if (!imageFile || !csvFile) {
-    return <p className="c">Missing files</p>;
+    return (<ErrorPage 
+      message="The Files are not available to Process." 
+      statusCode={404} 
+    />)
+;
   }
 
   const imageUrl = URL.createObjectURL(imageFile);
