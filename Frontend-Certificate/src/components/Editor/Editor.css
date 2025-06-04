@@ -1,0 +1,15 @@
+body{
+    overflow: visible;
+}
+.color_design {
+    text-align: center;
+}
+.Inner_div_design label {
+    display: block;
+}
+.Inner_div_design input
+ {
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin-left: 25px;
+}
