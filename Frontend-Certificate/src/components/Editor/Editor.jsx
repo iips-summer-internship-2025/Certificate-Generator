@@ -3,6 +3,7 @@ import "../../index.css";
 import { useLocation } from "react-router-dom";
 import Papa from "papaparse";
 import './Editor.css';
+import ErrorPage from "../Error page/ErrorPage";
 
 export default function Editor() {
   const { state } = useLocation();
@@ -10,8 +11,11 @@ export default function Editor() {
   const csvFile = state?.csvFile;
 
   if (!imageFile || !csvFile) {
-    return <p className="c">Missing files</p>;
-  }
+    return (<ErrorPage 
+        message="The page you're looking for doesn't exist." 
+        statusCode={404} 
+        />)
+    }
 
   const imageUrl = URL.createObjectURL(imageFile);
   const [columns, setColumns] = useState([]);
@@ -56,15 +60,15 @@ export default function Editor() {
 
     let d = document.getElementById(variable);
     if (d) {
-      d.style.position = "absolute";
-      d.style.left = `${e.clientX}px`;
-      d.style.top = `${e.clientY}px`;
-      d.style.zIndex = '99';
-    }
+        d.style.position = "absolute";
+        d.style.left = `${e.clientX}px`;
+        d.style.top = `${e.clientY}px`;
+        d.style.zIndex = '99';
+        }
 
-    let d_status = document.getElementById(`${variable}-status`);
-    if (d_status) {
-      d_status.style.backgroundColor = 'green';
+        let d_status = document.getElementById(variable + "-status");
+        if (d_status) {
+        d_status.style.backgroundColor = 'green';
     }
   };
    console.log(droppedVariables)
@@ -86,6 +90,8 @@ export default function Editor() {
 
           return (
             <div key={index}>
+
+                {/* Dr */}
               <div
                 id={title}
                 draggable
@@ -99,8 +105,8 @@ export default function Editor() {
                 className="relative text-grey rounded-md border-2 border-slate-400 border-dashed"
               >
                 <span
-                  id={`${title}-status`}
-                  className=" h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
+                id={title + "-status"}
+                className="h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
                 ></span>
                 <p className="m-2 font-bold ">{title}</p>
                 <span
@@ -137,14 +143,14 @@ export default function Editor() {
                         min="8"
                         max="72"
                         onChange={(e) => {
-                          const newSize = `${e.target.value}px`;
-                          setDroppedVariables((prev) =>
+                        const newSize = `${e.target.value}px`;
+                        setDroppedVariables((prev) =>
                             prev.map((p) =>
-                              p.name === title
+                            p.name === title
                                 ? { ...p, fontSize: newSize }
                                 : p
                             )
-                          );
+                        );
                         }}
                       />
                     </label>
