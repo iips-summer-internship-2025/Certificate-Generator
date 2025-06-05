@@ -171,3 +171,6 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
+
+# Load environment variable in .env, which should not be committed to version control
+.env

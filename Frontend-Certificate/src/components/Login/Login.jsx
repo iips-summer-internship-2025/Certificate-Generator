@@ -55,8 +55,8 @@ function Login() {
 
     return (
         <>
-            <div className="Login">
-                <img src={LoginBackground} alt="BACKGROUND" />
+            <div className="Login bg-gradient-to-br from-sky-600 to-sky-950">
+                {/* <img src={LoginBackground} alt="BACKGROUND" /> */}
                 <div className="Inner_parent">
                 <div className="container">
                     <div className="Inner_Login">

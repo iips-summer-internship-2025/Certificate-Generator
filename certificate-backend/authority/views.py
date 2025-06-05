@@ -1,5 +1,4 @@
 # users/views.py
-
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,6 +16,10 @@ from .models import Certificate
 import random
 import string
 
+from io import StringIO
+from .models import Certificate
+import cloudinary
+import cloudinary.uploader
 
 def generate_certificate_dynamic(template_path, output_path, data, user_type, certificate_id):
     image = Image.open(template_path).convert("RGB")
@@ -62,6 +65,7 @@ def generate_certificate_dynamic(template_path, output_path, data, user_type, ce
 
     image.save(output_path)
 
+
 def upload_files(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method'}, status=405)
@@ -72,11 +76,11 @@ def upload_files(request):
 
     if not csv_file or not image_file or not user_type:
         return JsonResponse({'error': 'Missing files or userType'}, status=400)
-
+    
     user_type = user_type.lower()
     if user_type not in ('merit', 'participant'):
         return JsonResponse({'error': 'Invalid userType'}, status=400)
-
+    
     upload_dir = 'uploads'
     os.makedirs("certificates/qrcodes", exist_ok=True)
     os.makedirs(upload_dir, exist_ok=True)
@@ -87,62 +91,61 @@ def upload_files(request):
         for chunk in image_file.chunks():
             f.write(chunk)
 
-    # Define CSV path based on user type
-    final_csv_path = os.path.join(upload_dir, f'{user_type}.csv')
-
     # Read uploaded CSV content
     csv_file_data = csv_file.read().decode('utf-8').splitlines()
-    csv_reader = csv.reader(csv_file_data)
+    csv_reader = csv.DictReader(StringIO(csv_file_data))
 
-    # Append or create the CSV file with appropriate header handling
-    file_exists = os.path.isfile(final_csv_path)
-    with open(final_csv_path, 'a', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-
-        if not file_exists:
-            header = next(csv_reader, None)
-            if header:
-                writer.writerow(header)
-        else:
-            # Skip header if file already exists
-            next(csv_reader, None)
-
-        for row in csv_reader:
-            writer.writerow(row)
-
-    # Prepare certificate output directory
+    # Prepares certificate output directory
     cert_dir = os.path.join('certificates', user_type)
     os.makedirs(cert_dir, exist_ok=True)
 
-    # Generate certificates from the updated CSV file
-    with open(final_csv_path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            name_slug = row.get('Name', '').replace(" ", "_")
-            if not name_slug:
-                continue  # Skip if no name found
- 
-            certificate_id = generate_unique_id() 
-            certificate_obj = Certificate.objects.create(
+    # Generate certificates from the CSV reader
+    for row in csv_reader:
+        # Generate certificates for each row
+        name_slug = row.get('Name', '').replace(" ", "_")
+        if not name_slug:
+            continue  # Skip if no name found
+        certificate_id = generate_unique_id() 
+        certificate_obj = Certificate.objects.create(
                  name=name_slug,
                  roll_no=row.get('roll_no', ''),
                  email_id=row.get('email_id', ''),
                  certificate_id=certificate_id
             )  
-            cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
-            generate_certificate_dynamic(img_path, cert_path, row, user_type,certificate_obj.certificate_id)
+        cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
+        generate_certificate_dynamic(img_path, cert_path, row, user_type)
+        
+        #  Upload to Cloudinary
+        cloudinary_result = cloudinary.uploader.upload(cert_path)
 
+        name = row.get('Name', '').strip()
+        roll_no = row.get('roll_no', '').strip()
+        email_id = row.get('email_id', '').strip()
+        status = row.get('status', '').strip()
+        if not name:
+            continue  
 
+        # Save certificate data to the database
+        Certificate.objects.create(
+            name=name,
+            roll_no=roll_no,
+            email_id=email_id,
+            status=status.lower() == 'true',  # Convert to boolean
+            certificate=cloudinary_result.get('secure_url') #certificate_url 
+        )
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
+
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
+
 class CustomTokenRefreshView(TokenRefreshView):
     pass
+
 
 
 class RegisterView(APIView):

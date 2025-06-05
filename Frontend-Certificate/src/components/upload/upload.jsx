@@ -352,48 +352,11 @@ function Upload() {
         return cookieValue;
       }
       
-
-    //   const handleSubmit = async () => {
-    //     if (!csvFile || !imageFile) {
-    //       alert('Please upload both files.');
-    //       return;
-    //     }
-      
-    //     const formData = new FormData();
-    //     formData.append('csvfile', csvFile);
-    //     formData.append('imagefile', imageFile);
-    //     formData.append('userType', userType);
-      
-    //     try {
-    //       const response = await fetch('http://localhost:8000/api/upload/', {
-    //         method: 'POST',
-    //         credentials: 'include',
-    //         headers: {
-    //           'X-CSRFToken': getCookie('csrftoken'),
-    //         },
-    //         body: formData,
-    //       });
-      
-    //       if (response.ok) {
-    //         const data = await response.json();
-    //         alert('Upload successful!');
-    //         console.log('Response:', data);
-    //         setCsvFile(null);
-    //         setImageFile(null);
-    //       } else {
-    //         const err = await response.text();
-    //         alert('Upload failed: ' + err);
-    //       }
-    //     } catch (error) {
-    //       alert('Error uploading files: ' + error.message);
-    //     }
-    //   };
-      
   
     return (
         <>
-            <div className="min-h-screen flex flex-col items-center justify-center bg-black relative p-6">
-                <img src="../bg-upload.jpg" alt="Background" className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-60" />
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 relative p-6">
+                {/* <img src="../bg-upload.jpg" alt="Background" className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-60" /> */}
                 <h1 className="text-white text-4xl md:text-5xl font-bold uppercase ">Upload your Files Here</h1>
                 {/* Header */}
                 <div className="z-10 text-center mt-8">
@@ -432,13 +395,13 @@ function Upload() {
                     <div className="flex flex-col md:flex-row justify-between ">
                         {/* CSV Upload Box */}
                         <div
-                            className={`flex-1 flex flex-col justify-center items-center gap-4 border-2 border-dashed rounded-lg p-6 transition h-48 cursor-pointer
+                            className={`flex-1 flex flex-col justify-center items-center gap-4 border-2 border-dashed rounded-lg p-6 transition h-54 cursor-pointer
                                 ${csvDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'}
                             `}
                             onDragOver={handleCsvDragOver}
                             onDragLeave={handleCsvDragLeave}
                             onDrop={handleCsvDrop}
-                            onClick={() => document.getElementById('csv-upload').click()}
+                            // onClick={() => document.getElementById('csv-upload').click()}
                         >
                             <label className="text-lg font-semibold">CSV / Excel</label>
                             <label className="bg-blue-100 text-blue-700 px-4 py-2 rounded cursor-pointer hover:bg-blue-200 transition">
@@ -457,7 +420,7 @@ function Upload() {
 
                         {/* Image Upload Box */}
                         <div
-                            className={`flex-1 flex flex-col justify-center items-center gap-4 border-2 border-dashed rounded-lg p-6 transition h-48 cursor-pointer
+                            className={`flex-1 flex flex-col justify-center items-center gap-4 border-2 border-dashed rounded-lg p-6 transition h-54 cursor-pointer
                                 ${imgDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'}
                             `}
                             onDragOver={handleImgDragOver}
