@@ -5,6 +5,9 @@ from django.urls import path
 from authority.views import CustomTokenObtainPairView, CustomTokenRefreshView, RegisterView
 from authority import views
 from authority.views import test_id_generation
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,5 +16,6 @@ urlpatterns = [
     path('api/register/', RegisterView.as_view(), name='register'),
     path('api/upload/', views.upload_files, name='upload_files'),
     path('test-id/', test_id_generation, name='test_id_generation'),
-
+    path('verify/<str:certificate_id>/', views.verify_certificate, name='verify_certificate'),
+    path('show-qr/<str:certificate_id>/', views.show_qr, name='show-qr'),
 ]
