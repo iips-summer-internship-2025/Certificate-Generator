@@ -9,6 +9,7 @@ from authority.views import test_cloudinary_upload
 #from authority.views import UploadCertificatesView # added for test
 from authority.views import UploadCertificatesView
 
+from authority.views import accept_coords
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -19,5 +20,5 @@ urlpatterns = [
     path('api/test-id/', views.test_id_generation, name='test_id_generation'),
     path('api/test-upload/', test_cloudinary_upload, name='test_cloudinary_upload'),
     path('api/upload-certificates/', UploadCertificatesView.as_view(), name='upload_certificates'),# added for test
-
+    path('api/coords', accept_coords, name='accept_coords'),
    ]
