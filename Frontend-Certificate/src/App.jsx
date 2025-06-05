@@ -10,6 +10,9 @@ import ChangePassword from './components/Admin pages/Change Password/changePassw
 import ViewCertificates from './components/Admin pages/View Certificates/viewCertificates'
 import CrudAdmins from './components/Admin pages/CRUD admins/CRUDAdmins'
 import ViewAdmins from './components/Admin pages/View Admins/ViewAdmins'
+import Loader from './components/Loader/Loader'
+import ErrorPage from './components/Error page/ErrorPage'
+
 
 
 
@@ -21,8 +24,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/loader" element={<Loader />} />
         {/* {token && <Route path="/upload" element={<Upload />}/>} */}
         <Route path="/editor" element={<Editor/>}/>
+
 
          {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
