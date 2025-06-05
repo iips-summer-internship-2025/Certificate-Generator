@@ -4,6 +4,14 @@ import './App.css'
 import Login from './components/Login/Login'
 import Upload from './components/upload/upload'
 import Editor from './components/Editor/Editor'
+import { AdminLayout } from './components/Admin pages/Admin'
+import Dashboard from './components/Admin pages/Dashboard/adminDashboard'
+import ChangePassword from './components/Admin pages/Change Password/changePassword'
+import ViewCertificates from './components/Admin pages/View Certificates/viewCertificates'
+import CrudAdmins from './components/Admin pages/CRUD admins/CRUDAdmins'
+import ViewAdmins from './components/Admin pages/View Admins/ViewAdmins'
+
+
 
 function App() {
   //const [count, setCount] = useState(0)
@@ -15,7 +23,19 @@ function App() {
         <Route path="/upload" element={<Upload />} />
         {/* {token && <Route path="/upload" element={<Upload />}/>} */}
         <Route path="/editor" element={<Editor/>}/>
+
+         {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="change-password" element={<ChangePassword />} />
+            <Route path="view-certificates" element={<ViewCertificates />} />
+            <Route path="crud-admins" element={<CrudAdmins />} />
+            <Route path="view-admins" element={<ViewAdmins />} />
+          </Route>
+
       </Routes>
+
+      
     </>
   )
 }
