@@ -15,7 +15,6 @@ import qrcode
 from .models import Certificate
 import random
 import string
-
 from io import StringIO
 from .models import Certificate
 import cloudinary
@@ -23,6 +22,9 @@ import cloudinary.uploader
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
+from rest_framework import viewsets
+from .serializers import CertificateSerializer
+
 
 def generate_certificate_dynamic(template_path, output_path, data, user_type, certificate_id):
     image = Image.open(template_path).convert("RGB")
@@ -139,7 +141,33 @@ def upload_files(request):
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
 
+@csrf_exempt 
+def accept_coords(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            if not isinstance(data, list):
+                return JsonResponse({'error': 'Expected a list of objects'}, status=400)
+            
+            for item in data:
+                title = item.get('title')
+                x = item.get('x')
+                y = item.get('y')
+                font_size = item.get('fontSize')
+                font_color = item.get('font_color')
+                
+                # You can now process/save/store this data
+                print(f"Received field: {title}, x: {x}, y: {y}, fontSize: {font_size}, fontcolor: {font_color}")
 
+            return JsonResponse({'status': 'success', 'message': f'{len(data)} fields received'})
+            generate_certificate_dynamic(
+                template_path="./uploads/Techno-Geek.png",  # update with actual path
+                output_path="./upload/output.png",      # update with actual path
+                coordinates=data                       # pass the entire list
+            )
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -217,3 +245,7 @@ def show_qr(request,certificate_id):
     response = HttpResponse(content_type="image/png")
     qr_img.save(response, "PNG")
     return response
+
+class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Certificate.objects.all()
+    serializer_class = CertificateSerializer
