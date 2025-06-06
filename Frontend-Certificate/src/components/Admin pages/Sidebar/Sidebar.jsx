@@ -204,7 +204,7 @@ export const Sidebar = ({ onLinkClick }) => {
       {/* Header */}
       <div className="p-6 border-b border-blue-500">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold">Admin</h1>
+          <h1 className="text-2xl text-white font-bold">Admin</h1>
           <Badge variant="secondary" className="bg-white text-blue-600 text-sm px-2 py-1">
             Super
           </Badge>
