@@ -108,7 +108,7 @@ export default function Editor() {
           return (
             <div key={index} className=" h-fit w-fit bg-gray-200/50 rounded-3xl">
               
-              
+
               {/* Draggable div */}
               <div
                 id={title}
@@ -123,8 +123,8 @@ export default function Editor() {
                 className="relative z-40 border-2 border-slate-200"
               >
                 <span
-                  id={title + "-status"}
-                  className="h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
+                id={title + "-status"}
+                className="h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
                 ></span>
                 <p className=" font-bold ">{title}</p>
                 <span
@@ -167,13 +167,13 @@ export default function Editor() {
                         onChange={(e) => {
                             
                             const newSize = `${e.target.value }px`;
-                          setDroppedVariables((prev) =>
+                        setDroppedVariables((prev) =>
                             prev.map((p) =>
-                              p.name === title
+                            p.name === title
                                 ? { ...p, fontSize: newSize }
                                 : p
                             )
-                          );
+                        );
                         }}
                       />
                     </label>
