@@ -132,7 +132,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'certificatedb',       
         'USER': 'postgres',      
-        'PASSWORD': '7911',
+        'PASSWORD': 7911,
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -210,3 +210,9 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'authority.CustomUser'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}

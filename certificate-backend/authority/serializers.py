@@ -30,7 +30,10 @@ class UserSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
-    
+# for testing purpose 
+class CertificateUploadSerializer(serializers.Serializer):
+    csv = serializers.FileField()
+    template = serializers.ImageField()    
 class CertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Certificate
