@@ -79,16 +79,6 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     qr = qr.resize((150, 150))  # Resize as needed
     image.paste(qr, (image.width - 170, image.height - 170))  # Bottom right corner
 
-
-
-
-    #  Generate QR code based on unique ID
-    qr_data = f"https://yourdomain.com/verify/{certificate_id}"
-    qr = qrcode.make(qr_data)
-    qr = qr.resize((150, 150))  # Resize as needed
-    image.paste(qr, (image.width - 170, image.height - 170))  # Bottom right corner
-
-
     image.save(output_path)
 
 @csrf_exempt
