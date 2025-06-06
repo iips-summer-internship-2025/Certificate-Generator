@@ -3,6 +3,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import CustomUser
+from .models import Certificate
 
 # users/serializers.py
 
@@ -29,3 +30,8 @@ class UserSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+    
+class CertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certificate
+        fields = [ 'name', 'roll_no', 'email_id', 'certificate_id', 'timestamp']
