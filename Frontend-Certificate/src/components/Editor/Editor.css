@@ -1,4 +1,6 @@
-body{
+@import "tailwindcss";
+
+/* body{
     overflow: visible;
 }
 .color_design {
@@ -12,4 +14,4 @@ body{
     border: 1px solid grey;
     border-radius: 5px;
     margin-left: 25px;
-}
+} */
