@@ -5,13 +5,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from PIL import Image, ImageDraw, ImageFont
 import pytesseract
 import csv
 import os
 from django.views.decorators.csrf import csrf_exempt 
 from .serializers import CustomTokenObtainPairSerializer, UserSerializer
+import qrcode
+from .models import Certificate
+import random
+import string
 from io import StringIO
 from .models import Certificate
 import cloudinary
@@ -23,30 +27,41 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
 
+from rest_framework import viewsets
+from .serializers import CertificateSerializer
 
-def generate_certificate_dynamic(template_path, output_path, coordinates,row):
+
+def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
     image = Image.open(template_path).convert("RGB")
+    width, height = image.size
+    
     draw = ImageDraw.Draw(image)
     # for field in ['name','event']:
     #     coord = next((item for item in coordinates if item['title'].lower() == field), None)
 
     for item in coordinates:
         field_key = item.get('title', '')
-        matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
-        text = row.get(matched_key, '') if matched_key else '' # dynamically extract from CSV
+        #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
+        text = row.get(field_key, '') #if matched_key else '' # dynamically extract from CSV
 
         #text = item.get('title', '')
-        x = item.get('x', 0)
-        y = item.get('y', 0)
+        x_percent = item.get('x', 0)
+        y_percent = item.get('y', 0)
+        # Convert percent to actual pixel values
+        x = int((x_percent / 100) * width)
+        y = int((y_percent / 100) * height)
         font_color = item.get('font_color')#, '#000000')
-        font_size_str = item.get('fontSize')#, '16px')
+        font_size_percent = float(item.get('fontSize', 2))
+        font_size = int((font_size_percent / 100) * height)
+
+
 
         # Remove 'px' and convert to int
-        try:
-            font_size = int(font_size_str.replace('px', ''))
-        except:
-            font_size = 16
+        # try:
+        #     font_size = int(font_size_str.replace('px', ''))
+        # except:
+        #     font_size = 16
 
         # Load a font — make sure 'arial.ttf' exists or use full path
         try:
@@ -55,6 +70,24 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row):
             font = ImageFont.load_default()
 
         draw.text((x, y), text, fill=font_color, font=font)
+
+
+
+    #  Generate QR code based on unique ID
+    qr_data = f"https://yourdomain.com/verify/{certificate_id}"
+    qr = qrcode.make(qr_data)
+    qr = qr.resize((150, 150))  # Resize as needed
+    image.paste(qr, (image.width - 170, image.height - 170))  # Bottom right corner
+
+
+
+
+    #  Generate QR code based on unique ID
+    qr_data = f"https://yourdomain.com/verify/{certificate_id}"
+    qr = qrcode.make(qr_data)
+    qr = qr.resize((150, 150))  # Resize as needed
+    image.paste(qr, (image.width - 170, image.height - 170))  # Bottom right corner
+
 
     image.save(output_path)
 
@@ -79,6 +112,7 @@ def upload_files(request):
         return JsonResponse({'error': 'Invalid userType'}, status=400)
     
     # upload_dir = 'uploads'
+    os.makedirs("certificates/qrcodes", exist_ok=True)
     # os.makedirs(upload_dir, exist_ok=True)
     template_filename = default_storage.save(os.path.join('templates', image_file.name), image_file)
     template_path = os.path.join(settings.MEDIA_ROOT, template_filename)
@@ -113,12 +147,14 @@ def upload_files(request):
         name_slug = name.replace(" ", "_")
         output_filename = f"{name_slug}.jpg"
         output_path = os.path.join(cert_dir, output_filename)
+        certificate_id = generate_unique_id() 
+        #  Generate the certificate dynamically
 
         # coordinates = [
         #     {'title': 'Name', 'x': 100, 'y': 150, 'font_color': '#000000', 'fontSize': '100px'},
         #     {'title': 'event', 'x': 100, 'y': 200, 'font_color': '#000000', 'fontSize': '100px'}
         # ] 
-        generate_certificate_dynamic(template_path, output_path, coordinates,row)
+        generate_certificate_dynamic(template_path, output_path, coordinates,row,certificate_id)
         
         #  Upload to Cloudinary
         cloudinary_result = cloudinary.uploader.upload(output_path)
@@ -136,7 +172,9 @@ def upload_files(request):
             roll_no=roll_no,
             email_id=email_id,
             #status=status.lower() == 'true',  # Convert to boolean
-            certificate=cloudinary_result.get('secure_url') #certificate_url 
+            certificate=cloudinary_result.get('secure_url') ,#certificate_url 
+            certificate_id=certificate_id
+
         )
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
@@ -173,8 +211,6 @@ def accept_coords(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
-
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -197,5 +233,61 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def test_id_generation(request):
-    obj = MyModel.objects.create(name="Example via view")
-    return JsonResponse({'unique_id': obj.unique_id})
+    row = {
+    'Name': 'Test User',
+    'roll_no': '12345',
+    'email_id': 'test@example.com',
+    # other fields
+}
+    name_slug = "test_name"  # or some default value
+    certificate_id = generate_unique_id()
+
+    obj = Certificate.objects.create(
+
+            name=name_slug,
+            roll_no=row.get('Roll No', ''),
+            email_id=row.get('Email', ''),
+            certificate_id=certificate_id,
+            certificate=f"https://yourdomain.com/verify/{certificate_id}"
+        
+    )
+    return JsonResponse({'unique_id': obj.certificate_id})
+
+def generate_unique_id():
+     while True:
+         # 2 uppercase letters + 4-digit number
+         prefix = ''.join(random.choices(string.ascii_uppercase, k=2))  # e.g., 'AB'
+         suffix = ''.join(random.choices(string.digits, k=4))           # e.g., '1234'
+         unique_id = prefix + suffix                                    # e.g., 'AB1234'
+
+         if not Certificate.objects.filter(certificate_id=unique_id).exists():
+             return unique_id
+
+
+
+def verify_certificate(request, certificate_id):
+     try:
+         cert = Certificate.objects.get(certificate_id=certificate_id)
+         return JsonResponse({
+            'status': 'valid',
+            'name': cert.name,
+            'roll_no': cert.roll_no,
+            'email': cert.email_id
+         })
+     except Certificate.DoesNotExist:
+         return JsonResponse({'status': 'Certificate not found'}, status=404)
+     
+
+
+def show_qr(request,certificate_id):
+   # test_id = "XB5879"  # Replace this with any real certificate_id for testing
+    qr_data = f"https://yourdomain.com/verify/{certificate_id}"
+    qr_img = qrcode.make(qr_data)
+
+    response = HttpResponse(content_type="image/png")
+    qr_img.save(response, "PNG")
+    return response
+
+class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Certificate.objects.all()
+    serializer_class = CertificateSerializer

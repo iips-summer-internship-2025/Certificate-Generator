@@ -38,7 +38,7 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="min-h-screen h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-white-200 to-white-100 p-6">
+    <div className="min-h-screen  overflow-hidden flex items-center justify-center bg-gradient-to-br from-white-200 to-white-100 p-6">
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}

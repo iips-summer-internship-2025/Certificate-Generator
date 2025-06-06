@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 import random
 import string
+from .utils import generate_unique_id
+
+
 
 def generate_unique_id():
     while True:
@@ -18,8 +21,6 @@ def generate_unique_id():
 class CustomUser(AbstractUser):
     
     email = models.EmailField(unique=True)
-
-
     # Add any additional fields here
 
     USERNAME_FIELD = 'email'
@@ -27,7 +28,6 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-
 
 
 class Certificate(models.Model):
@@ -40,8 +40,8 @@ class Certificate(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     #suser_type= models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"{self.name} ({self.roll_no})"
+    #def __str__(self):
+     #   return f"{self.name} ({self.roll_no})"
 
 
 

@@ -1,0 +1,280 @@
+:root {
+  --primary-blue: #0D1B2A;
+  --accent-gold: #F4B400;
+  --background-light: #FDFDFD;
+  --text-gray: #DDE2E5;
+  --highlight-blue: #3A86FF;
+}
+
+body {
+  background-color: var(--background-light);
+  color: var(--primary-blue);
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #f0f4ff, #e9f0fb, #fffbe6);
+  font-family: 'Times New Roman', Times, serif;
+}
+ul{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+h1,h2,h3,h4,h5,h6 {
+  margin-bottom: 0;
+}
+h1, .logo-text {
+  color: var(--primary-blue);
+}
+:focus-visible {
+    outline: none
+}
+
+button.primary {
+  background-color: var(--accent-gold);
+  color: var(--primary-blue);
+}
+
+a:hover {
+  color: var(--highlight-blue);
+}
+ul{
+    margin:0;
+}
+/************************Text Animation*********************/
+.parent_div_type {
+    font-family: 'Poppins', sans-serif;
+}
+.Inner_div_Animation {
+    text-align: center;
+    align-items: center;
+    margin: 90px 0;
+}
+.typing-container {
+      font-size: 1.8rem;
+      border-right: 3px solid #F4B400;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      text-align: center;
+      animation: typing 5s steps(60, end) forwards, blink .75s step-end infinite;
+    }
+    .typing-container.text-center.ma h1 {
+    font-weight: 600;
+    font-size: 50px;
+    color: #032e63;
+    letter-spacing: 5px;
+}
+.typing-container.text-center.ma h2 {
+    color: grey;
+    line-height: 2;
+    margin-bottom: 25px;
+}
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      from, to { border-color: transparent }
+      50% { border-color: #F4B400 }
+    }
+/**************Anchor design*********************/
+a.Redirect_anchor {
+    color: #fff;
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #3f4c5c, #93e9d5);
+    border-radius: 10px;
+    text-decoration: none;
+    border: 2px solid transparent;
+    font-weight: 600;
+    transition: all 0.3s linear;
+}
+a.Redirect_anchor:hover{
+    background: transparent;
+    color: #032e63;
+    border: 2px solid #032e63;
+}
+/*******Heading*************/
+.headig_inner_svg {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex
+;
+}
+.heading_inner_text {
+    text-align: center;
+}
+.heading_inner_text h2 {
+    display: inline-block;
+    color: #032e63;
+    letter-spacing: 3px;
+    font-weight: 600;
+}
+.heading_inner_text p {
+    display: inline-block;
+    padding-left: 10px;
+    font-size: 17px;
+    color: grey;
+}
+/***************************header CSS************************/
+.header_design {
+    margin: 25px 0;
+    background: #fff;
+    border-radius: 15px;
+}
+.Inner_header .left_svg img {
+    width: 100px;
+}
+.Right_menu li a:hover{
+    background: #f0f4ff;
+    color: #032e63;
+    border-radius: 10px;
+}
+.Right_menu li{
+    display: inline-block;
+    list-style: none;
+}
+.Right_menu a
+ {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 2px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    color: #143d69;
+}
+/*****************event*********************/
+
+
+/*************slider Heading********/
+.carousel-item img{
+    height: 550px;
+}
+.event {
+    padding: 85px 0;
+    background: #fff;
+}
+/*************template CSS*************/
+.design_template {
+    background: #fff;
+    padding: 45px 0;
+}
+.design_template_inner .col-lg-12 {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex
+;
+}
+.design_template_inner .col-lg-12 img{
+    margin-top: 20px;
+    display: block;
+}
+.design_template_inner .redirect_button {
+    text-align: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+/*************Steps And guide CSS*************/
+.Steps_guidence{
+    margin: 90px 0;
+}
+.Steps_guidence .heading {
+    margin-bottom: 40px;
+}
+.Steps_guidence_inner_box {
+    text-align: center;
+    padding: 20px 10px;
+    background: #fff;
+    border-radius: 15px;
+}
+.Steps_guidence_inner_box_svg {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex
+;
+}
+.Steps_guidence_inner_box_svg div {
+    width: fit-content;
+    padding: 10px;
+    background: #8dcdce30;
+    border-radius: 100%;
+}
+.Steps_guidence_inner_box_text h3 {
+    color: #032e63;
+    font-weight: 600;
+    margin-top: 10px;
+}
+.Steps_guidence_inner_box_text p {
+    color: grey;
+}
+/*************Footer CSS*************/
+.footer {
+    background-color: #fff;
+    padding-top : 50px;
+    margin-top: 50px;
+    background-attachment: fixed;
+    background-size: contain;
+    border-radius: 115px 0 0 0;
+}
+.footer-about {
+    backdrop-filter: blur(10px);
+    border-top: 1px solid #d1dbe8;
+    color: #0d1b2a;
+    padding-top: 20px;
+}
+.footer-about h5 {
+    font-size: 26px;
+    font-weight: 600;
+    font-family: monospace;
+    color: #000;
+}
+.footer-about p {
+    line-height: 3;
+    color: #737776;
+    font-size: 17px;
+}
+.footer_inner_links{
+    text-align: center;
+    margin-bottom: 10px
+}
+.footer_inner_links h2 {
+    color: #032e63;
+    font-weight: 600;
+}
+.footer_inner_links ul {
+    display: flex
+;
+    justify-content: center;
+    align-items: center;
+}
+.footer_inner_links ul li{
+    list-style: none;
+    margin: 0 10px;
+}
+.footer_inner_links ul li a {
+    display: inline-block;
+    color: #838080;
+    padding : 10px 20px;
+    text-decoration: none;
+}
+.footer_inner_links ul li a:hover {
+    color: #032e63;
+    background: #f0f4ff;
+    border-radius: 10px;
+}
+.footer_inner_text_copyright {
+    text-align: center;
+    backdrop-filter: blur(40px);
+    border-top: 1px solid rgba(94, 86, 86, 0.724);
+    padding: 10px 0;
+}
+.footer_inner_text_copyright p{
+    margin-bottom: 0;}
+.footer_inner_text_copyright a {
+    color: #000;
+    text-decoration: none;
+}

@@ -1,9 +1,11 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import "../../index.css";
 import { useLocation } from "react-router-dom";
 import Papa from "papaparse";
 import './Editor.css';
 import ErrorPage from "../Error page/ErrorPage";
+import Loader from "../Loader/Loader";
 
 export default function Editor() {
   const { state } = useLocation();
@@ -11,11 +13,11 @@ export default function Editor() {
   const csvFile = state?.csvFile;
 
   if (!imageFile || !csvFile) {
-    return (<ErrorPage 
-        message="The page you're looking for doesn't exist." 
-        statusCode={404} 
-        />)
-    }
+    return (<ErrorPage
+      message="The page you're looking for doesn't exist."
+      statusCode={404}
+    />)
+  }
 
   const imageUrl = URL.createObjectURL(imageFile);
   const [columns, setColumns] = useState([]);
@@ -60,24 +62,67 @@ export default function Editor() {
 
     let d = document.getElementById(variable);
     if (d) {
-        d.style.position = "absolute";
-        d.style.left = `${e.clientX}px`;
-        d.style.top = `${e.clientY}px`;
-        d.style.zIndex = '99';
-        }
+      d.style.position = "absolute";
+      d.style.left = `${e.clientX}px`;
+      d.style.top = `${e.clientY}px`;
+      d.style.zIndex = '99';
+    }
 
-        let d_status = document.getElementById(variable + "-status");
-        if (d_status) {
-        d_status.style.backgroundColor = 'green';
+    let d_status = document.getElementById(variable + "-status");
+    if (d_status) {
+      d_status.style.backgroundColor = 'green';
     }
   };
-   console.log(droppedVariables)
+  console.log(droppedVariables)
   const handleRemove = (title) => {
     document.getElementById(title).style.display = 'none';
     setDroppedVariables((prev) =>
       prev.filter((item) => item.name !== title)
     );
   };
+
+  // Function to handle the submission of coordinates
+  // const handleSubmitCoords = async () => {
+  //   try {
+
+  //     const payload = droppedVariables.map(({ name, x, y, color, fontSize }) => ({
+  //       name,
+  //       x,
+  //       y,
+  //       color,
+  //       fontSize,
+  //     }));
+
+  //     const response = await fetch('/api/coords', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ coords: payload }),
+  //     });
+
+  //     const data = await response.json();
+  //     if (response.ok && data.received) {
+  //       alert('Sending in process!');
+  //       setLoading(true);
+  //     }
+  //     else {
+  //       setLoading(false);
+  //       alert(data.error || "Failed to send coordinates. Please try again.");
+  //       window.location.reload();
+  //     }
+  //   } catch (error) {
+  //     setLoading(false);
+  //     alert('Error: ' + error.message);
+  //     window.location.reload();
+  //   }
+  // };
+  //testing without backend
+  const handleSubmitCoords = async () => {
+
+    setLoading(true);
+
+  }
 
   return (
     <div className="h-[100dvh] w-screen bg-slate-900 text-white">
@@ -91,7 +136,7 @@ export default function Editor() {
           return (
             <div key={index}>
 
-                {/* Dr */}
+              {/* Dr */}
               <div
                 id={title}
                 draggable
@@ -105,8 +150,8 @@ export default function Editor() {
                 className="relative text-grey rounded-md border-2 border-slate-400 border-dashed"
               >
                 <span
-                id={title + "-status"}
-                className="h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
+                  id={title + "-status"}
+                  className="h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
                 ></span>
                 <p className="m-2 font-bold ">{title}</p>
                 <span
@@ -143,14 +188,14 @@ export default function Editor() {
                         min="8"
                         max="72"
                         onChange={(e) => {
-                        const newSize = `${e.target.value}px`;
-                        setDroppedVariables((prev) =>
+                          const newSize = `${e.target.value}px`;
+                          setDroppedVariables((prev) =>
                             prev.map((p) =>
-                            p.name === title
+                              p.name === title
                                 ? { ...p, fontSize: newSize }
                                 : p
                             )
-                        );
+                          );
                         }}
                       />
                     </label>
@@ -179,7 +224,8 @@ export default function Editor() {
           >
             Reset changes
           </button>
-          <button className=" border-4 border-cyan-600 border-dashed shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-slate-300">
+          <button className=" border-4 border-cyan-600 border-dashed shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-slate-300"
+            onClick={handleSubmitCoords}>
             Submit
           </button>
         </div>
