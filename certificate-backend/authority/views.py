@@ -1,4 +1,5 @@
 # users/views.py
+# users/views.py
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,7 +16,6 @@ import qrcode
 from .models import Certificate
 import random
 import string
-
 from io import StringIO
 from .models import Certificate
 import cloudinary
@@ -23,39 +23,53 @@ import cloudinary.uploader
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
+from django.core.files.storage import default_storage
+from django.conf import settings
+from django.core.cache import cache
 
-def generate_certificate_dynamic(template_path, output_path, data, user_type, certificate_id):
+from rest_framework import viewsets
+from .serializers import CertificateSerializer
+
+
+def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
+    
     image = Image.open(template_path).convert("RGB")
+    width, height = image.size
+    
     draw = ImageDraw.Draw(image)
-    
-    # Perform OCR and get bounding boxes for each word
-    boxes = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)
+    # for field in ['name','event']:
+    #     coord = next((item for item in coordinates if item['title'].lower() == field), None)
 
-    font = ImageFont.load_default()
-    
-    # Loop over each detected word
-    n_boxes = len(boxes['level'])
-    for i in range(n_boxes):
-        word = boxes['text'][i].strip().lower()
-        if word in ['name', 'class', 'event', 'rank']:
-            # Get box coordinates
-            (x, y, w, h) = (boxes['left'][i], boxes['top'][i], boxes['width'][i], boxes['height'][i])
+    for item in coordinates:
+        field_key = item.get('title', '')
+        #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
+        text = row.get(field_key, '') #if matched_key else '' # dynamically extract from CSV
 
-            # Erase placeholder by drawing a white rectangle over it
-            draw.rectangle([x, y, x+w, y+h], fill='white')
+        #text = item.get('title', '')
+        x_percent = item.get('x', 0)
+        y_percent = item.get('y', 0)
+        # Convert percent to actual pixel values
+        x = int((x_percent / 100) * width)
+        y = int((y_percent / 100) * height)
+        font_color = item.get('font_color')#, '#000000')
+        font_size_percent = float(item.get('fontSize', 2))
+        font_size = int((font_size_percent / 100) * height)
 
-            # Write the actual data text next to or inside that box
-            # You can adjust text position as needed here
-            if word == 'name':
-                text = data.get('Name', '')
-            elif word == 'class':
-                text = data.get('class', '')
-            elif word == 'event':
-                text = data.get('event', '')
-            elif word == 'rank':
-                text = data.get('rank', '')
 
-            draw.text((x, y), text, fill='black', font=font)
+
+        # Remove 'px' and convert to int
+        # try:
+        #     font_size = int(font_size_str.replace('px', ''))
+        # except:
+        #     font_size = 16
+
+        # Load a font — make sure 'arial.ttf' exists or use full path
+        try:
+            font = ImageFont.truetype("arial.ttf", font_size)
+        except:
+            font = ImageFont.load_default()
+
+        draw.text((x, y), text, fill=font_color, font=font)
 
 
 
@@ -65,13 +79,16 @@ def generate_certificate_dynamic(template_path, output_path, data, user_type, ce
     qr = qr.resize((150, 150))  # Resize as needed
     image.paste(qr, (image.width - 170, image.height - 170))  # Bottom right corner
 
-
     image.save(output_path)
 
-
+@csrf_exempt
 def upload_files(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method'}, status=405)
+    
+    coordinates = cache.get('certificate_coordinates')
+    if not coordinates:
+        return JsonResponse({'error': 'Coordinates not set. Please send them first via /accept-coords'}, status=400)
 
     csv_file = request.FILES.get('csvfile')
     image_file = request.FILES.get('imagefile')
@@ -84,47 +101,58 @@ def upload_files(request):
     if user_type not in ('merit', 'participant'):
         return JsonResponse({'error': 'Invalid userType'}, status=400)
     
-    upload_dir = 'uploads'
+    # upload_dir = 'uploads'
     os.makedirs("certificates/qrcodes", exist_ok=True)
-    os.makedirs(upload_dir, exist_ok=True)
+    # os.makedirs(upload_dir, exist_ok=True)
+    template_filename = default_storage.save(os.path.join('templates', image_file.name), image_file)
+    template_path = os.path.join(settings.MEDIA_ROOT, template_filename)
+
+    # When creating the output certificate path
+    # output_filename = f"{name_slug}.jpg"
+    # output_path = os.path.join(settings.MEDIA_ROOT, 'certificates', output_filename)
 
     # Save the image file
-    img_path = os.path.join(upload_dir, image_file.name)
-    with open(img_path, 'wb+') as f:
-        for chunk in image_file.chunks():
-            f.write(chunk)
+    # img_path = os.path.join(upload_dir, image_file.name)
+    # with open(img_path, 'wb+') as f:
+    #     for chunk in image_file.chunks():
+    #         f.write(chunk)
 
     # Read uploaded CSV content
-    csv_file_data = csv_file.read().decode('utf-8').splitlines()
+    csv_file_data = csv_file.read().decode('utf-8')
     csv_reader = csv.DictReader(StringIO(csv_file_data))
+    csv_data_list = list(csv_reader)
 
     # Prepares certificate output directory
-    cert_dir = os.path.join('certificates', user_type)
+    cert_dir = os.path.join(settings.MEDIA_ROOT, 'certificates', user_type)
     os.makedirs(cert_dir, exist_ok=True)
-
+    
     # Generate certificates from the CSV reader
-    for row in csv_reader:
+    for row in csv_data_list:
+
         # Generate certificates for each row
-        name_slug = row.get('Name', '').replace(" ", "_")
-        if not name_slug:
-            continue  # Skip if no name found
+        name = row.get('Name', '').strip()
+        if not name:
+            continue
+        
+        name_slug = name.replace(" ", "_")
+        output_filename = f"{name_slug}.jpg"
+        output_path = os.path.join(cert_dir, output_filename)
         certificate_id = generate_unique_id() 
-        certificate_obj = Certificate.objects.create(
-                 name=name_slug,
-                 roll_no=row.get('roll_no', ''),
-                 email_id=row.get('email_id', ''),
-                 certificate_id=certificate_id
-            )  
-        cert_path = os.path.join(cert_dir, f"{name_slug}.jpg")
-        generate_certificate_dynamic(img_path, cert_path, row, user_type)
+        #  Generate the certificate dynamically
+
+        # coordinates = [
+        #     {'title': 'Name', 'x': 100, 'y': 150, 'font_color': '#000000', 'fontSize': '100px'},
+        #     {'title': 'event', 'x': 100, 'y': 200, 'font_color': '#000000', 'fontSize': '100px'}
+        # ] 
+        generate_certificate_dynamic(template_path, output_path, coordinates,row,certificate_id)
         
         #  Upload to Cloudinary
-        cloudinary_result = cloudinary.uploader.upload(cert_path)
+        cloudinary_result = cloudinary.uploader.upload(output_path)
 
         name = row.get('Name', '').strip()
         roll_no = row.get('roll_no', '').strip()
         email_id = row.get('email_id', '').strip()
-        status = row.get('status', '').strip()
+        #status = row.get('status', '').strip()
         if not name:
             continue  
 
@@ -133,13 +161,45 @@ def upload_files(request):
             name=name,
             roll_no=roll_no,
             email_id=email_id,
-            status=status.lower() == 'true',  # Convert to boolean
-            certificate=cloudinary_result.get('secure_url') #certificate_url 
+            #status=status.lower() == 'true',  # Convert to boolean
+            certificate=cloudinary_result.get('secure_url') ,#certificate_url 
+            certificate_id=certificate_id
+
         )
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
 
+@csrf_exempt 
+def accept_coords(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            if not isinstance(data, list):
+                return JsonResponse({'error': 'Expected a list of objects'}, status=400)
+            
+            for item in data:
+                title = item.get('title')
+                x = item.get('x')
+                y = item.get('y')
+                font_size = item.get('fontSize')
+                font_color = item.get('font_color')
+                print(f"Received field: {title}, x: {x}, y: {y}, fontSize: {font_size}, fontcolor: {font_color}")
+            
+            cache.set('certificate_coordinates', data, timeout=3600)  # expires in 1 hour
 
+                # You can now process/save/store this data
+                
+                
+            # generate_certificate_dynamic(
+            #     template_path="./uploads/Techno-Geek.png",  # update with actual path
+            #     output_path="./upload/output.png",      # update with actual path
+            #     coordinates=data                       # pass the entire list
+            # )
+            return JsonResponse({'status': 'success', 'message': f'{len(data)} fields received'})
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -184,14 +244,14 @@ def test_id_generation(request):
     return JsonResponse({'unique_id': obj.certificate_id})
 
 def generate_unique_id():
-    while True:
-        # 2 uppercase letters + 4-digit number
-        prefix = ''.join(random.choices(string.ascii_uppercase, k=2))  # e.g., 'AB'
-        suffix = ''.join(random.choices(string.digits, k=4))           # e.g., '1234'
-        unique_id = prefix + suffix                                    # e.g., 'AB1234'
+     while True:
+         # 2 uppercase letters + 4-digit number
+         prefix = ''.join(random.choices(string.ascii_uppercase, k=2))  # e.g., 'AB'
+         suffix = ''.join(random.choices(string.digits, k=4))           # e.g., '1234'
+         unique_id = prefix + suffix                                    # e.g., 'AB1234'
 
-        if not Certificate.objects.filter(certificate_id=unique_id).exists():
-            return unique_id
+         if not Certificate.objects.filter(certificate_id=unique_id).exists():
+             return unique_id
 
 
 
@@ -217,3 +277,7 @@ def show_qr(request,certificate_id):
     response = HttpResponse(content_type="image/png")
     qr_img.save(response, "PNG")
     return response
+
+class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Certificate.objects.all()
+    serializer_class = CertificateSerializer
