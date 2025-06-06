@@ -2,13 +2,14 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 import random
 import string
+from .utils import generate_unique_id
+
+
 
 #table 1
 class CustomUser(AbstractUser):
     
     email = models.EmailField(unique=True)
-
-
     # Add any additional fields here
 
     USERNAME_FIELD = 'email'
@@ -16,7 +17,6 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-
 
 
 class Certificate(models.Model):
@@ -29,23 +29,14 @@ class Certificate(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"{self.name} ({self.roll_no})"
+    #def __str__(self):
+     #   return f"{self.name} ({self.roll_no})"
 
 
-def generate_unique_id():
-    while True:
-        # 2 uppercase letters + 4-digit number
-        prefix = ''.join(random.choices(string.ascii_uppercase, k=2))  # e.g., 'AB'
-        suffix = ''.join(random.choices(string.digits, k=4))           # e.g., '1234'
-        unique_id = prefix + suffix                                    # e.g., 'AB1234'
 
-        if not MyModel.objects.filter(unique_id=unique_id).exists():
-            return unique_id
 
-class MyModel(models.Model):
-    name = models.CharField(max_length=255)
-    unique_id = models.CharField(max_length=6, unique=True, editable=False, default=generate_unique_id)
+#class MyModel(models.Model):
+ #   name = models.CharField(max_length=255)
+  #  unique_id = models.CharField(max_length=6, unique=True, editable=False, default=generate_unique_id)
 
     
-
