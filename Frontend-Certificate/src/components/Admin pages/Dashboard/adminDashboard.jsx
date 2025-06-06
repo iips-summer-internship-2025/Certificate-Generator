@@ -22,7 +22,7 @@ const dashboardCards = [
     title: "Send Certificate",
     description: "Issue certificates to users",
     icon: Send,
-    href: "/admin/send-certificate",
+    href: "/upload",
     linkText: "Send Certificate",
     bgColor: "bg-blue-50",
     iconColor: "text-blue-600"
