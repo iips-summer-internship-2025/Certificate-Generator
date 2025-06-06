@@ -11,6 +11,22 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+load_dotenv()  # Load environment variables from .env file
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+cloudinary.config( 
+  cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'), 
+  api_key = os.getenv('CLOUDINARY_API_KEY'), 
+  api_secret = os.getenv('CLOUDINARY_API_SECRET') 
+)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,10 +69,27 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    # Add other trusted origins if needed
+    
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+SESSION_COOKIE_SAMESITE = None
+CSRF_COOKIE_SAMESITE = None
+
+SESSION_COOKIE_SECURE = False  # only True for HTTPS
+CSRF_COOKIE_SECURE = False     # only True for HTTPS
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     # Add other trusted origins if needed
+    
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -98,8 +131,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'certificatedb',       
-        'USER': 'postgres',      
-        'PASSWORD': 7911,
+        'USER': 'generator',      
+        'PASSWORD': 'iipsdavv',
         'HOST': 'localhost',
         'PORT': '5432',
     }
