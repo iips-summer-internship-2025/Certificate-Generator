@@ -8,6 +8,7 @@ from authority.views import test_id_generation
 from authority.views import accept_coords
 
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

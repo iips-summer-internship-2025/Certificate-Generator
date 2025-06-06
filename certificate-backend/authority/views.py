@@ -139,29 +139,6 @@ def upload_files(request):
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
 
-@csrf_exempt 
-def accept_coords(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            if not isinstance(data, list):
-                return JsonResponse({'error': 'Expected a list of objects'}, status=400)
-            
-            for item in data:
-                title = item.get('title')
-                x = item.get('x')
-                y = item.get('y')
-                font_size = item.get('fontSize')
-                font_color = item.get('fontcolor')
-                
-                # You can now process/save/store this data
-                print(f"Received field: {title}, x: {x}, y: {y}, fontSize: {font_size}, fontcolor: {font_color}")
-
-            return JsonResponse({'status': 'success', 'message': f'{len(data)} fields received'})
-
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
