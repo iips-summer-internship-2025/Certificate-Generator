@@ -22,8 +22,7 @@ function App() {
   const token=localStorage.getItem('token');
   return (
     <>
-      <Header></Header>
-      {/* <Routes>
+      <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/loader" element={<Loader />} />
