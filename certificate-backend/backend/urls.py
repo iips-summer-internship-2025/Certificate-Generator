@@ -5,8 +5,7 @@ from django.urls import path
 from authority.views import CustomTokenObtainPairView, CustomTokenRefreshView, RegisterView
 from authority import views
 from authority.views import test_id_generation
-from django.conf import settings
-from django.conf.urls.static import static
+from authority.views import accept_coords
 
 
 urlpatterns = [
@@ -18,4 +17,5 @@ urlpatterns = [
     path('test-id/', test_id_generation, name='test_id_generation'),
     path('verify/<str:certificate_id>/', views.verify_certificate, name='verify_certificate'),
     path('show-qr/<str:certificate_id>/', views.show_qr, name='show-qr'),
+    path('api/coords', accept_coords, name='accept_coords'),
 ]
