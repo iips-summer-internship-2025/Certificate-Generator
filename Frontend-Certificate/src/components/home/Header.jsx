@@ -17,7 +17,7 @@ function Header() {
                                 <ul className='flex justify-end'>
                                     <li><a href="">Home</a></li>
                                     <li><a href="">Validation</a></li>
-                                    <li><a href="">Login-Admin</a></li>
+                                    <li><a href="/">Login-Admin</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -95,7 +95,7 @@ function Header() {
                                 <img src={template_image} alt="Design Template" />
                             </div>
                             <div class="redirect_button">
-                                <a href='#' className='Redirect_anchor '>Get Start</a>
+                                <a href='/' className='Redirect_anchor '>Get Start</a>
                             </div>
                         </div>
                     </div>
@@ -219,7 +219,7 @@ function Header() {
                         </div>
                         <div className='text-center mt-5'>
                             <div class="redirect_button">
-                                <a href='#' className='Redirect_anchor'>Login to continue</a>
+                                <a href='/' className='Redirect_anchor'>Login to continue</a>
                             </div>
                         </div>
                     </div>
@@ -237,9 +237,9 @@ function Header() {
                         <div className='footer_inner_links'>
                             <h2>Quick Link</h2>
                             <ul>
-                                <li><a href="#">Home</a></li>
-                                <li><a href="#">Validation</a></li>
-                                <li><a href="#">Login Admin</a></li>
+                                <li><a href="">Home</a></li>
+                                <li><a href="">Validation</a></li>
+                                <li><a href="/">Login Admin</a></li>
                             </ul>
 
                         </div>

@@ -4,7 +4,7 @@ import { Loader2, Sparkles } from 'lucide-react';
 
 export default function Loader({ message = "Generating Certificates..." }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-700 to-blue-200">
+    <div className="min-h-screen w-full text-black flex items-center justify-center bg-gradient-to-br from-sky-700 to-blue-200">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
