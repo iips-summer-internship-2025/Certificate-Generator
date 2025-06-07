@@ -292,11 +292,23 @@ export default function Upload() {
       complete: function (results) {
         const rows = results.data;
         // Check if any row has empty name or email
-        const hasEmpty = rows.some(
-          (row) =>
-            !row.name || row.name.toString().trim() === '' ||
-            !row.email || row.email.toString().trim() === ''
-        );
+        // Normalize headers to lowercase for checking
+        const headers = results.meta.fields.map(h => h.toLowerCase());
+        if (!headers.includes('name') || !headers.includes('email')) {
+          alert('CSV must contain "name" and "email" columns (case-insensitive).');
+          navigate("/upload");
+          return;
+        }
+        // Check for empty name/email in a case-insensitive way
+        const hasEmpty = rows.some(row => {
+          // Find the key for name/email (case-insensitive)
+          const nameKey = Object.keys(row).find(k => k.toLowerCase() === 'name');
+          const emailKey = Object.keys(row).find(k => k.toLowerCase() === 'email');
+          return (
+            !row[nameKey] || row[nameKey].toString().trim() === '' ||
+            !row[emailKey] || row[emailKey].toString().trim() === ''
+          );
+        });
         if (hasEmpty) {
           alert('CSV contains empty "name" or "email" fields. Please reupload a valid file.');
           navigate("/upload");
