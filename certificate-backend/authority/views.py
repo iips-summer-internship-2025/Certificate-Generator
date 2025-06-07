@@ -24,6 +24,10 @@ from django.http import JsonResponse
 import json
 from rest_framework import viewsets
 from .serializers import CertificateSerializer
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets, permissions
+from .serializers import AdminSerializer
 
 
 def generate_certificate_dynamic(template_path, output_path, data, user_type, certificate_id):
@@ -249,3 +253,56 @@ def show_qr(request,certificate_id):
 class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializer
+
+
+User = get_user_model()
+
+class AdminUserViewSet(viewsets.ViewSet):
+    permission_classes = [IsAdminUser]
+
+    def list(self, request):
+        admins = User.objects.filter(is_superuser=True)
+        data = [
+            {
+                "username": admin.username,
+                "email": admin.email,
+                "role": admin.role,  # 'admin' or 'superadmin'
+                "date_created": admin.date_joined.strftime('%Y-%m-%d %H:%M:%S'),
+
+            }
+            for admin in admins
+        ]
+        return Response(data)
+    
+#lass AdminListView(APIView):
+  #  permission_classes = [IsAuthenticated]
+
+   # def get(self, request):
+    #    admins = User.objects.filter(is_staff=True)
+     #   serializer = AdminSerializer(admins, many=True)
+      #  return Response(serializer.data)    
+    
+class AdminListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        admins = User.objects.filter(is_staff=True) | User.objects.filter(is_superuser=True)
+        admins = admins.distinct() # remove duplicates
+
+        data = []
+        for admin in admins:
+            if admin.is_superuser:
+                role = "superadmin"
+            elif admin.is_staff:
+                role = "admin"
+            else:
+                role = "user"  # fallback, shouldn't occur in this list
+
+            data.append({
+                "username": admin.username,
+                "email": admin.email,
+                "role": role,
+                "date_created": admin.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
+            })
+
+        return Response(data)    

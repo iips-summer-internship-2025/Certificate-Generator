@@ -4,6 +4,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import CustomUser
 from .models import Certificate
+from django.contrib.auth import get_user_model
 
 # users/serializers.py
 
@@ -35,3 +36,21 @@ class CertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Certificate
         fields = [ 'name', 'roll_no', 'email_id', 'certificate_id', 'timestamp']
+
+
+User = get_user_model()
+
+class AdminSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+    date_joined = serializers.DateTimeField(format="%Y-%m-%d %H:%M", read_only=True)
+
+    class Meta:
+        model = User
+        fields = [ 'username', 'email', 'role', 'date_joined']
+
+    def get_role(self, obj):
+        if obj.is_superuser:
+            return "Super Admin"
+        elif obj.is_staff:
+            return "Admin"
+        return "User"        
