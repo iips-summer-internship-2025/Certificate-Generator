@@ -29,6 +29,7 @@ from django.core.cache import cache
 
 from rest_framework import viewsets
 from .serializers import CertificateSerializer
+from .utils import send_bulk_emails
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
@@ -43,7 +44,9 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     for item in coordinates:
         field_key = item.get('title', '')
         #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
-        text = row.get(field_key, '') #if matched_key else '' # dynamically extract from CSV
+        # Find the matching key in row (case-insensitive)
+        matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.strip().lower()), None)
+        text = row.get(matched_key, '') if matched_key else ''
 
         #text = item.get('title', '')
         x_percent = item.get('x', 0)
@@ -85,14 +88,46 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 def upload_files(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method'}, status=405)
-    
-    coordinates = cache.get('certificate_coordinates')
-    if not coordinates:
-        return JsonResponse({'error': 'Coordinates not set. Please send them first via /accept-coords'}, status=400)
+    #for testing
+    # coordinates = cache.get('certificate_coordinates')
+    # if not coordinates:
+    #     return JsonResponse({'error': 'Coordinates not set. Please send them first via /accept-coords'}, status=400)
 
     csv_file = request.FILES.get('csvfile')
     image_file = request.FILES.get('imagefile')
     user_type = request.POST.get('userType')
+
+    
+    if request.content_type == 'application/json':
+        try:
+            body_data = json.loads(request.body)
+            coords_json = body_data.get('coords')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+    else:
+        coords_json = request.POST.get('coords')
+    if not coords_json:
+        return JsonResponse({'error': 'Missing coordinates'}, status=400)
+
+    try:
+        raw_coordinates = json.loads(coords_json)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON format for coordinates'}, status=400)
+
+    # Step 2: Sanitize and convert string values
+    coordinates = []  # Initialize the coordinates list
+    for item in raw_coordinates:
+        try:
+            coordinates.append({
+                'title': item.get('title', ''),
+                'x': float(item.get('x', 0)),
+                'y': float(item.get('y', 0)),
+                'fontSize': float(item.get('font_size', 16)),
+                'font_color': item.get('font_color', '#000000')
+            })
+        except (ValueError, TypeError) as e:
+            return JsonResponse({'error': f'Invalid coordinate values for field "{item.get("title", "unknown")}": {e}'}, status=400)
+    
 
     if not csv_file or not image_file or not user_type:
         return JsonResponse({'error': 'Missing files or userType'}, status=400)
@@ -131,8 +166,14 @@ def upload_files(request):
 
         # Generate certificates for each row
         name = row.get('Name', '').strip()
+        # Try to find 'name' in any case variant
+        name = ''
+        for key in row.keys():
+            if key.strip().lower() == 'name':
+                name = row[key].strip()
+                break
         if not name:
-            continue
+            raise Exception("Missing required field: 'name' (case-insensitive) in CSV row")
         
         name_slug = name.replace(" ", "_")
         output_filename = f"{name_slug}.jpg"
@@ -149,10 +190,16 @@ def upload_files(request):
         #  Upload to Cloudinary
         cloudinary_result = cloudinary.uploader.upload(output_path)
 
-        name = row.get('Name', '').strip()
+        # Support 'name', 'Name', or 'NAME' as the key
+        name = ''
+        for key in row.keys():
+            if key.strip().lower() == 'name':
+                name = row[key].strip()
+                break
         roll_no = row.get('roll_no', '').strip()
-        email_id = row.get('email_id', '').strip()
-        #status = row.get('status', '').strip()
+        email_id = row.get('email', '').strip()
+        status = 'idk'
+        # status = row.get('status', '').strip()
         if not name:
             continue  
 
@@ -162,13 +209,37 @@ def upload_files(request):
             roll_no=roll_no,
             email_id=email_id,
             #status=status.lower() == 'true',  # Convert to boolean
-            certificate=cloudinary_result.get('secure_url') ,#certificate_url 
+            certificate=cloudinary_result.get('secure_url'),  # certificate_url
             certificate_id=certificate_id
-
         )
 
-    return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
+        subject = "Certificate-testing"
+        # html_file = 'mails-certificate.html'
 
+        cc_list = [
+
+            'shubhanshsharmagreat@gmail.com',
+        ]
+
+        # # Ensure output_path is a string, not a list
+        # if isinstance(output_path, list):
+        #     output_path_str = output_path[0]
+        # else:
+        #     output_path_str = output_path
+
+        # with open(output_path_str, "rb") as img_file:
+        #     certificate_image_data = img_file.read()
+
+        
+        certificate=cloudinary_result['secure_url']  # certificate_url
+        certificate_image=cloudinary_result.get('public_id')  # or 'url' or any other field you need
+
+        # sending mails synchronously
+        send_bulk_emails(email_id, certificate_id, certificate, subject, cc_list)
+
+
+    return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
+#
 @csrf_exempt 
 def accept_coords(request):
     if request.method == 'POST':
@@ -200,6 +271,13 @@ def accept_coords(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
+
+
+
+
+
+
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
