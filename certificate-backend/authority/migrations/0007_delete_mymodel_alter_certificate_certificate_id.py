@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authority', '0006_remove_mymodel_created_at_alter_mymodel_name_and_more'),
+       # ('authority', '0006_remove_mymodel_created_at_alter_mymodel_name_and_more'),
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='MyModel',
-        ),
+        #migrations.DeleteModel(
+           # name='MyModel',
+        #),
         migrations.AlterField(
             model_name='certificate',
             name='certificate_id',

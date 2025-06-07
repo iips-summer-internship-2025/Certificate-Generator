@@ -6,6 +6,17 @@ from .utils import generate_unique_id
 
 
 
+def generate_unique_id():
+    while True:
+        # 2 uppercase letters + 4-digit number
+        prefix = ''.join(random.choices(string.ascii_uppercase, k=2))  # e.g., 'AB'
+        suffix = ''.join(random.choices(string.digits, k=4))           # e.g., '1234'
+        unique_id = prefix + suffix                                    # e.g., 'AB1234'
+
+        
+        if not Certificate.objects.filter(certificate_id=unique_id).exists():
+            return unique_id
+        
 #table 1
 class CustomUser(AbstractUser):
 
@@ -30,10 +41,10 @@ class Certificate(models.Model):
     name = models.CharField(max_length=150)
     roll_no = models.CharField(max_length=50)           # e.g., IC-2K22-89
     certificate = models.URLField(max_length=200, blank=True, null=True)  # URL to the certificate image
-    certificate_id = models.CharField(max_length=6, primary_key=True)    # e.g., afs234
+    certificate_id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False)
     email_id = models.EmailField(max_length=150)
     timestamp = models.DateTimeField(auto_now_add=True)
-    status = models.BooleanField(default=False)
+    #suser_type= models.BooleanField(default=False)
 
    
     

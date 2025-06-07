@@ -339,34 +339,34 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-700 to-white p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-700 to-white p-2 sm:p-4 md:p-8">
       {/* Main container with login form and welcome section */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
-        className="bg-white flex flex-col md:flex-row rounded-3xl shadow-2xl overflow-hidden max-w-7xl w-full min-h-[700px]"
+        className="bg-white flex flex-col gap-6 md:gap-0 mx-4 md:flex-row rounded-3xl shadow-2xl overflow-hidden w-full max-w-2xl md:max-w-4xl lg:max-w-7xl min-h-[500px] md:min-h-[600px]"
       >
         {/* Left panel with animated welcome section */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 1.2 }}
-          className="bg-sky-100 flex flex-col justify-center items-center p-12 md:w-1/2 text-center gap-6"
+          className="bg-sky-100 flex flex-col justify-center items-center p-4 sm:p-6 md:p-12 md:w-1/2 w-full text-center gap-4 md:gap-6"
         >
-          <div className="bg-white p-4 rounded-full shadow-lg">
-            <img src={logo} alt="Logo" className="w-33 h-33 m-3 " />
+          <div className="bg-white p-2 sm:p-4 rounded-full shadow-lg overflow-hidden">
+            <img src={logo} alt="Logo" className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain m-2 sm:m-3 " />
           </div>
           <motion.h2
-            className="text-5xl font-extrabold text-cyan-900"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-cyan-900"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 1.2 }}
           >
             Welcome To IIPS
           </motion.h2>
-          <p className="text-cyan-600 text-xl">Sampoorn</p>
-          <div className="text-base text-cyan-600 flex items-center gap-2">
+          <p className="text-cyan-600 text-lg sm:text-xl">Sampoorn</p>
+          <div className="text-sm sm:text-base text-cyan-600 flex items-center gap-2">
             <Lock className="w-5 h-5" /> Secure & Trusted
           </div>
         </motion.div>
@@ -376,16 +376,16 @@ export default function Login() {
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 1.2 }}
-          className="flex flex-col justify-center items-center pt-8 md:w-1/2 w-full gap-12"
+          className="flex flex-col justify-center items-center pt-6 pb-6 sm:pt-8 sm:pb-8 md:pt-8 md:pb-8 md:w-1/2 w-full gap-8 md:gap-12"
         >
-          <form onSubmit={handleSubmit} className="space-y-10 text-base w-full flex flex-col items-center gap-6">
+          <form onSubmit={handleSubmit} className="w-full flex flex-col items-center gap-6 px-2 sm:px-6">
             {/* Form heading */}
-            <h2 className="text-3xl font-bold text-cyan-900 flex items-center gap-2 text-center mt-0 mb-2 pb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-cyan-900 flex items-center gap-2 text-center mt-0 mb-2 pb-6 sm:pb-10">
               <FileText className="w-6 h-6 text-cyan-700" /> Log in
             </h2>
 
             {/* Email input field */}
-            <div className="w-2/3">
+            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
               <label className="block text-cyan-800 font-semibold mb-1">Email address</label>
               <div className="relative">
                 <input
@@ -401,7 +401,7 @@ export default function Login() {
             </div>
 
             {/* Password input field */}
-            <div className="w-2/3">
+            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
               <label className="block text-cyan-800 font-semibold mb-1">Password</label>
               <div className="relative">
                 <input
@@ -417,6 +417,7 @@ export default function Login() {
                   <EyeOff
                     onClick={() => setShowPassword(false)}
                     className="absolute right-3 top-3 text-cyan-500 w-4 h-4 cursor-pointer"
+                    
                   />
                 ) : (
                   <Eye
@@ -432,7 +433,7 @@ export default function Login() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               type="submit"
-              className="w-1/3 bg-gradient-to-r from-cyan-400 to-cyan-600 text-white font-semibold py-2 rounded-lg shadow-lg text-base "
+              className="w-full max-w-xs sm:max-w-sm md:max-w-md bg-gradient-to-r from-cyan-400 to-cyan-600 text-white font-semibold py-2 rounded-lg shadow-lg text-base "
             >
               <span className="flex justify-center items-center gap-2">
                 <LogIn className="w-4 h-4" /> Login
