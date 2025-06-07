@@ -26,13 +26,15 @@ import json
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
-
-from rest_framework import viewsets
 from .serializers import CertificateSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, permissions
-from .serializers import AdminSerializer
+from rest_framework import viewsets, permissions, status
+from .serializers import AdminUserSerializer,UserSerializer
+from django.contrib.auth import update_session_auth_hash
+from .models import CustomUser
+
+
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
@@ -289,37 +291,57 @@ class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
 
 User = get_user_model()
 
-class AdminUserViewSet(viewsets.ViewSet):
-    permission_classes = [IsAdminUser]
 
-    def list(self, request):
-        admins = User.objects.filter(is_superuser=True)
-        data = [
-            {
-                "username": admin.username,
-                "email": admin.email,
-                "role": admin.role,  # 'admin' or 'superadmin'
-                "date_created": admin.date_joined.strftime('%Y-%m-%d %H:%M:%S'),
 
-            }
-            for admin in admins
-        ]
-        return Response(data)
+class IsSuperAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        # Debug print (remove in production)
+        print(f"User: {user}, Authenticated: {user.is_authenticated}, Role: {getattr(user, 'role', None)}")
+        
+        return bool(
+            user and 
+            user.is_authenticated and 
+            getattr(user, 'role', None) == 'superadmin'
+        )
     
-#lass AdminListView(APIView):
-  #  permission_classes = [IsAuthenticated]
 
-   # def get(self, request):
-    #    admins = User.objects.filter(is_staff=True)
-     #   serializer = AdminSerializer(admins, many=True)
-      #  return Response(serializer.data)    
+class AdminUserAPIView(APIView):
+    permission_classes = [IsSuperAdmin]
+
+    def get(self, request):
+        users = CustomUser.objects.all()
+        serializer = AdminUserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = AdminUserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminUserDeleteAPIView(APIView):
+    permission_classes = [IsSuperAdmin]
+
+    def delete(self, request, username):
+        try:
+            user = CustomUser.objects.get(username=username)
+            user.delete()
+            return Response({"detail": "User deleted successfully."}, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     
+
+#User.objects.filter(is_staff=True) |
 class AdminListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        admins = User.objects.filter(is_staff=True) | User.objects.filter(is_superuser=True)
+        admins =  User.objects.filter(is_superuser=True)
         admins = admins.distinct() # remove duplicates
+        serializer = UserSerializer(admins, many=True)
 
         data = []
         for admin in admins:
@@ -336,5 +358,33 @@ class AdminListView(APIView):
                 "role": role,
                 "date_created": admin.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
             })
-
+        
         return Response(data)    
+    
+class ChangePasswordView(APIView):
+    permission_classes = [IsSuperAdmin]
+
+    def post(self, request):
+        user = request.user
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        if not current_password or not new_password or not confirm_password:
+            return Response({"detail": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.check_password(current_password):
+            return Response({"detail": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if new_password != confirm_password:
+            return Response({"detail": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(new_password) < 6:
+            return Response({"detail": "New password must be at least 6 characters."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        update_session_auth_hash(request, user)
+
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    

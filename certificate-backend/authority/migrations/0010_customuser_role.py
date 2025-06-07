@@ -7,6 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('authority', '0009_alter_certificate_certificate_id'),
+        
     ]
 
     operations = [

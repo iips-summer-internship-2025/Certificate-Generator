@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-       # ('authority', '0006_remove_mymodel_created_at_alter_mymodel_name_and_more'),
+       ('authority', '0006_remove_mymodel_created_at_alter_mymodel_name_and_more'),
     ]
 
     operations = [
@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
            # name='MyModel',
         #),
         migrations.AlterField(
-            model_name='certificate',
+            model_name='Certificate',
             name='certificate_id',
             field=models.CharField(default=authority.models.generate_unique_id, editable=False, max_length=6, primary_key=True, serialize=False),
         ),

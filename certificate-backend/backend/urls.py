@@ -8,13 +8,12 @@ from authority.views import test_id_generation
 from authority.views import accept_coords
 from rest_framework.routers import DefaultRouter
 from authority.views import CertificateViewSet
-from authority.views import AdminUserViewSet
-from authority.views import AdminListView
+from authority.views import AdminListView, ChangePasswordView, AdminUserAPIView, AdminUserDeleteAPIView
 
 
 
 certificate_list = CertificateViewSet.as_view({'get': 'list'})
-admin_list = AdminUserViewSet.as_view({'get': 'list'})
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +26,8 @@ urlpatterns = [
     path('show-qr/<str:certificate_id>/', views.show_qr, name='show-qr'),
     path('api/coords', accept_coords, name='accept_coords'),
     path('api/certificates/', certificate_list, name='certificate-list'),
-    path('api/admins/', admin_list, name='admin-list'),
     path('api/adminlist/', AdminListView.as_view(), name='admin-list'),
+    path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('api/crud-admins/', AdminUserAPIView.as_view(), name='admin_users'),
+    path('api/crud-admins/delete/<str:username>/', AdminUserDeleteAPIView.as_view(), name='delete_admin_user'),
 ]

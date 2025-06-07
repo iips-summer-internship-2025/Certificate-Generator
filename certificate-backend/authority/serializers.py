@@ -22,7 +22,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'username', 'password')
+        fields = ( 'username','email','role,' 'password','is_superuser')
+        read_only_fields = []  
+
 
     def create(self, validated_data):
         user = CustomUser.objects.create_user(
@@ -56,4 +58,20 @@ class AdminSerializer(serializers.ModelSerializer):
             return "Super Admin"
         elif obj.is_staff:
             return "Admin"
-        return "User"        
+        return "User"    
+
+
+    
+class AdminUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'role', 'password']
+        
+        def create(self, validated_data):
+            password = validated_data.pop('password')
+            user = CustomUser(**validated_data)
+            user.set_password(password)
+            user.save()
+            return user

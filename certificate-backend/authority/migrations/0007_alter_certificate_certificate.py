@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='certificate',
+            model_name='Certificate',
             name='certificate',
             field=models.URLField(blank=True, null=True),
         ),
