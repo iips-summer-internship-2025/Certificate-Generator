@@ -301,7 +301,7 @@ export default function Editor() {
         x,
         y,
         color: existing ? existing.color : "#565552",
-        fontSize: existing ? (existing.fontSize/imgWidth*100) : "16px",
+        fontSize: existing ? existing.fontSize : "16px",
         // fontSize: existing ? (existing.fontSize/imgWidth*100) : "16px",
       };
       return [...prev.filter((item) => item.name !== variable), newItem];
@@ -311,8 +311,15 @@ export default function Editor() {
     if (d) {
       d.style.position = "absolute";
       d.style.left = `${e.clientX}px`;
-      d.style.top = `${e.clientY}px`;
-      d.style.zIndex = '99';
+
+      // the distance from top was okay if you havn't scrolled the screen
+      // if you scrolled down, maybe because of the image is overflowing from the screen viewport
+      // then the dragging and dropping was facing issue,
+      // if you dropped at a place on image, it was going above because its calculating
+      // from the top of screen and not accounting for the scroll amount
+      // that's why i am using below method
+      d.style.top = `${window.scrollY + e.clientY}px`;
+      d.style.zIndex = '50';
     }
 
     let d_status = document.getElementById(variable + "-status");
@@ -320,6 +327,8 @@ export default function Editor() {
       d_status.style.backgroundColor = 'green';
     }
   };
+
+  console.log(droppedVariables);
 
   const handleRemove = (title) => {
     const d = document.getElementById(title);
@@ -331,48 +340,48 @@ export default function Editor() {
     );
   };
 
-  //   // Function to handle the submission of coordinates
-  //   // const handleSubmitCoords = async () => {
-  //   //   try {
+    // Function to handle the submission of coordinates
+    const handleSubmitCoords = async () => {
+      setLoading(true);
+      try {
+        const formData = new FormData();
+        formData.append('imagefile', imageFile);
+        formData.append('csvfile', csvFile);
+        formData.append('userType', 'merit');
+        formData.append(
+          'coords',
+          JSON.stringify(
+            droppedVariables.map(({ name, x, y, color, fontSize }) => ({
+              title:name,
+              x: (x / imageRef.current.offsetWidth) * 100, // percentage of width
+              y: (y / imageRef.current.offsetHeight) * 100, // percentage of height
+              font_color: color,
+              font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100, // font size as % of height
+            }))
+          )
+        );
+        const response = await fetch('http://127.0.0.1:8000/api/upload/', {
+          method: 'POST',
+          body: formData,
+        });
 
-  //   //     const payload = droppedVariables.map(({ name, x, y, color, fontSize }) => ({
-  //   //       name,
-  //   //       x,
-  //   //       y,
-  //   //       color,
-  //   //       fontSize,
-  //   //     }));
+        const text = await response.text();
+        setLoading(false);
+        if (response.ok) {
+          // handle success (e.g., show a message or redirect)
+        } else {
+          alert(text || "Failed to send coordinates. Please try again.");
+        }
+      } catch (error) {
+        setLoading(false);
+        alert('Error: ' + error.message);
+      }
+    };
 
-  //   //     const response = await fetch('/api/coords', {
-  //   //       method: 'POST',
-  //   //       headers: {
-  //   //         'Content-Type': 'application/json',
-  //   //       },
-  //   //       body: JSON.stringify({ coords: payload }),
-  //   //     });
-
-  //   //     const data = await response.json();
-  //   //     if (response.ok && data.received) {
-  //   //       alert('Sending in process!');
-  //   //       setLoading(true);
-  //   //     }
-  //   //     else {
-  //   //       setLoading(false);
-  //   //       alert(data.error || "Failed to send coordinates. Please try again.");
-  //   //       window.location.reload();
-  //   //     }
-  //   //   } catch (error) {
-  //   //     setLoading(false);
-  //   //     alert('Error: ' + error.message);
-  //   //     window.location.reload();
-  //   //   }
-  //   // };
-
-  // Function to handle the submission of coordinates
-  const handleSubmitCoords = async () => {
-    setLoading(true);
-
-  };
+  // // Function to handle the submission of coordinates
+  // const handleSubmitCoords = async () => {
+  //   setLoading(true);
+  // };
 
   // Preview code
 
@@ -381,7 +390,7 @@ export default function Editor() {
 
 
   return (
-    <div className="h-[100dvh] w-screen text-white bg-gradient-to-br from-sky-700 to-white p-8">
+    <div className=" flex flex-col justify-center items-center gap-14 w-screen text-white bg-gradient-to-br from-sky-700 to-white p-8">
       {loading && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
           <Loader/>
@@ -398,7 +407,7 @@ export default function Editor() {
             <div
               key={index}
               id={title + "-remove_div"}
-              className="bg-[rgba(30,30,30,0.12)] shadow-md p-4 flex flex-col items-center gap-2 border-2 border-slate-400 rounded-md"
+              className="bg-[rgba(30,30,30,0.12)] h-fit w-fit shadow-md p-4 flex flex-col items-center gap-2 border-2 border-slate-400 rounded-md"
             >
               {/* Draggable */}
               <div
@@ -417,7 +426,7 @@ export default function Editor() {
                   id={title + "-status"}
                   className="h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
                 ></span>
-                <p className=" font-bold ">{title}</p>
+                <p className="  ">{title}</p>
                 <span
                   onClick={() => handleRemove(title)}
                   className=" bg-slate-200 h-3 w-3 rounded-full absolute -top-1 -right-1 cursor-pointer add_cross"

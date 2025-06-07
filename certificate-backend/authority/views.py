@@ -84,6 +84,13 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 
     image.save(output_path)
 
+
+
+
+
+
+
+# Uploading Files and Generating certificates and sending them 
 @csrf_exempt
 def upload_files(request):
     if request.method != 'POST':
