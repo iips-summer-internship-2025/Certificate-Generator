@@ -457,7 +457,7 @@ export default function Upload() {
           initial={{ opacity: 0, y: -40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
-          className="bg-white rounded-[30px] shadow-2xl p-10 max-w-6xl w-full flex flex-col items-center text-center gap-8 mx-4 aspect-[16/9] justify-center"
+          className="bg-white rounded-[30px] shadow-2xl p-10 max-w-6xl w-full flex flex-col items-center text-center gap-8 mx-4 my-4 aspect-[16/9] justify-center"
         >
           {/* Cloud Icon Header */}
           <div className="text-sky-500 flex justify-center m-1">
