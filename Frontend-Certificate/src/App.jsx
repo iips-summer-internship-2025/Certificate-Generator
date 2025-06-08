@@ -13,6 +13,9 @@ import CrudAdmins from './components/Admin pages/CRUD admins/CRUDAdmins'
 import ViewAdmins from './components/Admin pages/View Admins/ViewAdmins'
 import Loader from './components/Loader/Loader'
 import ErrorPage from './components/Error page/ErrorPage'
+import Footer from './components/home/Footer'
+import Home from './components/home/Home'
+import Validation from './components/home/Validation/Validation'
 
 
 
@@ -23,11 +26,10 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path='/header' element={<Header/>}/>
-        <Route path="/upload" element={<Upload />} />
-        <Route path="/loader" element={<Loader />} />
-        {/* {token && <Route path="/upload" element={<Upload />}/>} */}
+        <Route path='/' element={<Home/>}/>
+        <Route path="/Validation" element={<Validation/>} />
+        <Route path="/Login" element={<Login/>} />
+        {token && <Route path="/upload" element={<Upload />}/>}
         <Route path="/editor" element={<Editor/>}/>
 
 
@@ -41,8 +43,6 @@ function App() {
           </Route>
 
       </Routes>
-
-      
     </>
   )
 }

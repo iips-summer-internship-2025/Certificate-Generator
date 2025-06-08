@@ -322,48 +322,48 @@ export default function Editor() {
     );
   };
 
-  //   // Function to handle the submission of coordinates
-  //   // const handleSubmitCoords = async () => {
-  //   //   try {
+    // Function to handle the submission of coordinates
+    const handleSubmitCoords = async () => {
+      try {
 
-  //   //     const payload = droppedVariables.map(({ name, x, y, color, fontSize }) => ({
-  //   //       name,
-  //   //       x,
-  //   //       y,
-  //   //       color,
-  //   //       fontSize,
-  //   //     }));
+        const payload = droppedVariables.map(({ name, x, y, color, fontSize }) => ({
+          name,
+          x,
+          y,
+          color,
+          fontSize,
+        }));
 
-  //   //     const response = await fetch('/api/coords', {
-  //   //       method: 'POST',
-  //   //       headers: {
-  //   //         'Content-Type': 'application/json',
-  //   //       },
-  //   //       body: JSON.stringify({ coords: payload }),
-  //   //     });
+        const response = await fetch('http://localhost:8000/api/upload/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ coords: payload }),
+        });
 
-  //   //     const data = await response.json();
-  //   //     if (response.ok && data.received) {
-  //   //       alert('Sending in process!');
-  //   //       setLoading(true);
-  //   //     }
-  //   //     else {
-  //   //       setLoading(false);
-  //   //       alert(data.error || "Failed to send coordinates. Please try again.");
-  //   //       window.location.reload();
-  //   //     }
-  //   //   } catch (error) {
-  //   //     setLoading(false);
-  //   //     alert('Error: ' + error.message);
-  //   //     window.location.reload();
-  //   //   }
-  //   // };
+        const data = await response.json();
+        if (response.ok && data.received) {
+          alert('Sending in process!');
+          setLoading(true);
+        }
+        else {
+          setLoading(false);
+          alert(data.error || "Failed to send coordinates. Please try again.");
+          window.location.reload();
+        }
+      } catch (error) {
+        setLoading(false);
+        alert('Error: ' + error.message);
+        window.location.reload();
+      }
+    };
 
   // Function to handle the submission of coordinates
-  const handleSubmitCoords = async () => {
-    setLoading(true);
+  // const handleSubmitCoords = async () => {
+  //   setLoading(true);
 
-  };
+  // };
 
   return (
     <div className="h-[100dvh] w-screen text-white bg-gradient-to-br from-sky-700 to-white p-8">
