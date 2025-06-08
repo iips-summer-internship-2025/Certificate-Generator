@@ -295,68 +295,80 @@ User = get_user_model()
 
 class IsSuperAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        user = request.user
-        # Debug print (remove in production)
-        print(f"User: {user}, Authenticated: {user.is_authenticated}, Role: {getattr(user, 'role', None)}")
+        return bool(request.user and request.user.is_superuser)
+       
         
-        return bool(
-            user and 
-            user.is_authenticated and 
-            getattr(user, 'role', None) == 'superadmin'
-        )
     
 
 class AdminUserAPIView(APIView):
     permission_classes = [IsSuperAdmin]
 
     def get(self, request):
-        users = CustomUser.objects.all()
-        serializer = AdminUserSerializer(users, many=True)
-        return Response(serializer.data)
+        users = User.objects.filter(is_staff=True) | User.objects.filter(is_superuser=True)
+        users = users.distinct()
+
+        data = []
+        for user in users:
+            if user.is_superuser:
+                role = "superadmin"
+            elif user.is_staff:
+                role = "admin"
+            else:
+                role = "user"
+
+            data.append({
+                "username": user.username,
+                "email": user.email,
+                "role": role,
+                "date_created": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
+            })
+
+        return Response(data)
+        
 
     def post(self, request):
-        serializer = AdminUserSerializer(data=request.data)
-        if serializer.is_valid():
+         data = request.data.copy()
+         data['is_staff'] = True  # Ensure the created user is marked as admin
+
+         serializer = AdminUserSerializer(data=data)
+         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class AdminUserDeleteAPIView(APIView):
     permission_classes = [IsSuperAdmin]
 
     def delete(self, request, username):
         try:
-            user = CustomUser.objects.get(username=username)
+            user = User.objects.get(username=username)
             user.delete()
             return Response({"detail": "User deleted successfully."}, status=status.HTTP_200_OK)
-        except CustomUser.DoesNotExist:
+        except User.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     
 
 #User.objects.filter(is_staff=True) |
 class AdminListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperAdmin]
 
     def get(self, request):
-        admins =  User.objects.filter(is_superuser=True)
-        admins = admins.distinct() # remove duplicates
-        serializer = UserSerializer(admins, many=True)
-
+        users = User.objects.all()
         data = []
-        for admin in admins:
-            if admin.is_superuser:
+        for user in users:
+            if user.is_superuser:
                 role = "superadmin"
-            elif admin.is_staff:
+            elif user.is_staff:
                 role = "admin"
             else:
                 role = "user"  # fallback, shouldn't occur in this list
 
             data.append({
-                "username": admin.username,
-                "email": admin.email,
+                "username": user.username,
+                "email": user.email,
                 "role": role,
-                "date_created": admin.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
+                "date_created": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
             })
         
         return Response(data)    

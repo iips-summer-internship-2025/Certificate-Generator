@@ -494,9 +494,9 @@ export default function Editor() {
               </div>
             </div>
           );
-          );
         })}
-      </div>
+
+    </div>
 
       <div className="h-3/5 flex p-4 relative justify-around">
         <div
@@ -524,5 +524,4 @@ export default function Editor() {
         </div>
       </div>
     </div>
-  );
-}
+ );

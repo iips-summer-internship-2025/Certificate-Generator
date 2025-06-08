@@ -73,5 +73,6 @@ class AdminUserSerializer(serializers.ModelSerializer):
             password = validated_data.pop('password')
             user = CustomUser(**validated_data)
             user.set_password(password)
+            user.is_staff = True
             user.save()
             return user
