@@ -34,11 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 # for testing purpose 
-class CertificateUploadSerializer(serializers.Serializer):
-    csv = serializers.FileField()
-    template = serializers.ImageField()    
-class CertificateSerializer(serializers.ModelSerializer):
+# class CertificateUploadSerializer(serializers.Serializer):
+#     csv = serializers.FileField()
+#     template = serializers.ImageField()    
+class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'is_superuser', 'is_staff', 'date_joined']
         model = Certificate
         fields = [ 'name', 'roll_no', 'email_id', 'certificate_id', 'timestamp']
 
