@@ -32,7 +32,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import permissions
 from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Qfrom .utils import send_bulk_emails
+
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
@@ -46,7 +47,9 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     for item in coordinates:
         field_key = item.get('title', '')
         #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
-        text = row.get(field_key, '') #if matched_key else '' # dynamically extract from CSV
+        # Find the matching key in row (case-insensitive)
+        matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.strip().lower()), None)
+        text = row.get(matched_key, '') if matched_key else ''
 
         #text = item.get('title', '')
         x_percent= item.get('x', 0)
@@ -92,10 +95,21 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 
     image.save(output_path)
 
+
+
+
+
+
+
+# Uploading Files and Generating certificates and sending them 
 @csrf_exempt
 def upload_files(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method'}, status=405)
+    #for testing
+    # coordinates = cache.get('certificate_coordinates')
+    # if not coordinates:
+    #     return JsonResponse({'error': 'Coordinates not set. Please send them first via /accept-coords'}, status=400)
     #for testing
     # coordinates = cache.get('certificate_coordinates')
     # if not coordinates:
@@ -174,8 +188,14 @@ def upload_files(request):
 
         # Generate certificates for each row
         name = row.get('Name', '').strip()
+        # Try to find 'name' in any case variant
+        name = ''
+        for key in row.keys():
+            if key.strip().lower() == 'name':
+                name = row[key].strip()
+                break
         if not name:
-            continue
+            raise Exception("Missing required field: 'name' (case-insensitive) in CSV row")
         
         name_slug = name.replace(" ", "_")
         certificate_id = generate_unique_id()
@@ -193,10 +213,16 @@ def upload_files(request):
         #  Upload to Cloudinary
         cloudinary_result = cloudinary.uploader.upload(output_path)
 
-        name = row.get('Name', '').strip()
+        # Support 'name', 'Name', or 'NAME' as the key
+        name = ''
+        for key in row.keys():
+            if key.strip().lower() == 'name':
+                name = row[key].strip()
+                break
         roll_no = row.get('roll_no', '').strip()
-        email_id = row.get('email_id', '').strip()
-        #status = row.get('status', '').strip()
+        email_id = row.get('email', '').strip()
+        status = 'idk'
+        # status = row.get('status', '').strip()
         if not name:
             continue  
         
@@ -207,9 +233,34 @@ def upload_files(request):
             roll_no=roll_no,
             email_id=email_id,
             #status=status.lower() == 'true',  # Convert to boolean
-            certificate=cloudinary_result.get('secure_url') ,#certificate_url 
-            certificate_id=certificate_id,
+            certificate=cloudinary_result.get('secure_url'),  # certificate_url
+            certificate_id=certificate_id
         )
+
+        subject = "Certificate-testing"
+        # html_file = 'mails-certificate.html'
+
+        cc_list = [
+
+            'shubhanshsharmagreat@gmail.com',
+        ]
+
+        # # Ensure output_path is a string, not a list
+        # if isinstance(output_path, list):
+        #     output_path_str = output_path[0]
+        # else:
+        #     output_path_str = output_path
+
+        # with open(output_path_str, "rb") as img_file:
+        #     certificate_image_data = img_file.read()
+
+        
+        certificate=cloudinary_result['secure_url']  # certificate_url
+        certificate_image=cloudinary_result.get('public_id')  # or 'url' or any other field you need
+
+        # sending mails synchronously
+        send_bulk_emails(email_id, certificate_id, certificate, subject, cc_list)
+
 
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
 #
@@ -245,6 +296,13 @@ def upload_files(request):
 #         except json.JSONDecodeError:
 #             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 #     return JsonResponse({'error': 'Only POST allowed'}, status=405)
+
+
+
+
+
+
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer

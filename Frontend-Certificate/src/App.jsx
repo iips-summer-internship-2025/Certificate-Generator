@@ -24,10 +24,12 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/upload" element={<Upload />} />
+        <Route path='/header' element={<Header/>}/>
+        {/* <Route path="/upload" element={<Upload />} /> */}
         <Route path="/loader" element={<Loader />} />
-        {/* {token && <Route path="/upload" element={<Upload />}/>} */}
-        <Route path="/editor" element={<Editor/>}/>
+        {token && <Route path="/upload" element={<Upload />}/>}
+        {token && <Route path="/editor" element={<Editor />}/>}
+        {/* <Route path="/editor" element={<Editor/>}/> */}
 
 
          {/* Admin Routes */}
