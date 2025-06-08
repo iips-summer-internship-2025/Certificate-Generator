@@ -539,13 +539,13 @@ export default function Upload() {
           {/* Info Section Below Submit */}
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 text-left w-full">
             <h2 className="text-lg font-semibold text-blue-700 mb-2">How to upload & accepted file types</h2>
-            <ul className="list-disc ml-6 text-blue-900 text-sm space-y-1">
-              <li>Accepted spreadsheet formats: <span className="font-semibold">.csv, .xls, .xlsx</span></li>
-              <li>Accepted image formats: <span className="font-semibold">.png, .jpg, .jpeg, .heic</span></li>
-              <li>Click or drag your files into the respective boxes above.</li>
-              <li>Ensure your Excel/CSV file has columns for each certificate field (e.g., Name, Date, Course).</li>
-              <li>Use a high-resolution image template (at least 1500px wide) for best results.</li>
-              <li>Include an <span className="font-semibold">email</span> column in Excel/CSV file to send certificates automatically.</li>
+            <ul className=" ml-6 text-blue-900 text-sm space-y-1">
+              <li>1. Accepted spreadsheet formats: <span className="font-semibold">.csv, .xls, .xlsx</span></li>
+              <li>2. Accepted image formats: <span className="font-semibold">.png, .jpg, .jpeg, .heic</span></li>
+              <li>3. Click or drag your files into the respective boxes above.</li>
+              <li>4. Ensure your Excel/CSV file has columns for each certificate field (e.g., Name, Date, Course).</li>
+              <li>5. Use a high-resolution image template (at least 1500px wide) for best results.</li>
+              <li>6. Include an <span className="font-semibold">email</span> column in Excel/CSV file to send certificates automatically.</li>
             </ul>
           </div>
         </motion.div>

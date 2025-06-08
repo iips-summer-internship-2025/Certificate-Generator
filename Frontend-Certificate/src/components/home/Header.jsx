@@ -15,9 +15,9 @@ function Header() {
                         <div class="col-lg-6">
                             <div class="Right_menu">
                                 <ul className='flex justify-end'>
-                                    <li><a href="">Home</a></li>
+                                    <li><a href="/">Home</a></li>
                                     <li><a href="">Validation</a></li>
-                                    <li><a href="/">Login-Admin</a></li>
+                                    <li><a href="/login">Login-Admin</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -32,7 +32,7 @@ function Header() {
                             <h2>Empowering Every Achievement, Digitally</h2>
                         </div>
                         <div class="redirect_button">
-                            <a href='#' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
+                            <a href='https://iips.edu.in/' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@ function Header() {
                                 <img src={template_image} alt="Design Template" />
                             </div>
                             <div class="redirect_button">
-                                <a href='/' className='Redirect_anchor '>Get Start</a>
+                                <a href='/login' className='Redirect_anchor '>Get Start</a>
                             </div>
                         </div>
                     </div>
@@ -218,9 +218,10 @@ function Header() {
                             </div>
                         </div>
                         <div className='text-center mt-5'>
-                            <div class="redirect_button">
+                            {/* to bbe removed */}
+                            {/* <div class="redirect_button">
                                 <a href='/' className='Redirect_anchor'>Login to continue</a>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -239,7 +240,7 @@ function Header() {
                             <ul>
                                 <li><a href="">Home</a></li>
                                 <li><a href="">Validation</a></li>
-                                <li><a href="/">Login Admin</a></li>
+                                <li><a href="/login">Login Admin</a></li>
                             </ul>
 
                         </div>

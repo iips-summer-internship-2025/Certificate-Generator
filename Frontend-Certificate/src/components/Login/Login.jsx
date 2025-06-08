@@ -326,12 +326,26 @@ export default function Login() {
 
       const data = await response.json();
 
+      // if (response.ok) {
+      //   localStorage.setItem('token', data.access); // Store token in local storage
+      //   setMessage('Login successful!');
+      //   navigate('/upload'); // Navigate to upload page on success
+      // } else {
+      //   setMessage(data.detail || 'Login failed'); // Show error message
+      // }
+
       if (response.ok) {
-        localStorage.setItem('token', data.access); // Store token in local storage
+        localStorage.setItem('token', data.access); // Store token
+        localStorage.setItem('email', email); // Store email for role check
         setMessage('Login successful!');
-        navigate('/upload'); // Navigate to upload page on success
+        // Check if superadmin (change email as per your superadmin)
+        if (email.toLowerCase() === "rudr@gmail.com") {
+          navigate('/admin');
+        } else {
+          navigate('/upload');
+        }
       } else {
-        setMessage(data.detail || 'Login failed'); // Show error message
+        setMessage(data.detail || 'Login failed');
       }
     } catch (error) {
       setMessage('Enter Correct Credentials '); // Show fallback error message
@@ -417,7 +431,7 @@ export default function Login() {
                   <EyeOff
                     onClick={() => setShowPassword(false)}
                     className="absolute right-3 top-3 text-cyan-500 w-4 h-4 cursor-pointer"
-                    
+
                   />
                 ) : (
                   <Eye
