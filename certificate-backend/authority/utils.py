@@ -19,7 +19,7 @@ def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
     smtp_username = 'shubhanshsharmaking@gmail.com'
-    smtp_password = ''  # Use app password here
+    smtp_password = 'emxsvgcsugutqxno'  # Use app password here
 
     # Load HTML template
     try:
