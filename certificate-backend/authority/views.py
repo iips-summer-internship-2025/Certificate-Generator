@@ -32,7 +32,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import permissions
 from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
-from django.db.models import Qfrom .utils import send_bulk_emails
+from django.db.models import Q
+from .utils import send_bulk_emails
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
