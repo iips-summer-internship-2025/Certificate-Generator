@@ -4,7 +4,6 @@ import './App.css'
 import Login from './components/Login/Login'
 import Upload from './components/upload/upload'
 import Editor from './components/Editor/Editor'
-// import Header from './components/home/header'
 import { AdminLayout } from './components/Admin pages/Admin'
 import Dashboard from './components/Admin pages/Dashboard/adminDashboard'
 import ChangePassword from './components/Admin pages/Change Password/changePassword'
@@ -25,7 +24,6 @@ function App() {
     
       <Routes>
         <Route path="/" element={<Login />} />
-        {/* <Route path='/header' element={<Header/>}/> */}
         {/* <Route path="/upload" element={<Upload />} /> */}
         <Route path="/loader" element={<Loader />} />
         {token && <Route path="/upload" element={<Upload />}/>}
