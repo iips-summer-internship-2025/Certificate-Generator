@@ -174,7 +174,9 @@ import {
   Lock,
   LogOut
 } from "lucide-react";
-import { cn } from "../../../lib/utils";
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
