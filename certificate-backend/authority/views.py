@@ -26,7 +26,6 @@ import json
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
-from .serializers import CertificateSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
@@ -41,7 +40,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import permissions
 from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
-from django.db.models import Qfrom .utils import send_bulk_emails
+from django.db.models import Q
+from .utils import send_bulk_emails
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
