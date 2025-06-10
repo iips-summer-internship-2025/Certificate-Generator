@@ -25,7 +25,6 @@ function App() {
     
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path='/header' element={<Header/>}/>
         {/* <Route path="/upload" element={<Upload />} /> */}
         <Route path="/loader" element={<Loader />} />
         {token && <Route path="/upload" element={<Upload />}/>}
