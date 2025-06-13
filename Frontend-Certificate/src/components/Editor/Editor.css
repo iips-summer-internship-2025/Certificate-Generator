@@ -1,15 +1,102 @@
-body{
-    overflow: visible;
+@import "tailwindcss";
+
+/* body{
+    overflow: hidden;
+} */
+
+
+p{
+    margin: 0;
+    padding: 0;
 }
-.color_design {
-    text-align: center;
+.remove_div{
+    position:relative;
 }
-.Inner_div_design label {
+.remove_div_design {
+    position: absolute;
+    top: 3%;
+    left: 17%;
+    transform: translate(-12%, 8%);
+}
+.Inner_div_design {
+    /* margin-left: 40px; */
+    /* border: 2px solid white; */
+    /* width: 70%; */
+}
+/* input.font_size_design {
+    color: #333;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    border-radius: 5px;
+    width: 100%;
+} */
+.add_scroller {
+    overflow-y: auto;
+    border-radius: 5px;
+    overflow-x: hidden;
+}
+/* .parent_div_90_30{
+    margin: 10px;
+    padding: 10px;
+} */
+ .heading_of_column{
+    color: #032e63;
+    font-weight: 700; 
+}
+.Side_Nav_Bar {
+    background-color: #747a7a54;
+}
+.Editor_heading.text-center {
+    margin: 10px;
+}
+.Ediotr_svg_parent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem; 
+}
+.Ediotr_svg_parent svg {
+  display: inline-block;
+}
+.Ediotr_svg_parent p {
+    display: inline-block;
+    margin-left: 10px;
+    font-weight: 700;
+    color: #032e63;
+        font-size: 20px;
+}
+.Ediotr_svg_parent div {
+    padding: 10px;
+    background: #ecf2fd;
+    border-radius: 100%;
+    align-items: center;
     display: block;
 }
-.Inner_div_design input
- {
-    border: 1px solid grey;
-    border-radius: 5px;
-    margin-left: 25px;
+.Ediotr_svg_parent svg {
+    display: inline-block;
+}
+.Divide_in_fifty{
+    height:50%;
+}
+.h-1\/2 {
+    overflow: hidden;
+    display: ruby;
+}
+.Image_Heading_svg_code{
+    background-color: grey;
+}
+/* Font Family and Weight Design */
+.font_family_design, .font_weight_design {
+  padding: 4px;
+  margin: 4px;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+  color: #333;
+}
+
+.font_family_design:focus, .font_weight_design:focus {
+  outline: none;
+  border-color: #565552;
 }

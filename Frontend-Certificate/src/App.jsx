@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import './App.css'
 import Login from './components/Login/Login'
 import Upload from './components/upload/upload'
 import Editor from './components/Editor/Editor'
@@ -16,6 +15,7 @@ import ErrorPage from './components/Error page/ErrorPage'
 import Footer from './components/home/Footer'
 import Home from './components/home/Home'
 import Validation from './components/home/Validation/Validation'
+import './App.css'
 
 
 

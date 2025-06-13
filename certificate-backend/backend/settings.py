@@ -130,14 +130,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'certificatedb',       
+        'NAME': 'certificate-local',       
         'USER': 'postgres',      
-        'PASSWORD': 7911,
+        'PASSWORD': 1234,
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '1910',
     }
 }
 
+
+# settings.py
+CLOUDINARY_STORAGE = {
+    'CLOUDINARY_CLOUD_NAME': 'duqrkojwt',
+    'CLOUDINARY_API_KEY': '854371679364326',
+    'CLOUDINARY_API_SECRET': 'ElrFOxB9Kdq3bLI48x7EGf4wuC0'
+}
 
 
 # Password validation
@@ -188,7 +195,10 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 
