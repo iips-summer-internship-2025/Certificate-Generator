@@ -17,7 +17,7 @@ from .models import Certificate
 import random
 import string
 from io import StringIO
-from .models import Certificate
+from .models import CustomUser
 import cloudinary
 import cloudinary.uploader
 from django.views.decorators.csrf import csrf_exempt
@@ -26,10 +26,15 @@ import json
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
-
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
-from .serializers import CertificateSerializer
-
+from django.contrib.auth import get_user_model
+from rest_framework import permissions
+from .serializers import AdminUserSerializer
+from django.core.paginator import Paginator
+# from django.db.models import Qfrom .utils import send_bulk_emails
+from django.db.models import Q
+from .utils import send_bulk_emails
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
@@ -43,11 +48,13 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     for item in coordinates:
         field_key = item.get('title', '')
         #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
-        text = row.get(field_key, '') #if matched_key else '' # dynamically extract from CSV
+        # Find the matching key in row (case-insensitive)
+        matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.strip().lower()), None)
+        text = row.get(matched_key, '') if matched_key else ''
 
         #text = item.get('title', '')
-        x_percent = item.get('x', 0)
-        y_percent = item.get('y', 0)
+        x_percent= item.get('x', 0)
+        y_percent= item.get('y', 0)
         # Convert percent to actual pixel values
         x = int((x_percent / 100) * width)
         y = int((y_percent / 100) * height)
@@ -74,25 +81,76 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 
 
     #  Generate QR code based on unique ID
-    qr_data = f"https://yourdomain.com/verify/{certificate_id}"
+    qr_data = f"http://127.0.0.1:8000/verify/{certificate_id}"
     qr = qrcode.make(qr_data)
-    qr = qr.resize((150, 150))  # Resize as needed
-    image.paste(qr, (image.width - 170, image.height - 170))  # Bottom right corner
+    qr = qr.resize((150, 150))
+    # Padding from top and right edges
+    padding_x = 20
+    padding_y = 20
+    
+    # Get QR code dimensions
+    qr_width, qr_height = qr.size
+    # Calculate position for top right corner with padding
+      # Resize as needed
+    image.paste(qr, (image.width - qr_width - padding_x,  padding_y))  # Bottom right corner
 
     image.save(output_path)
 
+
+
+
+
+
+
+# Uploading Files and Generating certificates and sending them 
 @csrf_exempt
 def upload_files(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method'}, status=405)
-    
-    coordinates = cache.get('certificate_coordinates')
-    if not coordinates:
-        return JsonResponse({'error': 'Coordinates not set. Please send them first via /accept-coords'}, status=400)
+    #for testing
+    # coordinates = cache.get('certificate_coordinates')
+    # if not coordinates:
+    #     return JsonResponse({'error': 'Coordinates not set. Please send them first via /accept-coords'}, status=400)
+    #for testing
+    # coordinates = cache.get('certificate_coordinates')
+    # if not coordinates:
+    #     return JsonResponse({'error': 'Coordinates not set. Please send them first via /accept-coords'}, status=400)
 
     csv_file = request.FILES.get('csvfile')
     image_file = request.FILES.get('imagefile')
     user_type = request.POST.get('userType')
+    
+      # getting and processing  coordinates from request
+      
+    if request.content_type == 'application/json':
+        try:
+            body_data = json.loads(request.body)
+            coords_json = body_data.get('coords')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+    else:
+        coords_json = request.POST.get('coords')
+    if not coords_json:
+        return JsonResponse({'error': 'Missing coordinates'}, status=400)
+
+    try:
+        raw_coordinates = json.loads(coords_json)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON format for coordinates'}, status=400)
+
+    # Step 2: Sanitize and convert string values
+    coordinates = []  # Initialize the coordinates list
+    for item in raw_coordinates:
+        try:
+            coordinates.append({
+                'title': item.get('title', ''),
+                'x': float(item.get('x', 0)),
+                'y': float(item.get('y', 0)),
+                'fontSize': float(item.get('fontSize',2)),
+                'font_color': item.get('font_color', '#000000')
+            })
+        except (ValueError, TypeError) as e:
+            return JsonResponse({'error': f'Invalid coordinate values for field "{item.get("title", "unknown")}": {e}'}, status=400)
 
     if not csv_file or not image_file or not user_type:
         return JsonResponse({'error': 'Missing files or userType'}, status=400)
@@ -131,13 +189,20 @@ def upload_files(request):
 
         # Generate certificates for each row
         name = row.get('Name', '').strip()
+        # Try to find 'name' in any case variant
+        name = ''
+        for key in row.keys():
+            if key.strip().lower() == 'name':
+                name = row[key].strip()
+                break
         if not name:
-            continue
+            raise Exception("Missing required field: 'name' (case-insensitive) in CSV row")
         
         name_slug = name.replace(" ", "_")
-        output_filename = f"{name_slug}.jpg"
+        certificate_id = generate_unique_id()
+        output_filename = f"{name_slug}_{certificate_id}.jpg"
         output_path = os.path.join(cert_dir, output_filename)
-        certificate_id = generate_unique_id() 
+         
         #  Generate the certificate dynamically
 
         # coordinates = [
@@ -149,12 +214,19 @@ def upload_files(request):
         #  Upload to Cloudinary
         cloudinary_result = cloudinary.uploader.upload(output_path)
 
-        name = row.get('Name', '').strip()
+        # Support 'name', 'Name', or 'NAME' as the key
+        name = ''
+        for key in row.keys():
+            if key.strip().lower() == 'name':
+                name = row[key].strip()
+                break
         roll_no = row.get('roll_no', '').strip()
-        email_id = row.get('email_id', '').strip()
-        #status = row.get('status', '').strip()
+        email_id = row.get('email', '').strip()
+        status = 'idk'
+        # status = row.get('status', '').strip()
         if not name:
             continue  
+        
 
         # Save certificate data to the database
         Certificate.objects.create(
@@ -162,44 +234,76 @@ def upload_files(request):
             roll_no=roll_no,
             email_id=email_id,
             #status=status.lower() == 'true',  # Convert to boolean
-            certificate=cloudinary_result.get('secure_url') ,#certificate_url 
+            certificate=cloudinary_result.get('secure_url'),  # certificate_url
             certificate_id=certificate_id
-
         )
 
+        subject = "Certificate-testing"
+        # html_file = 'mails-certificate.html'
+
+        cc_list = [
+
+            'shubhanshsharmagreat@gmail.com',
+        ]
+
+        # # Ensure output_path is a string, not a list
+        # if isinstance(output_path, list):
+        #     output_path_str = output_path[0]
+        # else:
+        #     output_path_str = output_path
+
+        # with open(output_path_str, "rb") as img_file:
+        #     certificate_image_data = img_file.read()
+
+        
+        certificate=cloudinary_result['secure_url']  # certificate_url
+        certificate_image=cloudinary_result.get('public_id')  # or 'url' or any other field you need
+
+        # sending mails synchronously
+        send_bulk_emails(email_id, certificate_id, certificate, subject, cc_list)
+
+
     return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
+#
+# @csrf_exempt 
+# def accept_coords(request):
+#     if request.method == 'POST':
+#         try:
 
-@csrf_exempt 
-def accept_coords(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            if not isinstance(data, list):
-                return JsonResponse({'error': 'Expected a list of objects'}, status=400)
+#             data = json.loads(request.body)
+#             if not isinstance(data, list):
+#                 return JsonResponse({'error': 'Expected a list of objects'}, status=400)
             
-            for item in data:
-                title = item.get('title')
-                x = item.get('x')
-                y = item.get('y')
-                font_size = item.get('fontSize')
-                font_color = item.get('font_color')
-                print(f"Received field: {title}, x: {x}, y: {y}, fontSize: {font_size}, fontcolor: {font_color}")
+#             for item in data:
+#                 title = item.get('title')
+#                 x = item.get('x')
+#                 y = item.get('y')
+#                 font_size = item.get('fontSize')
+#                 font_color = item.get('font_color')
+#                 print(f"Received field: {title}, x: {x}, y: {y}, fontSize: {font_size}, fontcolor: {font_color}")
             
-            cache.set('certificate_coordinates', data, timeout=3600)  # expires in 1 hour
+#             cache.set('certificate_coordinates', data, timeout=3600)  # expires in 1 hour
 
-                # You can now process/save/store this data
+#                 # You can now process/save/store this data
                 
                 
-            # generate_certificate_dynamic(
-            #     template_path="./uploads/Techno-Geek.png",  # update with actual path
-            #     output_path="./upload/output.png",      # update with actual path
-            #     coordinates=data                       # pass the entire list
-            # )
-            return JsonResponse({'status': 'success', 'message': f'{len(data)} fields received'})
+#             # generate_certificate_dynamic(
+#             #     template_path="./uploads/Techno-Geek.png",  # update with actual path
+#             #     output_path="./upload/output.png",      # update with actual path
+#             #     coordinates=data                       # pass the entire list
+#             # )
+#             return JsonResponse({'status': 'success', 'message': f'{len(data)} fields received'})
             
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    return JsonResponse({'error': 'Only POST allowed'}, status=405)
+#         except json.JSONDecodeError:
+#             return JsonResponse({'error': 'Invalid JSON'}, status=400)
+#     return JsonResponse({'error': 'Only POST allowed'}, status=405)
+
+
+
+
+
+
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -222,26 +326,26 @@ class RegisterView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def test_id_generation(request):
-    row = {
-    'Name': 'Test User',
-    'roll_no': '12345',
-    'email_id': 'test@example.com',
-    # other fields
-}
-    name_slug = "test_name"  # or some default value
-    certificate_id = generate_unique_id()
+# def test_id_generation(request):
+#     row = {
+#     'Name': 'Test User',
+#     'roll_no': '12345',
+#     'email_id': 'test@example.com',
+#     # other fields
+# }
+#     name_slug = "test_name"  # or some default value
+#     certificate_id = generate_unique_id()
 
-    obj = Certificate.objects.create(
+    # obj = Certificate.objects.create(
 
-            name=name_slug,
-            roll_no=row.get('Roll No', ''),
-            email_id=row.get('Email', ''),
-            certificate_id=certificate_id,
-            certificate=f"https://yourdomain.com/verify/{certificate_id}"
+    #         name=name_slug,
+    #         roll_no=row.get('Roll No', ''),
+    #         email_id=row.get('Email', ''),
+    #         certificate_id=certificate_id,
+    #         certificate=f"https://yourdomain.com/verify/{certificate_id}"
         
-    )
-    return JsonResponse({'unique_id': obj.certificate_id})
+    # )
+    # return JsonResponse({'unique_id': obj.certificate_id})
 
 def generate_unique_id():
      while True:
@@ -261,23 +365,89 @@ def verify_certificate(request, certificate_id):
          return JsonResponse({
             'status': 'valid',
             'name': cert.name,
-            'roll_no': cert.roll_no,
-            'email': cert.email_id
+            #'roll_no': cert.roll_no,
+            #'email': cert.email_id
+            'certificate_url': cert.certificate,
          })
      except Certificate.DoesNotExist:
          return JsonResponse({'status': 'Certificate not found'}, status=404)
      
 
 
-def show_qr(request,certificate_id):
-   # test_id = "XB5879"  # Replace this with any real certificate_id for testing
-    qr_data = f"https://yourdomain.com/verify/{certificate_id}"
-    qr_img = qrcode.make(qr_data)
+# def show_qr(request,certificate_id):
+#    # test_id = "XB5879"  # Replace this with any real certificate_id for testing
+#     qr_data = f"https://yourdomain.com/verify/{certificate_id}"
+#     qr_img = qrcode.make(qr_data)
 
-    response = HttpResponse(content_type="image/png")
-    qr_img.save(response, "PNG")
-    return response
+#     response = HttpResponse(content_type="image/png")
+#     qr_img.save(response, "PNG")
+#     return response
 
-class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Certificate.objects.all()
-    serializer_class = CertificateSerializer
+# class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+#     queryset = Certificate.objects.all()
+#     serializer_class = CertificateSerializer
+
+User = get_user_model()
+#for change password of user
+class SuperuserChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can change passwords.'}, status=status.HTTP_403_FORBIDDEN)
+
+        email = request.data.get("email")  # Email of the user whose password is to be changed
+        new_password = request.data.get("new_password")
+        confirm_password = request.data.get("confirm_password")
+
+        if not email or not new_password or not confirm_password:
+            return Response({'error': 'All fields (email, new_password, confirm_password) are required.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if new_password != confirm_password:
+            return Response({'error': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            user.set_password(new_password)  # Securely hashes the password
+            user.save()
+            return Response({'success': f'Password updated successfully for {user.email}.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+ # for admin view
+ 
+class ViewAdminUsersPost(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view user list.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = request.data.get('page', 1)
+        page_size = request.data.get('page_size', 10)
+
+        users = CustomUser.objects.all().order_by('-date_joined')
+
+        # Apply search filter
+        if search_query:
+            users = users.filter(
+                Q(email__icontains=search_query) |
+                Q(username__icontains=search_query) |
+                Q(id__icontains=search_query)
+            )
+
+        paginator = Paginator(users, page_size)
+        page = paginator.get_page(page_number)
+        #Serialize the page data
+        serializer = AdminUserSerializer(page, many=True)
+        
+        #  Return paginated, serialized response
+        
+        return Response({
+            'total_users': paginator.count,
+            'total_pages': paginator.num_pages,
+            'current_page': page.number,
+            'results': serializer.data
+        }, status=status.HTTP_200_OK)

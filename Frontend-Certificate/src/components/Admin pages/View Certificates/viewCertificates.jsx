@@ -143,7 +143,7 @@ export default function ViewCertificates() {
   useEffect(() => {
     const fetchCertificates = async () => {
       try {
-        const response = await fetch("/api/certificates"); // Update with your actual API endpoint
+        const response = await fetch("http://127.0.0.1:8000/verify/"); 
         const data = await response.json();
         setCertificates(data);
       } catch (error) {

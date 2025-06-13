@@ -338,12 +338,30 @@ export default function Login() {
         localStorage.setItem('token', data.access); // Store token
         localStorage.setItem('email', email); // Store email for role check
         setMessage('Login successful!');
-        // Check if superadmin (change email as per your superadmin)
-        if (email.toLowerCase() === "rudr@gmail.com") {
-          navigate('/admin');
-        } else {
-          navigate('/upload');
-        }
+        navigate("/upload");
+
+        // Now check the superuser role
+        // const token = data.access;
+        // try {
+        //   const roleRes = await fetch('http://127.0.0.1:8000/api/check-role/', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //     body: JSON.stringify({ page: 1, page_size: 1 }),
+        //   });
+        //   if (roleRes.ok) {
+        //     console.log(roleRes);
+        //     return navigate('/admin');
+        //   }
+        // } catch (err) {
+        //   console.error('Role check failed:', err);
+        // }
+        // console.log(roleRes);
+        // // Non-superusers or failed role-checks go to upload
+        // navigate('/upload');
+        
       } else {
         setMessage(data.detail || 'Login failed');
       }

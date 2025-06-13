@@ -139,6 +139,13 @@ DATABASES = {
 }
 
 
+# settings.py
+CLOUDINARY_STORAGE = {
+    'CLOUDINARY_CLOUD_NAME': 'duqrkojwt',
+    'CLOUDINARY_API_KEY': '854371679364326',
+    'CLOUDINARY_API_SECRET': 'ElrFOxB9Kdq3bLI48x7EGf4wuC0'
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
