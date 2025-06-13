@@ -240,7 +240,6 @@ import Papa from "papaparse";
 import './Editor.css';
 import ErrorPage from "../Error page/ErrorPage";
 import Loader from "../Loader/Loader";
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 
 export default function Editor() {
@@ -361,6 +360,7 @@ export default function Editor() {
             }))
           )
         );
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_URL}/api/upload/`, {
           method: 'POST',
           body: formData,

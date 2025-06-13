@@ -1,7 +1,9 @@
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "../../ui/button";
+import { Badge } from "../../ui/badge";
+import { twMerge } from "tailwind-merge";
+import clsx from "clsx";
 import {
   LayoutDashboard,
   Plus,
@@ -44,7 +46,7 @@ export const Sidebar = ({ onLinkClick }) => {
       <div className="p-6 border-b border-blue-500">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl text-white font-bold">Admin</h1>
-          <Badge variant="secondary" className="bg-white text-blue-600 text-sm px-2 py-1">
+          <Badge className="bg-white text-blue-600 text-sm px-2 py-1">
             Super
           </Badge>
         </div>
