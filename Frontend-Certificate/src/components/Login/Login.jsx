@@ -39,6 +39,7 @@ export default function Login() {
     try {
       
       // Send login data to backend
+      console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
       const response = await fetch(`${API_URL}/api/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
