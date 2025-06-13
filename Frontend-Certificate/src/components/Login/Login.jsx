@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import logo from '../../../public/assets/logo.jpg'; // Adjust the path as needed
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function Login() {
   const [email, setEmail] = useState(''); // State for email input
@@ -39,6 +38,7 @@ export default function Login() {
     try {
       
       // Send login data to backend
+      const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
       console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
       const response = await fetch(`${API_URL}/api/token/`, {
         method: 'POST',
