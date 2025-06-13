@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import './App.css'
 import Login from './components/Login/Login'
 import Upload from './components/upload/upload'
 import Editor from './components/Editor/Editor'
@@ -13,6 +12,10 @@ import CrudAdmins from './components/Admin pages/CRUD admins/CRUDAdmins'
 import ViewAdmins from './components/Admin pages/View Admins/ViewAdmins'
 import Loader from './components/Loader/Loader'
 import ErrorPage from './components/Error page/ErrorPage'
+import Footer from './components/home/Footer'
+import Home from './components/home/Home'
+import Validation from './components/home/Validation/Validation'
+import './App.css'
 
 
 
@@ -23,13 +26,11 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path='/header' element={<Header/>}/>
-        {/* <Route path="/upload" element={<Upload />} /> */}
-        <Route path="/loader" element={<Loader />} />
+        <Route path='/' element={<Home/>}/>
+        <Route path="/Validation" element={<Validation/>} />
+        <Route path="/Login" element={<Login/>} />
         {token && <Route path="/upload" element={<Upload />}/>}
-        {token && <Route path="/editor" element={<Editor />}/>}
-        {/* <Route path="/editor" element={<Editor/>}/> */}
+        <Route path="/editor" element={<Editor/>}/>
 
 
          {/* Admin Routes */}
@@ -42,8 +43,6 @@ function App() {
           </Route>
 
       </Routes>
-
-      
     </>
   )
 }

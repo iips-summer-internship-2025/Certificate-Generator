@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='MyModel',
-        ),
+        # migrations.DeleteModel(
+        #     name='MyModel',
+        # ),
         migrations.AddField(
             model_name='customuser',
             name='can_manage_users',
