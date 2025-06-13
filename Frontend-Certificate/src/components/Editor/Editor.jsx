@@ -240,6 +240,8 @@ import Papa from "papaparse";
 import './Editor.css';
 import ErrorPage from "../Error page/ErrorPage";
 import Loader from "../Loader/Loader";
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 
 export default function Editor() {
   const { state } = useLocation();
@@ -359,7 +361,7 @@ export default function Editor() {
             }))
           )
         );
-        const response = await fetch('http://127.0.0.1:8000/api/upload/', {
+        const response = await fetch(`${API_URL}/api/upload/`, {
           method: 'POST',
           body: formData,
         });
