@@ -106,6 +106,42 @@ export default function Editor() {
     }
   };
 
+  // const handleSubmitCoords = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append('imagefile', imageFile);
+  //     formData.append('csvfile', csvFile);
+  //     formData.append('userType', 'merit');
+  //     formData.append(
+  //       'coords',
+  //       JSON.stringify(
+  //         droppedVariables.map(({ name, x, y, color, fontSize }) => ({
+  //           title: name,
+  //           x: (x / imageRef.current.offsetWidth) * 100,
+  //           y: (y / imageRef.current.offsetHeight) * 100,
+  //           font_color: color,
+  //           font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100,
+  //           font_family: fontFamily,
+  //           font_weight: fontWeight
+  //         }))
+  //       )
+  //     );
+  //     const response = await fetch('http://127.0.0.1:8000/api/upload/', {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
+
+  //     const text = await response.text();
+  //     setLoading(false);
+  //     if (!response.ok) {
+  //       alert(text || "Failed to send coordinates. Please try again.");
+  //     }
+  //   } catch (error) {
+  //     setLoading(false);
+  //     alert('Error: ' + error.message);
+  //   }
+  // };
 const handleSubmitCoords = async () => {
   setLoading(true);
   try {
@@ -141,8 +177,7 @@ const handleSubmitCoords = async () => {
     setLoading(false);
     alert('Error: ' + error.message);
   }
-};cd
-
+};
   const [imgDims, setImgDims] = useState({ width: 1, height: 1 });
   const previewImgRef = useRef(null);
   console.log(droppedVariables);
@@ -393,7 +428,7 @@ const handleSubmitCoords = async () => {
               />
             </div>
             <div className="row flex justify-center items-center mt-2 text-center">
-              <div className="col-lg-6 mt-4">
+              <div className="col-lg-4 mt-4">
                 <button
                   onClick={() => setPreviewOpen(true)}
                   className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
@@ -401,7 +436,7 @@ const handleSubmitCoords = async () => {
                   Preview
                 </button>
               </div>
-              <div className="col-lg-6 mt-4">
+              <div className="col-lg-4 mt-4">
                 <button
                   onClick={() => window.location.reload()}
                   className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
@@ -409,7 +444,7 @@ const handleSubmitCoords = async () => {
                   Reset changes
                 </button>
               </div>
-              <div className="col-lg-6 mt-4">
+              <div className="col-lg-4 mt-4">
                 <button
             className=" border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600"
             onClick={handleSubmitCoords}
