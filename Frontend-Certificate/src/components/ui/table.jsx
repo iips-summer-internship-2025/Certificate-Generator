@@ -2,8 +2,9 @@
 
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
-
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
 function Table({
   className,
   ...props

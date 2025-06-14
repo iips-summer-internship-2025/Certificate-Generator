@@ -5,6 +5,7 @@ import './Editor.css';
 import ErrorPage from "../Error page/ErrorPage";
 import Loader from "../Loader/Loader";
 
+
 export default function Editor() {
   const { state } = useLocation();
   const imageFile = state?.imageFile;
@@ -163,7 +164,8 @@ const handleSubmitCoords = async () => {
         }))
       )
     );
-    const response = await fetch('http://127.0.0.1:8000/api/upload/', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+    const response = await fetch(`${API_URL}/api/upload/`, {
       method: 'POST',
       body: formData,
     });
