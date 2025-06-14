@@ -41,6 +41,7 @@ from rest_framework import permissions
 from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
 from django.db.models import Q
+ 
 from .utils import send_bulk_emails
 
 from rest_framework.decorators import api_view, permission_classes
@@ -403,9 +404,9 @@ def verify_certificate(request, certificate_id):
 #     qr_img.save(response, "PNG")
 #     return response
 
-# class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
-#     queryset = Certificate.objects.all()
-#     serializer_class = CertificateSerializer
+class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Certificate.objects.all()
+    serializer_class = CertificateSerializer
 
 User = get_user_model()
 #for change password of user

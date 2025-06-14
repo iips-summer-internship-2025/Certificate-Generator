@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import './App.css'
 import Login from './components/Login/Login'
 import Upload from './components/upload/upload'
 import Editor from './components/Editor/Editor'
@@ -13,6 +12,10 @@ import ViewAdmins from './components/Admin pages/View Admins/ViewAdmins'
 import Loader from './components/Loader/Loader'
 import ErrorPage from './components/Error page/ErrorPage'
 import CertificateSearch from './components/Search/CertificateSearch'
+import Footer from './components/home/Footer'
+import Home from './components/home/Home'
+import Validation from './components/home/Validation/Validation'
+import './App.css'
 
 
 
@@ -24,12 +27,13 @@ function App() {
     <>
     
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path='/' element={<Home/>}/>
+        {/* <Route path="/Validation" element={<Validation/>} /> */}
+        <Route path="/Login" element={<Login/>} />
         {/* <Route path="/upload" element={<Upload />} /> */}
         <Route path="/loader" element={<Loader />} />
         {token && <Route path="/upload" element={<Upload />}/>}
-        {token && <Route path="/editor" element={<Editor />}/>}
-        {/* <Route path="/editor" element={<Editor/>}/> */}
+        <Route path="/editor" element={<Editor/>}/>
 
 
          {/* Admin Routes */}
@@ -45,8 +49,6 @@ function App() {
           <Route path="/search" element={<CertificateSearch />} />
 
       </Routes>
-
-      
     </>
   )
 }
