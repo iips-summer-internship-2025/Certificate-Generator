@@ -46,7 +46,6 @@ from .utils import send_bulk_emails
 from rest_framework.decorators import api_view
 
 
-@api_view(['POST'])
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
     image = Image.open(template_path).convert("RGB")
