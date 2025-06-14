@@ -12,6 +12,7 @@ import CrudAdmins from './components/Admin pages/CRUD admins/CRUDAdmins'
 import ViewAdmins from './components/Admin pages/View Admins/ViewAdmins'
 import Loader from './components/Loader/Loader'
 import ErrorPage from './components/Error page/ErrorPage'
+import CertificateSearch from './components/Search/CertificateSearch'
 
 
 
@@ -39,6 +40,9 @@ function App() {
             <Route path="crud-admins" element={<CrudAdmins />} />
             <Route path="view-admins" element={<ViewAdmins />} />
           </Route>
+
+          {/* Search Page */}
+          <Route path="/search" element={<CertificateSearch />} />
 
       </Routes>
 

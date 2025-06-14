@@ -43,7 +43,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from .utils import send_bulk_emails
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
@@ -339,6 +340,7 @@ class RegisterView(APIView):
 
 # searching certificate:
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def search_certificates(request):
     search_query = request.GET.get('q', '')
     
