@@ -1,5 +1,4 @@
 # jwt_auth/urls.py
-
 from django.contrib import admin
 from django.urls import path , include 
 from authority.views import CustomTokenObtainPairView, CustomTokenRefreshView, RegisterView
@@ -38,4 +37,7 @@ urlpatterns = [
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/crud-admins/', AdminUserAPIView.as_view(), name='admin_users'),
     path('api/crud-admins/delete/<str:username>/', AdminUserDeleteAPIView.as_view(), name='delete_admin_user'),
+
+    # path for searching:
+    path('api/search/', views.search_certificates, name='search_certificates'),
 ]
