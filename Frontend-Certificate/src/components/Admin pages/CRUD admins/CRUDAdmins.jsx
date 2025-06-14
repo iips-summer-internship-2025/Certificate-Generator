@@ -92,7 +92,7 @@
 //                   className="w-40"
 //                 />
 //               </div>
-              
+
 //               <div className="space-y-2">
 //                 <Label htmlFor="adminEmail" className="text-gray-700">Email</Label>
 //                 <Input
@@ -104,7 +104,7 @@
 //                   className="w-48"
 //                 />
 //               </div>
-              
+
 //               <div className="space-y-2">
 //                 <Label htmlFor="adminPassword" className="text-gray-700">Password</Label>
 //                 <Input
@@ -116,7 +116,7 @@
 //                 />
 //               </div>
 //             </form>
-            
+
 //             <Button 
 //               onClick={handleAddAdmin}
 //               className=" relative self-center m-4 text-white  bg-blue-600 hover:bg-blue-700"
@@ -229,12 +229,15 @@ export default function CrudAdmins() {
       password: formData.password,
       role: "Admin",
     };
-
+    // After successful login, for example after fetching the token from your backend:
+    const token = response.token; // or response.access if using JWT
+    localStorage.setItem('token', token);
     try {
-      const res = await fetch("/api/admins", {
+      const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(newAdmin),
       });

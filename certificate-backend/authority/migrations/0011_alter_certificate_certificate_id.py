@@ -7,12 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authority', '0010_merge_20250606_2205'),
+        # ('authority', '0010_merge_20250606_2205'),
+        ('authority', '0010_customuser_role')
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='certificate',
+            model_name='Certificate',
             name='certificate_id',
             field=models.CharField(default=authority.models.generate_unique_id, editable=False, max_length=6, primary_key=True, serialize=False),
         ),

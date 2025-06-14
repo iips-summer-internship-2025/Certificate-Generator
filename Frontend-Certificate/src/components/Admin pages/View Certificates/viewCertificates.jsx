@@ -143,7 +143,13 @@ export default function ViewCertificates() {
   useEffect(() => {
     const fetchCertificates = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/verify/"); 
+        const response = await fetch("http://127.0.0.1:8000/api/certificates/",{
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming token is stored in localStorage
+          },
+        }); 
         const data = await response.json();
         setCertificates(data);
       } catch (error) {

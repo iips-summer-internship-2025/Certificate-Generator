@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='certificate',
+            model_name='Certificate',
             name='certificate_id',
             field=models.CharField(max_length=6, primary_key=True, serialize=False),
         ),
