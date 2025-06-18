@@ -26,7 +26,6 @@ import json
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
-from .serializers import CertificateSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
@@ -40,7 +39,11 @@ from rest_framework import permissions
 from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
 from django.db.models import Q
+ 
 from .utils import send_bulk_emails
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
@@ -346,7 +349,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
-
+    
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -355,26 +358,35 @@ class RegisterView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# def test_id_generation(request):
-#     row = {
-#     'Name': 'Test User',
-#     'roll_no': '12345',
-#     'email_id': 'test@example.com',
-#     # other fields
-# }
-#     name_slug = "test_name"  # or some default value
-#     certificate_id = generate_unique_id()
 
-    # obj = Certificate.objects.create(
-
-    #         name=name_slug,
-    #         roll_no=row.get('Roll No', ''),
-    #         email_id=row.get('Email', ''),
-    #         certificate_id=certificate_id,
-    #         certificate=f"https://yourdomain.com/verify/{certificate_id}"
-        
-    # )
-    # return JsonResponse({'unique_id': obj.certificate_id})
+# searching certificate:
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_certificates(request):
+    search_query = request.GET.get('q', '')
+    
+    if not search_query:
+        return Response({'error': 'Search query is required'}, status=400)
+    
+    # Search by name or email (case insensitive)
+    certificates = Certificate.objects.filter(
+        Q(name__icontains=search_query) | 
+        Q(email_id__icontains=search_query)
+    )
+    
+    results = [
+        {
+            'name': cert.name,
+            'roll_no': cert.roll_no,
+            'certificate': cert.certificate,
+            'certificate_id': cert.certificate_id,
+            'email_id': cert.email_id,
+            'timestamp': cert.timestamp
+        }
+        for cert in certificates
+    ]
+    
+    return Response({'results': results})
 
 def generate_unique_id():
      while True:
@@ -412,9 +424,71 @@ def verify_certificate(request, certificate_id):
 #     qr_img.save(response, "PNG")
 #     return response
 
-# class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
-#     queryset = Certificate.objects.all()
-#     serializer_class = CertificateSerializer
+class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Certificate.objects.all()
+    serializer_class = CertificateSerializer
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 #admin functinality:view certificate
 class ViewCertificatesAPI(APIView):

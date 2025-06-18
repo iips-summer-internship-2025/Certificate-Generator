@@ -1,5 +1,4 @@
 # jwt_auth/urls.py
-
 from django.contrib import admin
 from django.urls import path , include 
 from authority.views import CustomTokenObtainPairView, CustomTokenRefreshView, RegisterView
@@ -15,7 +14,7 @@ from django.urls import path
 from authority.views import ViewCertificatesAPI
 
 
-#certificate_list = CertificateViewSet.as_view({'get': 'list'})
+certificate_list = CertificateViewSet.as_view({'get': 'list'})
 
 
 urlpatterns = [
@@ -32,12 +31,15 @@ urlpatterns = [
     #path('api/certificates/', certificate_list, name='certificate-list'),
     path('api/admin/change-password/', SuperuserChangePasswordView.as_view(), name='superuser_change_password'),
     path('api/admin/view-users/', ViewAdminUsersPost.as_view(), name='view_users_post'),
-    #path('show-qr/<str:certificate_id>/', views.show_qr, name='show-qr'),
-    #path('api/coords', accept_coords, name='accept_coords'),
-    #path('api/certificates/', certificate_list, name='certificate-list'),
+    # path('show-qr/<str:certificate_id>/', views.show_qr, name='show-qr'),
+    # path('api/coords', accept_coords, name='accept_coords'),
+    # path('api/certificates/', certificate_list, name='certificate-list'),
     path('api/adminlist/', AdminListView.as_view(), name='admin-list'),
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/crud-admins/', AdminUserAPIView.as_view(), name='admin_users'),
     path('api/crud-admins/delete/<str:username>/', AdminUserDeleteAPIView.as_view(), name='delete_admin_user'),
     path('api/certificates/', ViewCertificatesAPI.as_view(), name='view-certificates'),
+
+    # path for searching:
+    path('api/search/', views.search_certificates, name='search_certificates'),
 ]

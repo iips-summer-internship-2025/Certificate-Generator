@@ -1,8 +1,9 @@
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 
-import { cn } from "@/lib/utils"
-
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
 function Label({
   className,
   ...props
