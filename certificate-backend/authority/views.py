@@ -33,8 +33,6 @@ from rest_framework import viewsets, permissions, status
 from .serializers import AdminUserSerializer,UserSerializer
 from django.contrib.auth import update_session_auth_hash
 from .models import CustomUser
-
-
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
@@ -64,15 +62,16 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
         #text = item.get('title', '')
         x_percent= item.get('x', 0)
         y_percent= item.get('y', 0)
+        
         # Convert percent to actual pixel values
+        
         x = int((x_percent / 100) * width)
-        y = int((y_percent / 100) * height)
+        y = int((y_percent / 100) * (height+30))    # Adjust y to avoid clipping at the bottom
         font_color = item.get('font_color')#, '#000000')
-        font_size_percent = float(item.get('fontSize', 2))
-        font_size = int((font_size_percent / 100) * height)
-
-
-
+        font_size_percent = item.get('fontSize', '10px')
+        print(f"font_size_percent: {font_size_percent}")
+        #font_size = int((font_size_percent / 100) * height)
+        
         # Remove 'px' and convert to int
         # try:
         #     font_size = int(font_size_str.replace('px', ''))
@@ -81,9 +80,28 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 
         # Load a font — make sure 'arial.ttf' exists or use full path
         try:
-            font = ImageFont.truetype("arial.ttf", font_size)
+            if isinstance(font_size_percent, str) and 'px' in font_size_percent:
+                # Remove 'px' and convert to int
+                based_font_size = int(str(font_size_percent.replace('px', '')))
+            else:
+                print (f"font_size_percent: {font_size_percent} in try block")
+                based_font_size = float(font_size_percent)
+            
+            print(f"Based font size: {based_font_size}in try block")
+            font_size = int((font_size_percent / 100) * width)
         except:
+            based_font_size = 10
+            print(f"Based font size: {based_font_size} in except block")
+            font_size = int((based_font_size/ 100) * width)
+        try:
+            font = ImageFont.truetype("ARIAL.TTF", font_size)
+            print(f"Using font size: {font_size}px and font: {font}")
+        except:
+            print(" Falling back to default font!")
             font = ImageFont.load_default()
+        print(f"Rendering '{text}' at ({x},{y}) with font size: {font_size}px {font}")
+        print(f"coordinates:{coordinates}")
+
 
         draw.text((x, y), text, fill=font_color, font=font)
 
@@ -155,9 +173,11 @@ def upload_files(request):
                 'title': item.get('title', ''),
                 'x': float(item.get('x', 0)),
                 'y': float(item.get('y', 0)),
-                'fontSize': float(item.get('fontSize',2)),
-                'font_color': item.get('font_color', '#000000')
+                'fontSize':float(item.get('font_size','8')),
+                'font_color': item.get('font_color', '#000000'),
+                
             })
+            print(f"{coordinates} in upload function")
         except (ValueError, TypeError) as e:
             return JsonResponse({'error': f'Invalid coordinate values for field "{item.get("title", "unknown")}": {e}'}, status=400)
 
@@ -396,8 +416,70 @@ def verify_certificate(request, certificate_id):
 #     queryset = Certificate.objects.all()
 #     serializer_class = CertificateSerializer
 
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
 User = get_user_model()
-#for change password of user
+#for change password of user 2. admin functionality
 class SuperuserChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -425,7 +507,7 @@ class SuperuserChangePasswordView(APIView):
             return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
  # for admin view
- 
+# for viewing admin users and their roles 3 functionality 
 class ViewAdminUsersPost(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -449,8 +531,26 @@ class ViewAdminUsersPost(APIView):
 
         paginator = Paginator(users, page_size)
         page = paginator.get_page(page_number)
+        
+        # Build the result list with dynamic role
+        results = []
+        for user in page:
+            if user.is_superuser:
+                role = "Super Admin"
+            elif user.is_staff:
+                role = "Admin"
+            else:
+                role = "User"  # fallback, not expected here
+            results.append({
+                "username": user.username,
+                "email": user.email,
+                "role": role,
+                "dateCreated": user.date_joined.strftime("%Y-%m-%d"),
+            })
+
+                
         #Serialize the page data
-        serializer = AdminUserSerializer(page, many=True)
+        # serializer = AdminUserSerializer(page, many=True)
         
         #  Return paginated, serialized response
         
@@ -458,7 +558,7 @@ class ViewAdminUsersPost(APIView):
             'total_users': paginator.count,
             'total_pages': paginator.num_pages,
             'current_page': page.number,
-            'results': serializer.data
+            'results': results
         }, status=status.HTTP_200_OK)
 
 User = get_user_model()
@@ -468,10 +568,7 @@ User = get_user_model()
 class IsSuperAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_superuser)
-       
-        
     
-
 class AdminUserAPIView(APIView):
     permission_classes = [IsSuperAdmin]
 

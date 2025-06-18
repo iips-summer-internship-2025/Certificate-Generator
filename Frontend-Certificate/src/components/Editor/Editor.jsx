@@ -287,8 +287,8 @@ export default function Editor() {
     const rect = imageRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const x_percent = (x / rect.width) * 100;
-    const y_percent = (y / rect.width) * 100;
+    // const x_percent = (x / rect.width) * 100;
+    // const y_percent = (y / rect.width) * 100;
     // const trueX = (imageRef.current.naturalWidth || imageRef.current.width) * x_percent / 100;
 
     const imgWidth = imageRef.current.offsetWidth;
@@ -355,7 +355,8 @@ export default function Editor() {
               x: (x / imageRef.current.offsetWidth) * 100, // percentage of width
               y: (y / imageRef.current.offsetHeight) * 100, // percentage of height
               font_color: color,
-              font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100, // font size as % of height
+              font_size: (parseFloat(fontSize) / imageRef.current.offsetWidth) * 100 // font size as % of width
+ 
             }))
           )
         );

@@ -18,8 +18,8 @@ def generate_unique_id():
 def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    smtp_username = 'shubhanshsharmaking@gmail.com'
-    smtp_password = ''  # Use app password here
+    smtp_username = 'thakursuhana07@gmail.com'
+    smtp_password = "Suhanagmail@79"  # Use app password here
 
     # Load HTML template
     try:
