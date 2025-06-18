@@ -156,8 +156,9 @@ def upload_files(request):
                 'x': float(item.get('x', 0)),
                 'y': float(item.get('y', 0)),
                 'fontSize': float(item.get('fontSize',2)),
-                'font_color': item.get('font_color', '#000000')
+                'font_color': item.get('font_color', '#000000'),
             })
+            
         except (ValueError, TypeError) as e:
             return JsonResponse({'error': f'Invalid coordinate values for field "{item.get("title", "unknown")}": {e}'}, status=400)
 

@@ -172,7 +172,292 @@
 //   );
 // }
 
-import { useState } from "react";
+// import { useState , useEffect} from "react";
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
+// import { Card, CardContent } from "@/components/ui/card";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table";
+
+// // Mock data
+// // const mockAdmins = [
+// //   {
+// //     id: 1,
+// //     name: "John Doe",
+// //     email: "john@example.com",
+// //     role: "Admin",
+// //   },
+// //   {
+// //     id: 2,
+// //     name: "Jane Smith",
+// //     email: "jane@example.com",
+// //     role: "Super Admin",
+// //   },
+// // ];
+
+// export default function CrudAdmins() {
+//   const [admins, setAdmins] = useState([]);
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     password: "",
+//   });
+//   const [nextId, setNextId] = useState(1);
+//   const [successMessage, setSuccessMessage] = useState("");
+
+//   const handleInputChange = (field, value) => {
+//     setFormData((prev) => ({
+//       ...prev,
+//       [field]: value,
+//     }));
+//   };
+
+//   // const handleAddAdmin = async (e) => {
+//   //   e.preventDefault();
+
+//   //   const newAdmin = {
+//   //     //id: nextId,
+//   //     username: formData.name,
+//   //     email: formData.email,
+//   //     password: formData.password,
+//   //     role: "Admin",
+//   //   };
+//     // After successful login, for example after fetching the token from your backend:
+//   //   const token = response.token; // or response.access if using JWT
+//   //   localStorage.setItem('token', token);
+//   //   try {
+//   //     const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
+//   //       method: "POST",
+//   //       headers: {
+//   //         "Content-Type": "application/json",
+//   //         'Authorization': `Bearer ${token}`
+//   //       },
+//   //       body: JSON.stringify(newAdmin),
+//   //     });
+
+//   //     if (!res.ok) throw new Error("Failed to add admin");
+
+//   //     // Update frontend immediately
+//   //     setAdmins((prev) => [...prev, { ...newAdmin, password: undefined }]);
+//   //     setNextId(nextId + 1);
+
+//   //     // Reset form and show message
+//   //     setFormData({
+//   //       username: "",
+//   //       email: "",
+//   //       password: "",
+//   //     });
+//   //     setSuccessMessage("Admin added successfully!");
+//   //     setTimeout(() => setSuccessMessage(""), 3000);
+//   //   } catch (error) {
+//   //     console.error(error);
+//   //     alert("Error adding admin");
+//   //   }
+//   // };
+
+//   const handleAddAdmin = async (e) => {
+//   e.preventDefault();
+
+//   const newAdmin = {
+//     id: nextId,
+//     username: formData.name,
+//     email: formData.email,
+//     password: formData.password,
+//     role: "admin",
+//   };
+//   console.log("Sending new admin:", newAdmin);
+//   // Get token from localStorage instead of undefined 'response'
+//   const token = localStorage.getItem("token");
+
+//   try {
+//     const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`, //use retrieved token
+//       },
+//       body: JSON.stringify(newAdmin),
+//     });
+//     const data = await res.json();
+//     if (!res.ok) {
+//   console.error("Server error message:", data);
+//   const errors = Object.entries(data)
+//     .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+//     .join("\n");
+//   alert(`Failed to add admin:\n${errors}`);
+//   return;
+// }
+
+
+//     // Update frontend immediately
+//     setAdmins((prev) => [...prev, { ...newAdmin, password: undefined }]);
+//     // setNextId(nextId + 1);
+//     setNextId(nextId + 1);
+
+//     // Reset form and show message
+//     setFormData({
+//       username: "",
+//       email: "",
+//       password: "",
+//     });
+//     setSuccessMessage("Admin added successfully!");
+//     setTimeout(() => setSuccessMessage(""), 3000);
+//   } catch (error) {
+//     console.error(error);
+//     alert("Error adding admin");
+//   }
+// };
+
+//   // Optional: Load existing admins on mount (GET)
+//   useEffect(() => {
+//     const fetchAdmins = async () => {
+//       try {
+//         const token = localStorage.getItem("token");
+
+//         const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
+
+//         const data = await res.json();
+//         if (res.ok) {
+//           setAdmins(data);
+//           setNextId(data.length > 0 ? Math.max(...data.map((a) => a.id)) + 1 : 1);
+//         } else {
+//           console.error("Failed to fetch admins", data);
+//         }
+//       } catch (error) {
+//         console.error("Fetch Admins Error:", error);
+//       }
+//     };
+
+//     fetchAdmins();
+//   }, []);
+
+//   const handleEdit = (adminId) => {
+//     console.log("Editing admin:", adminId);
+//   };
+
+//   const handleDelete = (adminId) => {
+//     setAdmins(admins.filter((admin) => admin.id !== adminId));
+//   };
+
+//   return (
+//     <div className="flex flex-col gap-10 p-8">
+//       {/* Header */}
+//       <div className="mb-8">
+//         <h1 className="text-3xl font-bold text-blue-600">CRUD Admins</h1>
+//       </div>
+
+//       {/* Success message */}
+//       {successMessage && (
+//         <div className="text-green-600 font-medium bg-green-100 border border-green-300 rounded p-3 w-fit">
+//           {successMessage}
+//         </div>
+//       )}
+
+//       {/* Add Admin Form */}
+//       <Card className="mb-8">
+//         <CardContent className="p-6">
+//           <div className="flex justify-between items-start ">
+//             <form onSubmit={handleAddAdmin} className="flex gap-6 p-4 flex-1">
+//               <div className="space-y-2">
+//                 <Label htmlFor="adminName" className="text-gray-700">Name</Label>
+//                 <Input
+//                   id="adminName"
+//                   placeholder={formData.name}
+//                   onChange={(e) => handleInputChange("name", e.target.value)}
+//                   className="w-40"
+//                 />
+//               </div>
+
+//               <div className="space-y-2">
+//                 <Label htmlFor="adminEmail" className="text-gray-700">Email</Label>
+//                 <Input
+//                   id="adminEmail"
+//                   type="email"
+//                   placeholder="Email"
+//                   onChange={(e) => handleInputChange("email", e.target.value)}
+//                   className="w-48"
+//                 />
+//               </div>
+
+//               <div className="space-y-2">
+//                 <Label htmlFor="adminPassword" className="text-gray-700">Password</Label>
+//                 <Input
+//                   id="adminPassword"
+//                   type="password"
+//                   placeholder={formData.password}
+//                   onChange={(e) => handleInputChange("password", e.target.value)}
+//                   className="w-40"
+//                 />
+//               </div>
+//             </form>
+
+//             <Button
+//               onClick={handleAddAdmin}
+//               className="relative self-center m-4 text-white bg-blue-600 hover:bg-blue-700"
+//             >
+//               Add Admin
+//             </Button>
+//           </div>
+//         </CardContent>
+//       </Card>
+
+//       {/* Admins Table */}
+//       <Card className="p-3">
+//         <Table>
+//           <TableHeader>
+//             <TableRow className="bg-blue-50">
+//               <TableHead className="font-semibold text-gray-700">Name</TableHead>
+//               <TableHead className="font-semibold text-gray-700">Email</TableHead>
+//               <TableHead className="font-semibold text-gray-700">Role</TableHead>
+//               <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+//             </TableRow>
+//           </TableHeader>
+//           <TableBody>
+//             {admins.map((admin) => (
+//               <TableRow key={admin.id}>
+//                 <TableCell>{admin.username}</TableCell>
+//                 <TableCell>{admin.email}</TableCell>
+//                 <TableCell>{admin.role}</TableCell>
+//                 <TableCell>
+//                   <div className="flex gap-2">
+//                     <Button
+//                       size="sm"
+//                       variant="outline"
+//                       className="bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200"
+//                       onClick={() => handleEdit(admin.id)}
+//                     >
+//                       Edit
+//                     </Button>
+//                     <Button
+//                       size="sm"
+//                       variant="destructive"
+//                       onClick={() => handleDelete(admin.id)}
+//                     >
+//                       Delete
+//                     </Button>
+//                   </div>
+//                 </TableCell>
+//               </TableRow>
+//             ))}
+//           </TableBody>
+//         </Table>
+//       </Card>
+//     </div>
+//   );
+// }
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -186,30 +471,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Mock data
-const mockAdmins = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Admin",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Super Admin",
-  },
-];
-
 export default function CrudAdmins() {
-  const [admins, setAdmins] = useState(mockAdmins);
+  const [admins, setAdmins] = useState([]);
   const [formData, setFormData] = useState({
-    name: "Admin Name",
-    email: "admin@email.com",
-    password: "Password",
+    username: "",
+    email: "",
+    password: "",
   });
-  const [nextId, setNextId] = useState(Math.max(...mockAdmins.map((a) => a.id)) + 1);
+  const [nextId, setNextId] = useState(1);
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleInputChange = (field, value) => {
@@ -223,36 +492,41 @@ export default function CrudAdmins() {
     e.preventDefault();
 
     const newAdmin = {
-      id: nextId,
-      name: formData.name,
+      username: formData.username,
       email: formData.email,
       password: formData.password,
-      role: "Admin",
+      role: "admin",
     };
-    // After successful login, for example after fetching the token from your backend:
-    const token = response.token; // or response.access if using JWT
-    localStorage.setItem('token', token);
+
+    const token = localStorage.getItem("token");
+
     try {
       const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(newAdmin),
       });
 
-      if (!res.ok) throw new Error("Failed to add admin");
+      const data = await res.json();
 
-      // Update frontend immediately
-      setAdmins((prev) => [...prev, { ...newAdmin, password: undefined }]);
-      setNextId(nextId + 1);
+      if (!res.ok) {
+        const errors = Object.entries(data)
+          .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+          .join("\n");
+        alert(`Failed to add admin:\n${errors}`);
+        return;
+      }
 
-      // Reset form and show message
+      setAdmins((prev) => [...prev, { ...data, password: undefined }]);
+      setNextId((prev) => prev + 1);
+
       setFormData({
-        name: "Admin Name",
-        email: "admin@email.com",
-        password: "Password",
+        username: "",
+        email: "",
+        password: "",
       });
       setSuccessMessage("Admin added successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -262,22 +536,124 @@ export default function CrudAdmins() {
     }
   };
 
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          setAdmins(data);
+          setNextId(data.length > 0 ? Math.max(...data.map((a) => a.id)) + 1 : 1);
+        } else {
+          console.error("Failed to fetch admins", data);
+        }
+      } catch (error) {
+        console.error("Fetch Admins Error:", error);
+      }
+    };
+
+    fetchAdmins();
+  }, []);
+
   const handleEdit = (adminId) => {
     console.log("Editing admin:", adminId);
   };
 
-  const handleDelete = (adminId) => {
-    setAdmins(admins.filter((admin) => admin.id !== adminId));
-  };
+  // const handleDelete = (adminId) => {
+  //   setAdmins(admins.filter((admin) => admin.id !== adminId));
+  // };
+  // const handleDelete = async (adminId) => {
+  //   const token = localStorage.getItem("token");
+  //   if (!window.confirm("Are you sure you want to delete this admin?")) return;
+
+  //   try {
+  //     const res = await fetch(`http://127.0.0.1:8000/api/crud-admins/delete/`, {
+  //       method: "DELETE",
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     if (!res.ok) throw new Error("Failed to delete admin");
+
+  //     // Remove from frontend
+  //     setAdmins(admins.filter((admin) => admin.id !== adminId));
+  //     setSuccessMessage("Admin deleted successfully!");
+  //     setTimeout(() => setSuccessMessage(""), 3000);
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("Error deleting admin");
+  //   }
+  // };
+//edit option
+  // const [editingId, setEditingId] = useState(null);
+  // const handleEdit = (admin) => {
+  //   setEditingId(admin.id);
+  //   setFormData({
+  //     name: admin.username,
+  //     email: admin.email,
+  //     password: "", // Let user re-enter if needed
+  //   });
+  // };
+  // const handleUpdateAdmin = async (e) => {
+  //   e.preventDefault();
+  //   const token = localStorage.getItem("token");
+
+  //   const updatedAdmin = {
+  //     username: formData.name,
+  //     email: formData.email,
+  //     password: formData.password,
+  //     role: "admin",
+  //   };
+
+  //   try {
+  //     const res = await fetch(`http://127.0.0.1:8000/api/crud-admins/${editingId}/`, {
+  //       method: "PATCH",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(updatedAdmin),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       const errors = Object.entries(data)
+  //         .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+  //         .join("\n");
+  //       alert(`Failed to update admin:\n${errors}`);
+  //       return;
+  //     }
+
+  //     // Update frontend state
+  //     setAdmins((prev) =>
+  //       prev.map((admin) =>
+  //         admin.id === editingId ? { ...admin, ...updatedAdmin, id: editingId } : admin
+  //       )
+  //     );
+  //     setEditingId(null);
+  //     setFormData({ name: "", email: "", password: "" });
+  //     setSuccessMessage("Admin updated successfully!");
+  //     setTimeout(() => setSuccessMessage(""), 3000);
+  //   } catch (error) {
+  //     console.error("Update failed:", error);
+  //     alert("Error updating admin");
+  //   }
+  // };
+
 
   return (
     <div className="flex flex-col gap-10 p-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-blue-600">CRUD Admins</h1>
-      </div>
+      <h1 className="text-3xl font-bold text-blue-600">CRUD Admins</h1>
 
-      {/* Success message */}
       {successMessage && (
         <div className="text-green-600 font-medium bg-green-100 border border-green-300 rounded p-3 w-fit">
           {successMessage}
@@ -287,14 +663,16 @@ export default function CrudAdmins() {
       {/* Add Admin Form */}
       <Card className="mb-8">
         <CardContent className="p-6">
-          <div className="flex justify-between items-start ">
-            <form onSubmit={handleAddAdmin} className="flex gap-6 p-4 flex-1">
+          {/* <form onSubmit={editingId ? handleUpdateAdmin : handleAddAdmin} className="flex gap-6 p-4 flex-1"> */}
+          <form onSubmit={handleAddAdmin} className="flex justify-between p-4 items-start">
+            <div className="flex gap-6 flex-1">
               <div className="space-y-2">
-                <Label htmlFor="adminName" className="text-gray-700">Name</Label>
+                <Label htmlFor="adminUsername" className="text-gray-700">Username</Label>
                 <Input
-                  id="adminName"
-                  placeholder={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  id="adminUsername"
+                  required
+                  value={formData.username}
+                  onChange={(e) => handleInputChange("username", e.target.value)}
                   className="w-40"
                 />
               </div>
@@ -304,7 +682,8 @@ export default function CrudAdmins() {
                 <Input
                   id="adminEmail"
                   type="email"
-                  placeholder="Email"
+                  required
+                  value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className="w-48"
                 />
@@ -315,20 +694,22 @@ export default function CrudAdmins() {
                 <Input
                   id="adminPassword"
                   type="password"
-                  placeholder={formData.password}
+                  required
+                  value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
                   className="w-40"
                 />
               </div>
-            </form>
+            </div>
 
             <Button
-              onClick={handleAddAdmin}
+              type="submit"
               className="relative self-center m-4 text-white bg-blue-600 hover:bg-blue-700"
             >
               Add Admin
+              {/* {editingId ? "Update Admin" : "Add Admin"} */}
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
 
@@ -337,7 +718,7 @@ export default function CrudAdmins() {
         <Table>
           <TableHeader>
             <TableRow className="bg-blue-50">
-              <TableHead className="font-semibold text-gray-700">Name</TableHead>
+              <TableHead className="font-semibold text-gray-700">Username</TableHead>
               <TableHead className="font-semibold text-gray-700">Email</TableHead>
               <TableHead className="font-semibold text-gray-700">Role</TableHead>
               <TableHead className="font-semibold text-gray-700">Actions</TableHead>
@@ -346,7 +727,7 @@ export default function CrudAdmins() {
           <TableBody>
             {admins.map((admin) => (
               <TableRow key={admin.id}>
-                <TableCell>{admin.name}</TableCell>
+                <TableCell>{admin.username}</TableCell>
                 <TableCell>{admin.email}</TableCell>
                 <TableCell>{admin.role}</TableCell>
                 <TableCell>

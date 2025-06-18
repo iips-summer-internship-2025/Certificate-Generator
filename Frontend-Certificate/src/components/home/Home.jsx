@@ -1,32 +1,12 @@
 import './Header.css'
 import sampoorn_logo from '../../../public/assets/sampoorn_logo.png'
 import template_image from '../../../public/assets/template_image.png'
-import { Link } from 'react-router-dom'
-import React from 'react'
-function Header() {
-    return (
-        <>
-            <div className="header_design">
-                <div className="container">
-                    <div className="Inner_header row justify-between flex items-center flex-wrap -mx-2">
-                        <div class="col-lg-6">
-                            <div className='left_svg'>
-                                <img src={sampoorn_logo} alt="logo image" />
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="Right_menu">
-                                <ul className='flex justify-end'>
-                                    <li><Link to="/">Home</Link></li>
-                                    <li><a href="/Validation">Validation</a></li>
-                                    <li><a href="/Login">Login-Admin</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className='parent_div_type'>
+import Header from './Header';
+import Footer from './Footer';
+function Home(){
+    return<>
+        <Header />
+        <div className='parent_div_type'>
                 <div className='container'>
                     <div className='Inner_div_Animation'>
                         <div class="typing-container text-center ma">
@@ -34,12 +14,12 @@ function Header() {
                             <h2>Empowering Every Achievement, Digitally</h2>
                         </div>
                         <div class="redirect_button">
-                            <a href='https://iips.edu.in/' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
+                            <a href='#' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='design_template'>
+        <div className='design_template'>
                 <div className='heading'>
                     <div className='container'>
                         <div className='headig_inner_svg'>
@@ -97,7 +77,7 @@ function Header() {
                                 <img src={template_image} alt="Design Template" />
                             </div>
                             <div class="redirect_button">
-                                <a href='/login' className='Redirect_anchor '>Get Start</a>
+                                <a href='/' className='Redirect_anchor '>Get Start</a>
                             </div>
                         </div>
                     </div>
@@ -220,40 +200,14 @@ function Header() {
                             </div>
                         </div>
                         <div className='text-center mt-5'>
-                            {/* to bbe removed */}
-                            {/* <div class="redirect_button">
+                            <div class="redirect_button">
                                 <a href='/' className='Redirect_anchor'>Login to continue</a>
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='footer'>
-                <div className='container'>
-                    <div className='footer_inner'>
-                        <div className="footer-about text-center px-3">
-                            <h5>Sampoorn – Smart Certificate Generator</h5>
-                            <p className='max-w-[600px] mx-auto text-[0.95rem]'>
-                                Sampoorn is developed by IIPS to streamline the creation, distribution, and validation of certificates for events conducted by its 12 student-driven clubs.
-                            </p>
-                        </div>
-                        <div className='footer_inner_links'>
-                            <h2>Quick Link</h2>
-                            <ul>
-                                <li><a href="">Home</a></li>
-                                <li><a href="">Validation</a></li>
-                                <li><a href="/login">Login Admin</a></li>
-                            </ul>
-
-                        </div>
-                        <div className='footer_inner_text_copyright'>
-                            <p>© 2025 All rights reserved by <a href="https://www.technext.io/" target="_blank" rel="noopener noreferrer">IIPS Eductaion</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
+            <Footer />
+    </>
 }
-export default Header
-
+export default Home;
