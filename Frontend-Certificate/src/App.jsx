@@ -29,8 +29,9 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path="/Validation" element={<Validation/>} />
         <Route path="/Login" element={<Login/>} />
-        {token && <Route path="/upload" element={<Upload />}/>}
+        {/* {token && <Route path="/upload" element={<Upload />}/>} */}
         <Route path="/editor" element={<Editor/>}/>
+        <Route path="/upload" element={<Upload />}/>
 
 
          {/* Admin Routes */}
