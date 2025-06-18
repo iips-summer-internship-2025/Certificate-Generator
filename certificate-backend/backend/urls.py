@@ -18,6 +18,8 @@ from authority.views import ViewAdminUsersPost
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin/admin-list/', views.AdminListView.as_view(), name='admin-list'),
+
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('api/register/', RegisterView.as_view(), name='register'),
@@ -38,6 +40,10 @@ urlpatterns = [
     path('api/crud-admins/', AdminUserAPIView.as_view(), name='admin_users'),
     path('api/crud-admins/delete/<str:username>/', AdminUserDeleteAPIView.as_view(), name='delete_admin_user'),
 
+
     # path for searching:
     path('api/search/', views.search_certificates, name='search_certificates'),
+
+    # path for super admin to view certificates
+    path('api/certificates-latest/', views.latest_certificates.as_view(), name='latest_certificates'),
 ]

@@ -20,8 +20,8 @@ const CertificateSearch = () => {
 
     try {
       const response = await axios.get(
-        'https://certificate-generator-production-ff36.up.railway.app/api/search/',
-        // 'http://127.0.0.1:8000/api/search/',
+        // 'https://certificate-generator-production-ff36.up.railway.app/api/search/',
+        'http://127.0.0.1:8000/api/search/',
         {
           params: { q: searchQuery },
           headers: {

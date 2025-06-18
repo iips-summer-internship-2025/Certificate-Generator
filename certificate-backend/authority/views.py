@@ -29,7 +29,7 @@ from django.core.cache import cache
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
-from .serializers import AdminUserSerializer,UserSerializer
+from .serializers import AdminUserSerializer, UserSerializer, CertificateSerializer
 from django.contrib.auth import update_session_auth_hash
 from .models import CustomUser
 
@@ -45,7 +45,7 @@ from django.db.models import Q
 from .utils import send_bulk_emails
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from .serializers import CertificateSerializer
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
@@ -583,4 +583,12 @@ class ChangePasswordView(APIView):
 
         update_session_auth_hash(request, user)
 
-        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+class latest_certificates(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        certificates = Certificate.objects.order_by('-timestamp')[:50]
+        serializer = CertificateSerializer(certificates, many=True)
+        return Response(serializer.data)
