@@ -11,9 +11,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        #migrations.DeleteModel(
-           # name='MyModel',
-        #),
+        # migrations.DeleteModel(
+        #     name='MyModel',
+        # ),
         migrations.AlterField(
             model_name='Certificate',
             name='certificate_id',
