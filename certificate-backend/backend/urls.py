@@ -12,9 +12,10 @@ from authority.views import SuperuserChangePasswordView
 from authority.views import ViewAdminUsersPost
 from django.urls import path
 from authority.views import ViewCertificatesAPI
+from authority.views import CheckSuperuserStatusView  
 
 
-certificate_list = CertificateViewSet.as_view({'get': 'list'})
+# certificate_list = CertificateViewSet.as_view({'get': 'list'})
 
 
 urlpatterns = [
@@ -42,4 +43,7 @@ urlpatterns = [
 
     # path for searching:
     path('api/search/', views.search_certificates, name='search_certificates'),
+    # path for checking superuser status
+    # This endpoint can be used to check if the user is a superuser
+    path('api/check-superuser/', CheckSuperuserStatusView.as_view(), name='check-superuser'),
 ]

@@ -39,12 +39,11 @@ from rest_framework import permissions
 from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
 from django.db.models import Q
- 
 from .utils import send_bulk_emails
-
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-
+from.serializers import CertificateSerializer
+from django.contrib.auth import authenticate, get_user_model
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
@@ -52,9 +51,6 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     width, height = image.size
     
     draw = ImageDraw.Draw(image)
-    # for field in ['name','event']:
-    #     coord = next((item for item in coordinates if item['title'].lower() == field), None)
-
     for item in coordinates:
         field_key = item.get('title', '')
         #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
@@ -68,11 +64,13 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
         
         # Convert percent to actual pixel values
         
-        x = int((x_percent / 100) * width)
-        y = int((y_percent / 100) * (height+30))    # Adjust y to avoid clipping at the bottom
+        x = int((x_percent / 100) * (width-600))
+        y = int((y_percent / 100) * (height))    # Adjust y to avoid clipping at the bottom
         font_color = item.get('font_color')#, '#000000')
         font_size_percent = item.get('fontSize', '10px')
+        fonts=item.get('font', 'ARIAL.TTF')
         print(f"font_size_percent: {font_size_percent}")
+        font_weight = item.get('font_weight', 'normal')
         #font_size = int((font_size_percent / 100) * height)
         
         # Remove 'px' and convert to int
@@ -97,8 +95,61 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
             print(f"Based font size: {based_font_size} in except block")
             font_size = int((based_font_size/ 100) * width)
         try:
-            font = ImageFont.truetype("ARIAL.TTF", font_size)
-            print(f"Using font size: {font_size}px and font: {font}")
+            if(fonts== 'Arial'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("ARIALBD.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("ARIALI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("ARIALBI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("ARIAL.TTF", font_size)
+                print(f"{font} in try block")
+            elif(fonts== 'Times New Roman'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("TIMESBD.TTF", font_size) 
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("TIMESI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("TIMESBI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("TIMES.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts== 'Courier New'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("COURBD.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("COURI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("COURBI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("COUR.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts== 'Verdana'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("VERDANAB.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("VERDANAI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("VERDANABI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("VERDANA.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts== 'Georgia'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("GEORGIAB.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("GEORGIAI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("GEORGIA.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts=='Helvetica'):
+                font = ImageFont.truetype("HELVETICA.TTF", font_size)
+                print(f"{font} in try block")
+            else:
+                font = ImageFont.truetype(font, font_size)
+                print(f"{font} in try block")
+            print(f"Using font size: {font_size}px and font: {font}{font_weight}")
         except:
             print(" Falling back to default font!")
             font = ImageFont.load_default()
@@ -125,11 +176,6 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     image.paste(qr, (image.width - qr_width - padding_x,  padding_y))  # Bottom right corner
 
     image.save(output_path)
-
-
-
-
-
 
 
 # Uploading Files and Generating certificates and sending them 
@@ -178,7 +224,8 @@ def upload_files(request):
                 'y': float(item.get('y', 0)),
                 'fontSize':float(item.get('font_size','8')),
                 'font_color': item.get('font_color', '#000000'),
-                
+                'font': item.get('font_family', 'ARIAL.TTF'), # Default font if not provided
+                'font_weight': item.get('font_weight', 'normal')  # Default font weight if not provided
             })
             print(f"{coordinates} in upload function")
         except (ValueError, TypeError) as e:
@@ -318,7 +365,6 @@ def upload_files(request):
 
 #                 # You can now process/save/store this data
                 
-                
 #             # generate_certificate_dynamic(
 #             #     template_path="./uploads/Techno-Geek.png",  # update with actual path
 #             #     output_path="./upload/output.png",      # update with actual path
@@ -331,21 +377,11 @@ def upload_files(request):
 #     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 
-
-
-
-
-
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-
-
 class CustomTokenRefreshView(TokenRefreshView):
     pass
-
-
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -424,9 +460,9 @@ def verify_certificate(request, certificate_id):
 #     qr_img.save(response, "PNG")
 #     return response
 
-class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Certificate.objects.all()
-    serializer_class = CertificateSerializer
+# class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+#     queryset = Certificate.objects.all()
+#     serializer_class = CertificateSerializer
 
 #admin functinality:view certificate
 class ViewCertificatesAPI(APIView):
@@ -743,3 +779,33 @@ class ChangePasswordView(APIView):
         update_session_auth_hash(request, user)
 
         return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    
+    
+User = get_user_model()
+    #to check whether the user is superuser or not
+class CheckSuperuserStatusView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return Response({'error': 'Email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Try to authenticate using email (custom user model must support email-based auth)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            return Response({
+            'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff,
+                'email': user.email,
+                'username': user.username,
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
