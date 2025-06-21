@@ -54,6 +54,7 @@ export default function Editor() {
       if (element) {
         element.style.fontFamily = item.fontFamily;
         element.style.fontWeight = item.fontWeight;
+        element.style.fontStyle = item.fontStyle;
       }
     });
   }, [droppedVariables]);
@@ -334,7 +335,6 @@ export default function Editor() {
                               <option value="Courier New">Courier New</option>
                               <option value="Georgia">Georgia</option>
                               <option value="Verdana">Verdana</option>
-                              <option value="Helvetica">Helvetica</option>
                             </select>
                           </label>
                           <label className="inline-block w-1/2">
@@ -353,17 +353,8 @@ export default function Editor() {
                             >
                               <option value="normal">Normal</option>
                               <option value="bold">Bold</option>
-                              <option value="lighter">Light</option>
-                              <option value="bolder">Bolder</option>
-                              <option value="100">100</option>
-                              <option value="200">200</option>
-                              <option value="300">300</option>
-                              <option value="400">400</option>
-                              <option value="500">500</option>
-                              <option value="600">600</option>
-                              <option value="700">700</option>
-                              <option value="800">800</option>
-                              <option value="900">900</option>
+                              <option value="italic">Italic</option>
+                              <option value="bold italic">Bold Italic</option>
                             </select>
                           </label>
                         </form>
