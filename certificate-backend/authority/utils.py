@@ -8,6 +8,7 @@ from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 import os
 import requests
+from dotenv import load_dotenv
 
 
 def generate_unique_id():
@@ -18,8 +19,9 @@ def generate_unique_id():
 def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    smtp_username = 'ashwinchouhan567@gmail.com'
-    smtp_password = os.getenv('EMAIL_APP_KEY')  # Use app password here
+    smtp_username = os.getenv('Apna_Apna_Email')
+    load_dotenv()
+    smtp_password = os.getenv('SMTP_PASSWORD')  # Set SMTP_PASSWORD in your .env file
 
     # Load HTML template
     try:

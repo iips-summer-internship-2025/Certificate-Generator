@@ -3,6 +3,7 @@ import sampoorn_logo from '../../../public/assets/sampoorn_logo.png'
 import template_image from '../../../public/assets/template_image.png'
 import { Link } from 'react-router-dom'
 import React from 'react'
+import CertificateSearch from '../Search/CertificateSearch'
 function Header() {
     return (
         <>
@@ -18,8 +19,8 @@ function Header() {
                             <div class="Right_menu">
                                 <ul className='flex justify-end'>
                                     <li><Link to="/">Home</Link></li>
-                                    <li><a href="/Validation">Validation</a></li>
-                                    <li><a href="/Login">Login-Admin</a></li>
+                                    <li><a href="/CertificateSearch">Validation</a></li>
+                                    <li><a href="/Login">Login</a></li>
                                 </ul>
                             </div>
                         </div>
