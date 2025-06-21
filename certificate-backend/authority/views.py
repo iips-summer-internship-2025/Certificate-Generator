@@ -64,7 +64,7 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
         
         # Convert percent to actual pixel values
         
-        x = int((x_percent / 100) * (width-600))
+        x = int((x_percent / 100) * (width))
         y = int((y_percent / 100) * (height))    # Adjust y to avoid clipping at the bottom
         font_color = item.get('font_color')#, '#000000')
         font_size_percent = item.get('fontSize', '10px')
