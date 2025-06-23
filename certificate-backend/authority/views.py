@@ -274,8 +274,19 @@ def upload_files(request):
         # sending mails synchronously
         send_bulk_emails(email_id, certificate_id, certificate, subject, cc_list)
 
+        # Collect certificate links for response
+        if 'certificate_links' not in locals():
+            certificate_links = []
 
-    return JsonResponse({'message': 'Files uploaded and certificates generated successfully'})
+        certificate_links.append({
+            'name': name,
+            'certificate_url': certificate
+        })
+
+    return JsonResponse({
+    'message': 'Files uploaded and certificates generated successfully',
+    'certificate_links': certificate_links if 'certificate_links' in locals() else []
+    })
 #
 # @csrf_exempt 
 # def accept_coords(request):
