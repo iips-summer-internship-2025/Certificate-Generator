@@ -26,22 +26,18 @@ import json
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
+
 from .serializers import CertificateSerializer
+
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
 from .serializers import AdminUserSerializer,UserSerializer
 from django.contrib.auth import update_session_auth_hash
 from .models import CustomUser
-
-
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets
-from django.contrib.auth import get_user_model
-from rest_framework import permissions
-from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
-from django.db.models import Qfrom .utils import send_bulk_emails
+from django.db.models import Q
+from .utils import send_bulk_emails
 
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
@@ -67,17 +63,16 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
         x = int((x_percent / 100) * width)
         y = int((y_percent / 100) * height)
         font_color = item.get('font_color')#, '#000000')
-        font_size_percent = float(item.get('fontSize', 2))
-        font_size = int((font_size_percent / 100) * height)
-
-
+        font_size_str = str(item.get('fontSize', 20))
+        
 
         # Remove 'px' and convert to int
-        # try:
-        #     font_size = int(font_size_str.replace('px', ''))
-        # except:
-        #     font_size = 16
-
+        try:
+            based_font_size = int(font_size_str.replace('px', ''))
+        except:
+            based_font_size = 5
+        font_size = int((based_font_size/ 100) * height)
+        
         # Load a font — make sure 'arial.ttf' exists or use full path
         try:
             font = ImageFont.truetype("arial.ttf", font_size)
@@ -391,9 +386,9 @@ def verify_certificate(request, certificate_id):
 #     qr_img.save(response, "PNG")
 #     return response
 
-# class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
-#     queryset = Certificate.objects.all()
-#     serializer_class = CertificateSerializer
+class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
+     queryset = Certificate.objects.all()
+     serializer_class = CertificateSerializer
 
 User = get_user_model()
 #for change password of user
@@ -521,53 +516,53 @@ class AdminUserDeleteAPIView(APIView):
     
 
 #User.objects.filter(is_staff=True) |
-class AdminListView(APIView):
-    permission_classes = [IsSuperAdmin]
+#class AdminListView(APIView):
+#    permission_classes = [IsSuperAdmin]
 
-    def get(self, request):
-        users = User.objects.all()
-        data = []
-        for user in users:
-            if user.is_superuser:
-                role = "superadmin"
-            elif user.is_staff:
-                role = "admin"
-            else:
-                role = "user"  # fallback, shouldn't occur in this list
+#    def get(self, request):
+#        users = User.objects.all()
+#        data = []
+#        for user in users:
+#            if user.is_superuser:
+#                role = "superadmin"
+#            elif user.is_staff:
+#                role = "admin"
+#            else:
+#                role = "user"  # fallback, shouldn't occur in this list
 
-            data.append({
-                "username": user.username,
-                "email": user.email,
-                "role": role,
-                "date_created": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
-            })
+#            data.append({
+#                "username": user.username,
+#                "email": user.email,
+#                "role": role,
+#                "date_created": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
+#            })
         
-        return Response(data)    
+#        return Response(data)    
     
-class ChangePasswordView(APIView):
-    permission_classes = [IsSuperAdmin]
+#class ChangePasswordView(APIView):
+#    permission_classes = [IsSuperAdmin]
 
-    def post(self, request):
-        user = request.user
-        current_password = request.data.get('current_password')
-        new_password = request.data.get('new_password')
-        confirm_password = request.data.get('confirm_password')
+#    def post(self, request):
+#        user = request.user
+#        current_password = request.data.get('current_password')
+#        new_password = request.data.get('new_password')
+#        confirm_password = request.data.get('confirm_password')
 
-        if not current_password or not new_password or not confirm_password:
-            return Response({"detail": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+#        if not current_password or not new_password or not confirm_password:
+#            return Response({"detail": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not user.check_password(current_password):
-            return Response({"detail": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+#        if not user.check_password(current_password):
+#            return Response({"detail": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if new_password != confirm_password:
-            return Response({"detail": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+#        if new_password != confirm_password:
+#            return Response({"detail": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if len(new_password) < 6:
-            return Response({"detail": "New password must be at least 6 characters."}, status=status.HTTP_400_BAD_REQUEST)
+#        if len(new_password) < 6:
+#            return Response({"detail": "New password must be at least 6 characters."}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.set_password(new_password)
-        user.save()
+#        user.set_password(new_password)
+#        user.save()
 
-        update_session_auth_hash(request, user)
+#        update_session_auth_hash(request, user)
 
-        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    
+#        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    

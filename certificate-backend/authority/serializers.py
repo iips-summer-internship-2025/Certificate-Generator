@@ -34,9 +34,9 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 # for testing purpose 
-# class CertificateUploadSerializer(serializers.Serializer):
-#     csv = serializers.FileField()
-#     template = serializers.ImageField()    
+#class CertificateUploadSerializer(serializers.Serializer):
+ #    csv = serializers.FileField()
+  #   template = serializers.ImageField()    
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -78,3 +78,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
             user.is_staff = True
             user.save()
             return user
+        
+class CertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certificate
+        fields = '__all__'        
