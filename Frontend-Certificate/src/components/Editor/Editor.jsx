@@ -6,6 +6,7 @@ import './Editor.css';
 import ErrorPage from "../Error page/ErrorPage";
 import Loader from "../Loader/Loader";
 
+
 export default function Editor() {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -144,31 +145,35 @@ export default function Editor() {
   //     alert('Error: ' + error.message);
   //   }
   // };
-  const handleSubmitCoords = async () => {
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('imagefile', imageFile);
-      formData.append('csvfile', csvFile);
-      formData.append('userType', 'merit');
-      formData.append(
-        'coords',
-        JSON.stringify(
-          droppedVariables.map(({ name, x, y, color, fontSize, fontFamily, fontWeight }) => ({
-            title: name,
-            x: (x / imageRef.current.offsetWidth) * 100,
-            y: (y / imageRef.current.offsetHeight) * 100,
-            font_color: color,
-            font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100,
-            font_family: fontFamily,
-            font_weight: fontWeight
-          }))
-        )
-      );
-      const response = await fetch('http://127.0.0.1:8000/api/upload/', {
-        method: 'POST',
-        body: formData,
-      });
+const handleSubmitCoords = async () => {
+  setLoading(true);
+  try {
+    const formData = new FormData();
+    formData.append('imagefile', imageFile);
+    formData.append('csvfile', csvFile);
+    formData.append('userType', 'merit');
+    formData.append(
+      'coords',
+      JSON.stringify(
+        droppedVariables.map(({ name, x, y, color, fontSize, fontFamily, fontWeight }) => ({
+          title: name,
+          x: (x / imageRef.current.offsetWidth) * 100,
+          y: (y / imageRef.current.offsetHeight) * 100,
+          font_color: color,
+          font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100,
+          font_family: fontFamily,
+          font_weight: fontWeight
+        }))
+      )
+    );
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+    const response = await fetch(`${API_URL}/api/upload/`, {
+      method: 'POST',
+      body: formData,
+      // const response = await fetch('http://127.0.0.1:8000/api/upload/', {
+      //   method: 'POST',
+      //   body: formData,
+    });
 
       const text = await response.text();
       setLoading(false);

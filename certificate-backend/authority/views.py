@@ -26,7 +26,6 @@ import json
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
-from .serializers import CertificateSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
@@ -41,9 +40,13 @@ from django.contrib.auth import get_user_model
 from rest_framework import permissions
 from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
-# from django.db.models import Qfrom .utils import send_bulk_emails
 from django.db.models import Q
+ 
 from .utils import send_bulk_emails
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from .serializers import CertificateSerializer
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
@@ -327,7 +330,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
-
+    
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -336,26 +339,35 @@ class RegisterView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# def test_id_generation(request):
-#     row = {
-#     'Name': 'Test User',
-#     'roll_no': '12345',
-#     'email_id': 'test@example.com',
-#     # other fields
-# }
-#     name_slug = "test_name"  # or some default value
-#     certificate_id = generate_unique_id()
 
-    # obj = Certificate.objects.create(
-
-    #         name=name_slug,
-    #         roll_no=row.get('Roll No', ''),
-    #         email_id=row.get('Email', ''),
-    #         certificate_id=certificate_id,
-    #         certificate=f"https://yourdomain.com/verify/{certificate_id}"
-        
-    # )
-    # return JsonResponse({'unique_id': obj.certificate_id})
+# searching certificate:
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_certificates(request):
+    search_query = request.GET.get('q', '')
+    
+    if not search_query:
+        return Response({'error': 'Search query is required'}, status=400)
+    
+    # Search by name or email (case insensitive)
+    certificates = Certificate.objects.filter(
+        Q(name__icontains=search_query) | 
+        Q(email_id__icontains=search_query)
+    )
+    
+    results = [
+        {
+            'name': cert.name,
+            'roll_no': cert.roll_no,
+            'certificate': cert.certificate,
+            'certificate_id': cert.certificate_id,
+            'email_id': cert.email_id,
+            'timestamp': cert.timestamp
+        }
+        for cert in certificates
+    ]
+    
+    return Response({'results': results})
 
 def generate_unique_id():
      while True:

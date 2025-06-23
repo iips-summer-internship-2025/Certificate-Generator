@@ -17,8 +17,8 @@ function Footer(){
                             <h2>Quick Link</h2>
                             <ul>
                                 <li><a href="">Home</a></li>
-                                <li><a href="">Validation</a></li>
-                                <li><a href="/">Login Admin</a></li>
+                                <li><a href="/validation">Validation</a></li>
+                                <li><a href="/Login">Login Admin</a></li>
                             </ul>
 
                         </div>
