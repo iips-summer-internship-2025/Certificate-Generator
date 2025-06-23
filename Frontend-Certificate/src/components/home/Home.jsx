@@ -14,7 +14,7 @@ function Home(){
                             <h2>Empowering Every Achievement, Digitally</h2>
                         </div>
                         <div class="redirect_button">
-                            <a href='#' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
+                            <a href='https://iips.edu.in/sampoorna/Sampoorna.php' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
                         </div>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ function Home(){
                                 <img src={template_image} alt="Design Template" />
                             </div>
                             <div class="redirect_button">
-                                <a href='/' className='Redirect_anchor '>Get Start</a>
+                                <a href='/Login' className='Redirect_anchor '>Get Start</a>
                             </div>
                         </div>
                     </div>
@@ -201,7 +201,7 @@ function Home(){
                         </div>
                         <div className='text-center mt-5'>
                             <div class="redirect_button">
-                                <a href='/' className='Redirect_anchor'>Login to continue</a>
+                                <a href='/Login' className='Redirect_anchor'>Login to continue</a>
                             </div>
                         </div>
                     </div>

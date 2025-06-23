@@ -4,12 +4,13 @@ import Papa from "papaparse";
 import './Editor.css';
 import ErrorPage from "../Error page/ErrorPage";
 import Loader from "../Loader/Loader";
-
+import EditorRulesModal from "../Warning&Rules/EditorRulesModal";
 
 export default function Editor() {
   const { state } = useLocation();
   const imageFile = state?.imageFile;
   const csvFile = state?.csvFile;
+  const [showRulesModal, setShowRulesModal] = useState(true); // Changed to true by default
 
   if (!imageFile || !csvFile) {
     return (
@@ -19,10 +20,20 @@ export default function Editor() {
       />
     );
   }
+    // Show modal on every page load
+    useEffect(() => {
+      setShowRulesModal(true);
+    }, []);
 
   const imageUrl = URL.createObjectURL(imageFile);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [droppedVariables, setDroppedVariables] = useState([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [imgDims, setImgDims] = useState({ width: 1, height: 1 });
+
+  const imageRef = useRef(null);
+  const previewImgRef = useRef(null);
 
   useEffect(() => {
     if (csvFile) {
@@ -37,19 +48,17 @@ export default function Editor() {
     }
   }, [csvFile]);
 
-  const imageRef = useRef(null);
-  const [droppedVariables, setDroppedVariables] = useState([]);
-  const [previewOpen, setPreviewOpen] = useState(false);
-
-    useEffect(() => {
+  useEffect(() => {
     droppedVariables.forEach(item => {
       const element = document.getElementById(item.name);
       if (element) {
         element.style.fontFamily = item.fontFamily;
         element.style.fontWeight = item.fontWeight;
+        element.style.fontStyle = item.fontStyle;
       }
     });
   }, [droppedVariables]);
+
   const handleDrop = (e) => {
     e.preventDefault();
     const variable = e.dataTransfer.getData("text/plain");
@@ -60,138 +69,109 @@ export default function Editor() {
     const y = e.clientY - rect.top;
 
     setDroppedVariables((prev) => {
-      const existing = prev.find((item) => item.name === variable);
-      const newItem = {
-        name: variable,
-        x,
-        y,
-        color: existing ? existing.color : "#565552",
-        fontSize: existing ? existing.fontSize : "16px",
-        fontFamily: existing ? existing.fontFamily : "Arial",
-        fontWeight: existing ? existing.fontWeight : "normal"
-      };
-      return [...prev.filter((item) => item.name !== variable), newItem];
+      const existingItem = prev.find((item) => item.name === variable);
+      return [
+        ...prev.filter((item) => item.name !== variable),
+        {
+          name: variable,
+          x,
+          y,
+          color: existingItem?.color || "#565552",
+          fontSize: existingItem?.fontSize || "16px",
+          fontFamily: existingItem?.fontFamily || "Arial",
+          fontWeight: existingItem?.fontWeight || "normal"
+        }
+      ];
     });
 
-    const d = document.getElementById(variable);
-    if (d) {
-      const existingStyle = droppedVariables.find((item) => item.name === variable);
-      d.style.position = "absolute";
-      d.style.left = `${e.clientX}px`;
-      d.style.top = `${window.scrollY + e.clientY}px`;
-      d.style.zIndex = '50';
-      d.style.fontFamily = existing ? existing.fontFamily : "Arial";
-      d.style.fontWeight = existing ? existing.fontWeight : "normal";
+    const element = document.getElementById(variable);
+    if (element) {
+      const existingItem = droppedVariables.find((item) => item.name === variable);
+      element.style.position = "absolute";
+      element.style.left = `${e.clientX}px`;
+      element.style.top = `${window.scrollY + e.clientY}px`;
+      element.style.zIndex = '50';
+      element.style.fontFamily = existingItem?.fontFamily || "Arial";
+      element.style.fontWeight = existingItem?.fontWeight || "normal";
     }
 
-    const d_status = document.getElementById(variable + "-status");
-    if (d_status) {
-      d_status.style.backgroundColor = 'green';
+    const statusElement = document.getElementById(`${variable}-status`);
+    if (statusElement) {
+      statusElement.style.backgroundColor = 'green';
     }
   };
 
   const handleRemove = (title) => {
-    const dRemove = document.getElementById(title + "-remove_div");
-    if (dRemove) dRemove.style.display = 'none';
+    const removeElement = document.getElementById(`${title}-remove_div`);
+    if (removeElement) removeElement.style.display = 'none';
     setDroppedVariables((prev) => prev.filter((item) => item.name !== title));
   };
 
-  const handelSetVariable = (title) => {
+  const handleSetVariable = (title) => {
     setDroppedVariables((prev) => prev.filter((item) => item.name !== title));
-    const d = document.getElementById(title);
-    if (d) {
-      d.style.position = "static";
-      d.style.left = "unset";
-      d.style.top = "unset";
-      d.style.zIndex = "unset";
+    const element = document.getElementById(title);
+    if (element) {
+      element.style.position = "relative";
+      element.style.left = "unset";
+      element.style.top = "unset";
+      element.style.zIndex = "unset";
     }
   };
 
-  // const handleSubmitCoords = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append('imagefile', imageFile);
-  //     formData.append('csvfile', csvFile);
-  //     formData.append('userType', 'merit');
-  //     formData.append(
-  //       'coords',
-  //       JSON.stringify(
-  //         droppedVariables.map(({ name, x, y, color, fontSize }) => ({
-  //           title: name,
-  //           x: (x / imageRef.current.offsetWidth) * 100,
-  //           y: (y / imageRef.current.offsetHeight) * 100,
-  //           font_color: color,
-  //           font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100,
-  //           font_family: fontFamily,
-  //           font_weight: fontWeight
-  //         }))
-  //       )
-  //     );
-  //     const response = await fetch('http://127.0.0.1:8000/api/upload/', {
-  //       method: 'POST',
-  //       body: formData,
-  //     });
+  const handleSubmitCoords = async () => {
+    console.log('Submit button clicked');
+    setLoading(true);
+    try {
+      console.log('Starting API call'); 
+      const formData = new FormData();
+      formData.append('imagefile', imageFile);
+      formData.append('csvfile', csvFile);
+      formData.append('userType', 'merit');
+      formData.append(
+        'coords',
+        JSON.stringify(
+          droppedVariables.map(({ name, x, y, color, fontSize, fontFamily, fontWeight }) => ({
+            title: name,
+            x: (x / imageRef.current.offsetWidth) * 100,
+            y: (y / imageRef.current.offsetHeight) * 100,
+            font_color: color,
+            font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100,
+            font_family: fontFamily,
+            font_weight: fontWeight
+          }))
+        )
+      );
+      
+      const response = await fetch('http://127.0.0.1:8000/api/upload/', {
+        method: 'POST',
+        body: formData,
+      });
 
-  //     const text = await response.text();
-  //     setLoading(false);
-  //     if (!response.ok) {
-  //       alert(text || "Failed to send coordinates. Please try again.");
-  //     }
-  //   } catch (error) {
-  //     setLoading(false);
-  //     alert('Error: ' + error.message);
-  //   }
-  // };
-const handleSubmitCoords = async () => {
-  setLoading(true);
-  try {
-    const formData = new FormData();
-    formData.append('imagefile', imageFile);
-    formData.append('csvfile', csvFile);
-    formData.append('userType', 'merit');
-    formData.append(
-      'coords',
-      JSON.stringify(
-        droppedVariables.map(({ name, x, y, color, fontSize, fontFamily, fontWeight }) => ({
-          title: name,
-          x: (x / imageRef.current.offsetWidth) * 100,
-          y: (y / imageRef.current.offsetHeight) * 100,
-          font_color: color,
-          font_size: (parseInt(fontSize) / imageRef.current.offsetHeight) * 100,
-          font_family: fontFamily,
-          font_weight: fontWeight
-        }))
-      )
-    );
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
-    const response = await fetch(`${API_URL}/api/upload/`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    const text = await response.text();
-    setLoading(false);
-    if (!response.ok) {
-      alert(text || "Failed to send coordinates. Please try again.");
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Failed to send coordinates");
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setLoading(false);
-    alert('Error: ' + error.message);
-  }
-};
-  const [imgDims, setImgDims] = useState({ width: 1, height: 1 });
-  const previewImgRef = useRef(null);
-  console.log(droppedVariables);
+  };
+  console.log(droppedVariables)
+
   return (
-    <div className="flex flex-col justify-center items-center gap-14 w-screen overflow-hidden ">
+    <div className="flex flex-col justify-center items-center gap-14 w-screen overflow-hidden">
       {loading && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
           <Loader />
         </div>
       )}
-
-      <div>
+      {/* Editor Rules Modal - Now shows on every page load */}
+      <EditorRulesModal 
+        show={showRulesModal} 
+        onClose={() => setShowRulesModal(false)} 
+      />
+      <div className="w-full">
         <div className="row">
           <div className="col-lg-3 Side_Nav_Bar h-screen">
             <div className="h-1/2">
@@ -220,16 +200,15 @@ const handleSubmitCoords = async () => {
                   };
 
                   return (
-                    <div className="col-lg-12 row" key={index}>
+                    <div className="col-lg-12 row" key={`column-${index}`}>
                       <div
-                        id={title + "-remove_div"}
+                        id={`${title}-remove_div`}
                         className="rmeove_div bg-[floralwhite] h-fit w-fit shadow-md p-1 flex flex-col items-center gap-2 border-2 border-slate-400 rounded-md"
                       >
-                        <p className="capitalize heading_of_column">{title}</p>
-                        <div className="relative">
-                          <span
+                        <p className="capitalize heading_of_column w-full flex item-center justify-around">{title}
+                        <span
                             onClick={() => handleRemove(title)}
-                            className="absolute top-1/2 -translate-y-1/2 -left-32 bg-red-600 rounded cursor-pointer px-2 hover:bg-green-600">
+                            className="   rounded cursor-pointer px-2 hover:bg-red-600 inline-block">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" fill="none">
                               <path d="M10 11V17" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                               <path d="M14 11V17" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -238,14 +217,12 @@ const handleSubmitCoords = async () => {
                               <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </span>
-                        </div>
-
+                        
+                        </p>
                         <div
                           id={title}
                           draggable
-                          onDragStart={(e) =>
-                            e.dataTransfer.setData("text/plain", title)
-                          }
+                          onDragStart={(e) => e.dataTransfer.setData("text/plain", title)}
                           style={{
                             color: item.color,
                             fontSize: item.fontSize,
@@ -253,13 +230,13 @@ const handleSubmitCoords = async () => {
                           className="relative z-40 border-2 border-slate-200"
                         >
                           <span
-                            id={title + "-status"}
+                            id={`${title}-status`}
                             className="h-3 w-3 rounded-full -translate-2 bg-red-600 absolute cursor-move"
                           ></span>
                           <p className="capitalize">{title}</p>
                           <span
-                            className=" bg-slate-200 h-3 w-3 rounded-full absolute -top-1 -right-1 cursor-pointer add_cross"
-                            onClick={() => handelSetVariable(title)}
+                            className="bg-slate-200 h-3 w-3 rounded-full absolute -top-1 -right-1 cursor-pointer add_cross"
+                            onClick={() => handleSetVariable(title)}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="8px" height="8px" viewBox="0 0 16 16" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                               <path d="M0 14.545L1.455 16 8 9.455 14.545 16 16 14.545 9.455 8 16 1.455 14.545 0 8 6.545 1.455 0 0 1.455 6.545 8z" fillRule="evenodd" />
@@ -277,17 +254,12 @@ const handleSubmitCoords = async () => {
                 <div className="Ediotr_svg_parent text-center">
                   <div>
                     <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" width="20px" height="20px" viewBox="0 -2 32 32" version="1.1">
-
                       <title>brush</title>
                       <desc>Created with Sketch Beta.</desc>
-                      <defs>
-
-                      </defs>
+                      <defs></defs>
                       <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd" sketch:type="MSPage">
                         <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-99.000000, -154.000000)" fill="#000000">
-                          <path d="M128.735,157.585 L116.047,170.112 L114.65,168.733 L127.339,156.206 C127.725,155.825 128.35,155.825 128.735,156.206 C129.121,156.587 129.121,157.204 128.735,157.585 L128.735,157.585 Z M112.556,173.56 C112.427,173.433 111.159,172.181 111.159,172.181 L113.254,170.112 L114.65,171.491 L112.556,173.56 L112.556,173.56 Z M110.461,178.385 C109.477,179.298 105.08,181.333 102.491,179.36 C102.491,179.36 103.392,178.657 104.074,177.246 C105.703,172.919 109.763,173.56 109.763,173.56 L111.159,174.938 C111.173,174.952 112.202,176.771 110.461,178.385 L110.461,178.385 Z M130.132,154.827 C128.975,153.685 127.099,153.685 125.942,154.827 L108.764,171.788 C106.661,171.74 103.748,172.485 102.491,176.603 C101.53,178.781 99,178.671 99,178.671 C104.253,184.498 110.444,181.196 111.857,179.764 C113.1,178.506 113.279,176.966 113.146,175.734 L130.132,158.964 C131.289,157.821 131.289,155.969 130.132,154.827 L130.132,154.827 Z" id="brush" sketch:type="MSShapeGroup">
-
-                          </path>
+                          <path d="M128.735,157.585 L116.047,170.112 L114.65,168.733 L127.339,156.206 C127.725,155.825 128.35,155.825 128.735,156.206 C129.121,156.587 129.121,157.204 128.735,157.585 L128.735,157.585 Z M112.556,173.56 C112.427,173.433 111.159,172.181 111.159,172.181 L113.254,170.112 L114.65,171.491 L112.556,173.56 L112.556,173.56 Z M110.461,178.385 C109.477,179.298 105.08,181.333 102.491,179.36 C102.491,179.36 103.392,178.657 104.074,177.246 C105.703,172.919 109.763,173.56 109.763,173.56 L111.159,174.938 C111.173,174.952 112.202,176.771 110.461,178.385 L110.461,178.385 Z M130.132,154.827 C128.975,153.685 127.099,153.685 125.942,154.827 L108.764,171.788 C106.661,171.74 103.748,172.485 102.491,176.603 C101.53,178.781 99,178.671 99,178.671 C104.253,184.498 110.444,181.196 111.857,179.764 C113.1,178.506 113.279,176.966 113.146,175.734 L130.132,158.964 C131.289,157.821 131.289,155.969 130.132,154.827 L130.132,154.827 Z" id="brush" sketch:type="MSShapeGroup"></path>
                         </g>
                       </g>
                     </svg>
@@ -301,105 +273,93 @@ const handleSubmitCoords = async () => {
                     color: "#000000",
                     fontSize: "16px",
                   };
+                  
+                  if (!droppedVariables.some(v => v.name === title)) return null;
+
                   return (
-                    <>
-                      {/* === Show tools only if this column was dropped === */}
-                      {droppedVariables.find((v) => v.name === title) && (
-                        <div className="col-lg-12 row">
-                          <div className="Inner_div_design rmeove_div bg-[floralwhite] h-fit w-fit shadow-md p15 flex flex-col items-center gap-2 border-2 border-slate-400 rounded-md">
-                            <form>
-                              <p className="block px-3 title_color_design border-l border-r border-grey  text-black text-center capitalize">{title}</p>
-                              <label className="inline-block w-1/2">
-                                <input
-                                  type="color"
-                                  value={item.color}
-                                  onChange={(e) => {
-                                    setDroppedVariables((prev) =>
-                                      prev.map((p) =>
-                                        p.name === title
-                                          ? { ...p, color: e.target.value }
-                                          : p
-                                      )
-                                    );
-                                  }}
-                                  className="w-full border-2 border-amber-100 rounded-md"
-                                />
-                              </label>
-                              <label className="inline-block w-1/2">
-                                <input
-                                  type="number"
-                                  value={parseInt(item.fontSize)}
-                                  min="8"
-                                  max="72"
-                                  onChange={(e) => {
-                                    const newSize = `${e.target.value}px`;
-                                    setDroppedVariables((prev) =>
-                                      prev.map((p) =>
-                                        p.name === title
-                                          ? { ...p, fontSize: newSize }
-                                          : p
-                                      )
-                                    );
-                                  }}
-                                  className="font_size_design font_family_design"
-                                />
-                              </label>
-                              <label className="inline-block w-1/2">
-                                <select
-                                  value={item.fontFamily}
-                                  onChange={(e) => {
-                                    setDroppedVariables((prev) =>
-                                      prev.map((p) =>
-                                        p.name === title
-                                          ? { ...p, fontFamily: e.target.value }
-                                          : p
-                                      )
-                                    );
-                                  }}
-                                  className="font_family_design"
-                                >
-                                  <option value="Arial">Arial</option>
-                                  <option value="Times New Roman">Times New Roman</option>
-                                  <option value="Courier New">Courier New</option>
-                                  <option value="Georgia">Georgia</option>
-                                  <option value="Verdana">Verdana</option>
-                                  <option value="Helvetica">Helvetica</option>
-                                </select>
-                              </label>
-                              <label className="inline-block w-1/2">
-                                <select
-                                  value={item.fontWeight}
-                                  onChange={(e) => {
-                                    setDroppedVariables((prev) =>
-                                      prev.map((p) =>
-                                        p.name === title
-                                          ? { ...p, fontWeight: e.target.value }
-                                          : p
-                                      )
-                                    );
-                                  }}
-                                  className="font_weight_design"
-                                >
-                                  <option value="normal">Normal</option>
-                                  <option value="bold">Bold</option>
-                                  <option value="lighter">Light</option>
-                                  <option value="bolder">Bolder</option>
-                                  <option value="100">100</option>
-                                  <option value="200">200</option>
-                                  <option value="300">300</option>
-                                  <option value="400">400</option>
-                                  <option value="500">500</option>
-                                  <option value="600">600</option>
-                                  <option value="700">700</option>
-                                  <option value="800">800</option>
-                                  <option value="900">900</option>
-                                </select>
-                              </label>
-                            </form>
-                          </div>
-                        </div>
-                      )}
-                    </>
+                    <div className="col-lg-12 row" key={`style-${index}`}>
+                      <div className="Inner_div_design rmeove_div bg-[floralwhite] h-fit w-fit shadow-md p15 flex flex-col items-center gap-2 border-2 border-slate-400 rounded-md">
+                        <form>
+                          <p className="block px-3 title_color_design border-l border-r border-grey text-black text-center capitalize">{title}</p>
+                          <label className="inline-block w-1/2">
+                            <input
+                              type="color"
+                              value={item.color}
+                              onChange={(e) => {
+                                setDroppedVariables((prev) =>
+                                  prev.map((p) =>
+                                    p.name === title
+                                      ? { ...p, color: e.target.value }
+                                      : p
+                                  )
+                                );
+                              }}
+                              className="w-full border-2 border-amber-100 rounded-md"
+                            />
+                          </label>
+                          <label className="inline-block w-1/2">
+                            <input
+                              type="number"
+                              value={parseInt(item.fontSize)}
+                              min="8"
+                              max="72"
+                              onChange={(e) => {
+                                const newSize = `${e.target.value}px`;
+                                setDroppedVariables((prev) =>
+                                  prev.map((p) =>
+                                    p.name === title
+                                      ? { ...p, fontSize: newSize }
+                                      : p
+                                  )
+                                );
+                              }}
+                              className="font_size_design font_family_design"
+                            />
+                          </label>
+                          <label className="inline-block w-1/2">
+                            <select
+                              value={item.fontFamily}
+                              onChange={(e) => {
+                                setDroppedVariables((prev) =>
+                                  prev.map((p) =>
+                                    p.name === title
+                                      ? { ...p, fontFamily: e.target.value }
+                                      : p
+                                  )
+                                );
+                              }}
+                              className="font_family_design"
+                            >
+                              <option value="Arial">Arial</option>
+                              <option value="Times New Roman">Times New Roman</option>
+                              <option value="Courier New">Courier New</option>
+                              <option value="Georgia">Georgia</option>
+                              <option value="Verdana">Verdana</option>
+                            </select>
+                          </label>
+                          <label className="inline-block w-1/2">
+                            <select
+                              value={item.fontWeight}
+                              onChange={(e) => {
+                                setDroppedVariables((prev) =>
+                                  prev.map((p) =>
+                                    p.name === title
+                                      ? { ...p, fontWeight: e.target.value }
+                                      : p
+                                  )
+                                );
+                              }}
+                              className="font_weight_design"
+                            >
+                              <option value="normal">Normal</option>
+                              <option value="bold">Bold</option>
+                              <option value="italic">Italic</option>
+                              <option value="bold italic">Bold Italic</option>
+                            </select>
+                          </label>
+                        </form>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -422,7 +382,7 @@ const handleSubmitCoords = async () => {
               onDragOver={(e) => e.preventDefault()}
               ref={imageRef}
             >
-              <div className="absolute inset-0 z-0 rounded-[5px]  pointer-events-none"></div>
+              <div className="absolute inset-0 z-0 rounded-[5px] pointer-events-none"></div>
               <img
                 src={imageUrl}
                 alt="Certificate"
@@ -448,17 +408,17 @@ const handleSubmitCoords = async () => {
               </div>
               <div className="col-lg-4 mt-4">
                 <button
-            className=" border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600"
-            onClick={handleSubmitCoords}
-          >
-            Submit
-          </button>
+                  className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
+                  onClick={handleSubmitCoords}
+                >
+                  Submit
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {/* Preview Modal */}
+      
       {previewOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70">
           <div className="relative bg-slate-900 rounded-lg shadow-lg flex flex-col items-center p-4">
@@ -498,7 +458,7 @@ const handleSubmitCoords = async () => {
               />
               {droppedVariables.map((item) => (
                 <div
-                  key={item.name}
+                  key={`preview-${item.name}`}
                   style={{
                     position: "absolute",
                     left: item.x,

@@ -6,11 +6,13 @@ from authority import views
 #from authority.views import test_id_generation
 #from authority.views import accept_coords
 from rest_framework.routers import DefaultRouter
-# from authority.views import CertificateViewSet
+#from authority.views import CertificateViewSet
 from authority.views import AdminListView, ChangePasswordView, AdminUserAPIView, AdminUserDeleteAPIView
-
 from authority.views import SuperuserChangePasswordView
 from authority.views import ViewAdminUsersPost
+from django.urls import path
+from authority.views import ViewCertificatesAPI
+from authority.views import CheckSuperuserStatusView  
 
 
 # certificate_list = CertificateViewSet.as_view({'get': 'list'})
@@ -39,11 +41,18 @@ urlpatterns = [
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/crud-admins/', AdminUserAPIView.as_view(), name='admin_users'),
     path('api/crud-admins/delete/<str:username>/', AdminUserDeleteAPIView.as_view(), name='delete_admin_user'),
+    path('api/certificates/', ViewCertificatesAPI.as_view(), name='view-certificates'),
 
 
     # path for searching:
     path('api/search/', views.search_certificates, name='search_certificates'),
+<<<<<<< HEAD
 
     # path for super admin to view certificates
     path('api/certificates-latest/', views.latest_certificates.as_view(), name='latest_certificates'),
+=======
+    # path for checking superuser status
+    # This endpoint can be used to check if the user is a superuser
+    path('api/check-superuser/', CheckSuperuserStatusView.as_view(), name='check-superuser'),
+>>>>>>> 44d403eb10b5f42f40de3fcc0fd9978893cefa08
 ]
