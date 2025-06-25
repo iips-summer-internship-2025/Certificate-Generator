@@ -19,7 +19,7 @@ def generate_unique_id():
 def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    smtp_username = 'rudranshpardeshi12@gmail.com'
+    smtp_username = os.getenv('Apna_Apna_Email')
     load_dotenv()
     smtp_password = os.getenv('SMTP_PASSWORD')  # Set SMTP_PASSWORD in your .env file
 

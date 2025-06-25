@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authority', '0015_delete_mymodel'),
+        #('authority', '0015_delete_mymodel'),
         ('authority', '0015_remove_customuser_can_manage_users'),
     ]
 

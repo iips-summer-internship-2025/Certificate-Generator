@@ -133,25 +133,34 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Component
 export default function ViewCertificates() {
   const [searchQuery, setSearchQuery] = useState("");
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 50;
 
-  // Fetch data from backend
   useEffect(() => {
     const fetchCertificates = async () => {
+      setLoading(true);
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/certificates/",{
-          method: "GET",
+        const token = localStorage.getItem('token');
+        const response = await fetch("http://127.0.0.1:8000/api/certificates/", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming token is stored in localStorage
+            'Authorization': `Bearer ${token}`,
           },
-        }); 
+          body: JSON.stringify({
+            page: page,
+            page_size: pageSize,
+            search: searchQuery.trim(),
+          }),
+        });
         const data = await response.json();
-        setCertificates(data);
+        setCertificates(data.results || []);
+        setTotalPages(data.totalPages || 1);
       } catch (error) {
         console.error("Failed to fetch certificates:", error);
       } finally {
@@ -160,18 +169,14 @@ export default function ViewCertificates() {
     };
 
     fetchCertificates();
-  }, []);
+  }, [page, searchQuery]);
 
-  // Filter logic
-  const filteredCertificates = certificates.filter((cert) =>
-    [cert.recipient, cert.title, cert.name, cert.event, cert.rollNo, cert.id.toString()]
-      .join(" ")
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase())
-  );
+  const handlePrev = () => setPage((p) => Math.max(1, p - 1));
+  const handleNext = () => setPage((p) => Math.min(totalPages, p + 1));
 
   const handleSearch = () => {
-    console.log("Searching for:", searchQuery);
+    setPage(1); // Reset to first page on new search
+    // The effect will re-run due to searchQuery change
   };
 
   const handleView = (certificateId) => {
@@ -221,8 +226,8 @@ export default function ViewCertificates() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCertificates.length > 0 ? (
-                filteredCertificates.map((certificate) => (
+              {certificates.length > 0 ? (
+                certificates.map((certificate) => (
                   <TableRow key={certificate.id}>
                     <TableCell>{certificate.recipient}</TableCell>
                     <TableCell>{certificate.title}</TableCell>
@@ -258,6 +263,19 @@ export default function ViewCertificates() {
           </Table>
         )}
       </Card>
+
+      {/* Pagination controls */}
+      <div style={{ marginTop: "1rem" }}>
+        <button onClick={handlePrev} disabled={page === 1}>
+          Previous
+        </button>
+        <span style={{ margin: "0 1rem" }}>
+          Page {page} of {totalPages}
+        </span>
+        <button onClick={handleNext} disabled={page === totalPages}>
+          Next
+        </button>
+      </div>
     </div>
   );
 }

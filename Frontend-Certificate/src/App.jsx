@@ -30,13 +30,12 @@ function App() {
     
       <Routes>
         <Route path='/' element={<Home/>}/>
-        {/* <Route path="/Validation" element={<Validation/>} /> */}
-        <Route path="/Login" element={<Login/>} />
-        {/* <Route path="/upload" element={<Upload />} /> */}
-        <Route path="/loader" element={<Loader />} />
+        {token && <Route path="/Login" element={<Login />}/>}
         {token && <Route path="/upload" element={<Upload />}/>}
+        {/* <Route path="/upload" element={<Upload />}/>
+        <Route path="/Login" element={<Login/>} /> */}
         <Route path="/editor" element={<Editor/>}/>
-        <Route path="/CertificateSearch" element={<CertificateSearch/>} />
+        <Route path="/CertificateSearch" element={<CertificateSearch />}/>
 
 
          {/* Admin Routes */}

@@ -3,6 +3,7 @@ import sampoorn_logo from '../../../public/assets/sampoorn_logo.png'
 import template_image from '../../../public/assets/template_image.png'
 import { Link } from 'react-router-dom'
 import React from 'react'
+import CertificateSearch from '../Search/CertificateSearch'
 function Header() {
     return (
         <>

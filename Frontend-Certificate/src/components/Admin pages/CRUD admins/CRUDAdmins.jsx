@@ -564,10 +564,16 @@ export default function CrudAdmins() {
 
   const handleEdit = (adminId) => {
     console.log("Editing admin:", adminId);
+    // Implement edit logic here
   };
 
+  const handleDelete = (adminId) => {
+    setAdmins(admins.filter((admin) => admin.id !== adminId));
+    // Implement backend delete logic if needed
+  };
   // const handleDelete = (adminId) => {
-  //   setAdmins(admins.filter((admin) => admin.id !== adminId));
+  //   setAdmins(admins.filter(((admin)) => admin.id !== adminId));
+    // Implement backend delete logic if needed
   // };
   // const handleDelete = async (adminId) => {
   //   const token = localStorage.getItem("token");
@@ -663,8 +669,7 @@ export default function CrudAdmins() {
       {/* Add Admin Form */}
       <Card className="mb-8">
         <CardContent className="p-6">
-          {/* <form onSubmit={editingId ? handleUpdateAdmin : handleAddAdmin} className="flex gap-6 p-4 flex-1"> */}
-          <form onSubmit={handleAddAdmin} className="flex justify-between p-4 items-start">
+          <form onSubmit={handleAddAdmin} className="flex justify-between items-start">
             <div className="flex gap-6 flex-1">
               <div className="space-y-2">
                 <Label htmlFor="adminUsername" className="text-gray-700">Username</Label>
