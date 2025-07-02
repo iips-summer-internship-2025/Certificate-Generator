@@ -44,6 +44,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from.serializers import CertificateSerializer
 from django.contrib.auth import authenticate, get_user_model
+from rest_framework import generics
+from .models import Club, Event
+from .serializers import ClubSerializer, EventSerializer
+
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
@@ -140,6 +144,8 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
                     font = ImageFont.truetype("GEORGIAB.TTF", font_size)
                 elif(font_weight == 'italic'):
                     font = ImageFont.truetype("GEORGIAI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("GEORGIAZ.TTF", font_size)
                 else:
                     font = ImageFont.truetype("GEORGIA.TTF", font_size)
                 print(f"{font}  in try block")
@@ -809,3 +815,16 @@ class CheckSuperuserStatusView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+# Clubs
+class ClubListCreateView(generics.ListCreateAPIView):
+    queryset = Club.objects.all()
+    serializer_class = ClubSerializer
+    permission_classes = [IsAuthenticated]  # Only logged-in users
+
+# Events
+class EventListCreateView(generics.ListCreateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAdminUser]  # Only admins can add/view
