@@ -57,5 +57,23 @@ class Certificate(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     #suser_type= models.BooleanField(default=False)
 
-   
+class Club(models.Model):
+    club_code = models.CharField(max_length=10, primary_key=True)  # Custom PK
+    name = models.CharField(max_length=100, unique=True)
+    head = models.CharField(max_length=100)
+    
+
+    def __str__(self):
+        return self.name
+
+class Event(models.Model):
+    club = models.ForeignKey(Club, to_field='club_code', on_delete=models.CASCADE)
+    event_name = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    coordinator_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.event_name} ({self.club.name})"
+  
     
