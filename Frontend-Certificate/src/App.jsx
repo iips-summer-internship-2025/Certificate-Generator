@@ -16,6 +16,7 @@ import Footer from './components/home/Footer'
 import Home from './components/home/Home'
 import Validation from './components/home/Validation/Validation'
 import './App.css'
+import DownloadReport from './components/Clubs/DownloadReport'
 
 
 
@@ -28,6 +29,7 @@ function App() {
     
       <Routes>
         <Route path='/' element={<Home/>}/>
+        <Route path="/DownloadReport" element={<DownloadReport/>}/>
         {token && <Route path="/Login" element={<Login />}/>}
         {token && <Route path="/upload" element={<Upload />}/>}
         {/* <Route path="/upload" element={<Upload />}/>

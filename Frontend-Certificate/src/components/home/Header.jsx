@@ -19,7 +19,13 @@ function Header() {
                             <div class="Right_menu">
                                 <ul className='flex justify-end'>
                                     <li><Link to="/">Home</Link></li>
-                                    <li><a href="/CertificateSearch">Validation</a></li>
+                                    <li><a href="/CertificateSearch">Search-Certificate</a></li>
+                                    <li><a>Clubs</a>
+                                        <ul className='Clubs_Drop_Down'>
+                                            <li><a href="/UploadReport">Upload-Report</a></li>
+                                            <li><a href="/DownloadReport">Download-Report</a></li>
+                                        </ul>
+                                    </li>
                                     <li><a href="/Login">Login</a></li>
                                 </ul>
                             </div>

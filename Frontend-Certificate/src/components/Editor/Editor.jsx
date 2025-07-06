@@ -54,7 +54,6 @@ export default function Editor() {
       if (element) {
         element.style.fontFamily = item.fontFamily;
         element.style.fontWeight = item.fontWeight;
-        element.style.fontStyle = item.fontStyle;
       }
     });
   }, [droppedVariables]);
@@ -141,7 +140,7 @@ export default function Editor() {
           }))
         )
       );
-      
+
       const response = await fetch('http://127.0.0.1:8000/api/upload/', {
         method: 'POST',
         body: formData,
@@ -217,7 +216,7 @@ export default function Editor() {
                               <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </span>
-                        
+
                         </p>
                         <div
                           id={title}
@@ -273,7 +272,7 @@ export default function Editor() {
                     color: "#000000",
                     fontSize: "16px",
                   };
-                  
+
                   if (!droppedVariables.some(v => v.name === title)) return null;
 
                   return (
@@ -354,7 +353,7 @@ export default function Editor() {
                               <option value="normal">Normal</option>
                               <option value="bold">Bold</option>
                               <option value="italic">Italic</option>
-                              <option value="bold italic">Bold Italic</option>
+                              <option value="bolder">Bold Italic</option>
                             </select>
                           </label>
                         </form>
@@ -390,15 +389,15 @@ export default function Editor() {
               />
             </div>
             <div className="row flex justify-center items-center mt-2 text-center">
-              <div className="col-lg-4 mt-4">
+              {/* <div className="col-lg-4 mt-4">
                 <button
                   onClick={() => setPreviewOpen(true)}
                   className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
                 >
                   Preview
                 </button>
-              </div>
-              <div className="col-lg-4 mt-4">
+              </div> */}
+              <div className="col-lg-6 mt-4">
                 <button
                   onClick={() => window.location.reload()}
                   className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
@@ -406,7 +405,7 @@ export default function Editor() {
                   Reset changes
                 </button>
               </div>
-              <div className="col-lg-4 mt-4">
+              <div className="col-lg-6 mt-4">
                 <button
                   className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
                   onClick={handleSubmitCoords}
@@ -418,7 +417,7 @@ export default function Editor() {
           </div>
         </div>
       </div>
-      
+
       {previewOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70">
           <div className="relative bg-slate-900 rounded-lg shadow-lg flex flex-col items-center p-4">
@@ -467,6 +466,7 @@ export default function Editor() {
                     fontSize: item.fontSize,
                     fontFamily: item.fontFamily,
                     fontWeight: item.fontWeight,
+                    fontStyle: item.fontWeight,
                     pointerEvents: "none",
                     textShadow: "0 0 4px #000",
                   }}

@@ -1,10 +1,4 @@
 @import "tailwindcss";
-
-/* body{
-    overflow: hidden;
-} */
-
-
 p{
     margin: 0;
     padding: 0;
@@ -19,22 +13,11 @@ p{
     transform: translate(-12%, 8%);
 }
 
-/* input.font_size_design {
-    color: #333;
-    border: 1px solid #ccc;
-    background: #f8f8f8;
-    border-radius: 5px;
-    width: 100%;
-} */
 .add_scroller {
     overflow-y: auto;
     border-radius: 5px;
     overflow-x: hidden;
 }
-/* .parent_div_90_30{
-    margin: 10px;
-    padding: 10px;
-} */
  .heading_of_column{
     color: #032e63;
     font-weight: 700; 
