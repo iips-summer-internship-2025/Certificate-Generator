@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+// import "../../index.css";
+import { useLocation, useNavigate } from "react-router-dom";
 import Papa from "papaparse";
 import './Editor.css';
 import ErrorPage from "../Error page/ErrorPage";
@@ -8,6 +9,7 @@ import EditorRulesModal from "../Warning&Rules/EditorRulesModal";
 
 export default function Editor() {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const imageFile = state?.imageFile;
   const csvFile = state?.csvFile;
   const [showRulesModal, setShowRulesModal] = useState(true); // Changed to true by default
@@ -173,9 +175,9 @@ export default function Editor() {
       />
       <div className="w-full">
         <div className="row">
-          <div className="col-lg-3 Side_Nav_Bar h-screen">
+          <div className="col-lg-3 Side_Nav_Bar h-screen ">
             <div className="h-1/2">
-              <div className="Editor_heading text-center">
+              <div className="Editor_heading text-center ">
                 <div className="Ediotr_svg_parent text-center">
                   <div>
                     <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" fill="#000000" height="20px" width="20px" version="1.1" id="Capa_1" viewBox="0 0 48 48" xmlSpace="preserve">
@@ -243,7 +245,7 @@ export default function Editor() {
                             </svg>
                           </span>
                         </div>
-                      </div>
+                      </div> 
                     </div>
                   );
                 })}
@@ -365,15 +367,15 @@ export default function Editor() {
               </div>
             </div>
           </div>
-          <div className="col-lg-9">
+          <div className="col-lg-9 bg-white">
             <div className="Image_heading text-center">
-              <div className="Image_Heading_svg_code inline-block px-2 py-2 bg-gray-300 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" fill="none">
+              <div className="Image_Heading_svg_code inline-block px-2 py-4 bg-white ">
+                {/* <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="9" r="7" stroke="#ffffff" strokeWidth="1.5" />
                   <path d="M7.35111 15L6.71424 17.323C6.0859 19.6148 5.77173 20.7607 6.19097 21.3881C6.3379 21.6079 6.535 21.7844 6.76372 21.9008C7.41635 22.2331 8.42401 21.7081 10.4393 20.658C11.1099 20.3086 11.4452 20.1339 11.8014 20.0959C11.9335 20.0818 12.0665 20.0818 12.1986 20.0959C12.5548 20.1339 12.8901 20.3086 13.5607 20.658C15.576 21.7081 16.5837 22.2331 17.2363 21.9008C17.465 21.7844 17.6621 21.6079 17.809 21.3881C18.2283 20.7607 17.9141 19.6148 17.2858 17.323L16.6489 15" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                </svg> */}
               </div>
-              <p>Customize Template</p>
+              {/* <p>Customize Template</p> */}
             </div>
             <div
               className="relative flex items-center justify-center min-h-[80vh] bg-transparent"
@@ -393,7 +395,7 @@ export default function Editor() {
               <div className="col-lg-4 mt-4">
                 <button
                   onClick={() => setPreviewOpen(true)}
-                  className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
+                  className=" shadow-md rounded-[6px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
                 >
                   Preview
                 </button>
@@ -401,7 +403,7 @@ export default function Editor() {
               <div className="col-lg-4 mt-4">
                 <button
                   onClick={() => window.location.reload()}
-                  className="border-4 border-cyan-600 shadow-md rounded-[4px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
+                  className="shadow-md rounded-[6px] px-4 py-2 bg-cyan-900 text-white bg-gradient-to-r from-sky-500 to-sky-700 hover:from-sky-600 font-semibold"
                 >
                   Reset changes
                 </button>
