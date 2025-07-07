@@ -187,3 +187,21 @@ class AdminUserSerializer(serializers.ModelSerializer):
             )
             user.save()
             return user
+        
+from rest_framework import serializers
+from .models import Club, Event
+
+class ClubSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Club
+        fields = '__all__'
+
+class EventSerializer(serializers.ModelSerializer):
+    club = serializers.SlugRelatedField(
+        queryset=Club.objects.all(),
+        slug_field='club_code'  # since club_code is the primary key
+    )
+
+    class Meta:
+        model = Event
+        fields = '__all__'
