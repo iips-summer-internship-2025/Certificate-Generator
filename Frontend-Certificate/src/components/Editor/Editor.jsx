@@ -245,7 +245,7 @@ export default function Editor() {
                             </svg>
                           </span>
                         </div>
-                      </div> }
+                      </div> 
                     </div>
                   );
                 })}

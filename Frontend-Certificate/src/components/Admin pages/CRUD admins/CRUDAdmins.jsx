@@ -671,8 +671,8 @@ export default function CrudAdmins() {
         <CardContent className="p-6">
           <form onSubmit={handleAddAdmin} className="flex justify-between items-start">
             <div className="flex gap-6 flex-1">
-              <div className="space-y-2">
-                <Label htmlFor="adminUsername" className="text-gray-700">Username</Label>
+              <div className="space-y-2 mx-4 my-4">
+                <Label htmlFor="adminUsername" className="text-gray-700 ">Username</Label>
                 <Input
                   id="adminUsername"
                   required
@@ -682,7 +682,7 @@ export default function CrudAdmins() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 mx-4 my-4">
                 <Label htmlFor="adminEmail" className="text-gray-700">Email</Label>
                 <Input
                   id="adminEmail"
@@ -694,7 +694,7 @@ export default function CrudAdmins() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 mx-4 my-4">
                 <Label htmlFor="adminPassword" className="text-gray-700">Password</Label>
                 <Input
                   id="adminPassword"
@@ -731,7 +731,7 @@ export default function CrudAdmins() {
           </TableHeader>
           <TableBody>
             {admins.map((admin) => (
-              <TableRow key={admin.id}>
+              <TableRow key= {admin.email}>
                 <TableCell>{admin.username}</TableCell>
                 <TableCell>{admin.email}</TableCell>
                 <TableCell>{admin.role}</TableCell>

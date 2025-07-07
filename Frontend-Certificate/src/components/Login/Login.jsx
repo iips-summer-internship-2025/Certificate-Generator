@@ -60,44 +60,44 @@ export default function Login() {
         localStorage.setItem('token', data.access); // Store token
         localStorage.setItem('email', email); // Store email for role check
         setMessage('Login successful!');
-        navigate("/upload");
+        // navigate("/upload");
 
         // Now check the superuser role
-        // const token = data.access;
-        // try {
-        //   const roleRes = await fetch('http://127.0.0.1:8000/api/check-superuser/', {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //     body: JSON.stringify({ email, password }), 
-        //     // body: JSON.stringify({ page: 1, page_size: 1 }),
-        //   });
-        //   if (roleRes.ok) {
-        //     const roleData = await roleRes.json();
-        //     // console.log(roleRes);
-        //     // setMessage('Login successful!');
-        //     // return navigate('/admin');
-        //     if (roleData.is_superuser) {
-        //       setMessage('Login successful as Admin!');
-        //       return navigate('/admin');
-        //     } else {
-        //       setMessage('Login successful!');
-        //       return navigate('/upload');
-        //     }
-        //   } else {
-        //     console.error('Failed to fetch role data');
-        //     // setMessage('Login successful!');
-        //     // return navigate('/upload');
-        //   }
-        // } catch (err) {
-        //   console.error('Role check failed:', err);
-        // }
-        // // console.log(roleRes);
-        // // // Non-superusers or failed role-checks go to upload
-        // // setMessage('Login successful!');
-        // navigate('/upload');
+        const token = data.access;
+        try {
+          const roleRes = await fetch('http://127.0.0.1:8000/api/check-superuser/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ email, password }), 
+            // body: JSON.stringify({ page: 1, page_size: 1 }),
+          });
+          if (roleRes.ok) {
+            const roleData = await roleRes.json();
+            // console.log(roleRes);
+            // setMessage('Login successful!');
+            // return navigate('/admin');
+            if (roleData.is_superuser) {
+              setMessage('Login successful as Admin!');
+              return navigate('/admin');
+            } else {
+              setMessage('Login successful!');
+              return navigate('/upload');
+            }
+          } else {
+            console.error('Failed to fetch role data');
+            // setMessage('Login successful!');
+            // return navigate('/upload');
+          }
+        } catch (err) {
+          console.error('Role check failed:', err);
+        }
+        // console.log(roleRes);
+        // // Non-superusers or failed role-checks go to upload
+        // setMessage('Login successful!');
+        navigate('/upload');
 
       } else {
         setMessage(data.detail || 'Login failed');

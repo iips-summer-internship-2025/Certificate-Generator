@@ -545,7 +545,7 @@ function Home() {
         <div className="container">
           <div className="hero-content">
             <div className="hero-text">
-              <h1 className="gradient-text">Welcome to IIPS Sampoorn</h1>
+              <h1 className="gradient-text">Welcome to IIPS Sampoorna</h1>
               <h2>Empowering Every Achievement, Digitally</h2>
               <p className="subtext">Create stunning, professional certificates with just a few clicks</p>
             </div>

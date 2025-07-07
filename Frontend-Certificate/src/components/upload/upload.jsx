@@ -276,51 +276,29 @@ export default function Upload() {
   const [csvDragActive, setCsvDragActive] = useState(false);
   const [imgDragActive, setImgDragActive] = useState(false);
 
+  const [hodSignature, setHodSignature] = useState(null);
+  const [clubCoordinatorSignature, setClubCoordinatorSignature] = useState(null);
+  const [clubHeadSignature, setClubHeadSignature] = useState(null);
+  const [clubSignature, setClubSignature] = useState(null);
+
+  const [hodDragActive, setHodDragActive] = useState(false);
+  const [clubCoordinatorDragActive, setClubCoordinatorDragActive] = useState(false);
+  const [clubHeadDragActive, setClubHeadDragActive] = useState(false);
+  const [clubDragActive, setClubDragActive] = useState(false);
+
+
   const navigate = useNavigate();
   // for testing purpose without backend
 
   const handleSubmit = () => {
 
     if (!csvFile || !imageFile) {
-      alert('Please upload both files.');
+      alert('Please upload both the CSV and certificate image files.');
       return;
     }
     console.log(csvFile, imageFile);
-    // Papa.parse(csvFile, {
-    //   header: true,
-    //   skipEmptyLines: true,
-    //   complete: function (results) {
-    //     const rows = results.data;
-    //     // Check if any row has empty name or email
-    //     // Normalize headers to lowercase for checking
-    //     // const headers = results.meta.fields.map(h => h.toLowerCase());
-    //     if (!headers.includes('name') || !headers.includes('email') ) {
-    //       alert('CSV must contain "name" and "email" columns (case-insensitive).');
-    //       navigate("/upload");
-    //       return;
-    //     }
 
-    //     // Check for empty name/email in a case-insensitive way
-    //     const hasEmpty = rows.some(row => {
-    //       // Find the key for name/email (case-insensitive)
-    //       const nameKey = Object.keys(row).find(k => k.toLowerCase() === 'name' || k.toLowerCase() === 'std_name');
-    //       const emailKey = Object.keys(row).find(k => k.toLowerCase() === 'email'|| k.toLowerCase() === 'email_id' || k.toLowerCase() === 'email_address');
-    //       return (
-    //         !row[nameKey] || row[nameKey].toString().trim() === '' ||
-    //         !row[emailKey] || row[emailKey].toString().trim() === ''
-    //       );
-    //     });
-    //     if (!hasNameHeader || !hasEmailHeader) {
-    //       alert('CSV must contain a "name" or "student_name" column AND an "email", "email_address", or "email_d" column (case-insensitive)');
-    //       navigate("/upload");
-    //       return;
-    //     }
-
-    //   },
-    //   error: function () {
-    //     alert('Failed to parse the CSV file.');
-    //   }
-    // });
+    // Validate CSV file content
     Papa.parse(csvFile, {
       header: true,
       skipEmptyLines: true,
@@ -350,8 +328,8 @@ export default function Upload() {
             k =>
               k.toLowerCase() === 'email' ||
               k.toLowerCase() === 'email_address' ||
-              k.toLowerCase() === 'email_id' 
-             
+              k.toLowerCase() === 'email_id'
+
           );
           return (
             !row[nameKey] || row[nameKey].toString().trim() === '' ||
@@ -374,10 +352,14 @@ export default function Upload() {
     formData.append('csvfile', csvFile);
     formData.append('imagefile', imageFile);
     formData.append('userType', userType);
+    formData.append('hodSignature', hodSignature);
+    formData.append('clubCoordinatorSignature', clubCoordinatorSignature);
+    formData.append('clubHeadSignature', clubHeadSignature);
+    formData.append('clubSignature', clubSignature);
 
 
     navigate("/editor", {
-      state: { csvFile, imageFile, userType }
+      state: { csvFile, imageFile, userType, hodSignature, clubCoordinatorSignature, clubHeadSignature, clubSignature }
     });
   };
 
@@ -441,6 +423,43 @@ export default function Upload() {
       alert('Upload a valid image file');
     }
   };
+
+  const isAllowedImage = (fileName) => /\.(png|jpe?g|heic)$/i.test(fileName);
+ 
+  const handleSignatureChange = (e, setter) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (isAllowedImage(file.name)) {
+        setter(file);
+      } else {
+        alert('Upload a valid image file (.png, .jpg, .jpeg, .heic)');
+      }
+    }
+  };
+
+  const handleSignatureDrop = (e, setter, setDrag) => {
+    e.preventDefault();
+    setDrag(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (isAllowedImage(file.name)) {
+        setter(file);
+      } else {
+        alert('Upload a valid image file (.png, .jpg, .jpeg, .heic)');
+      }
+    }
+  };
+
+  const handleDragOver = (e, setDrag) => {
+    e.preventDefault();
+    setDrag(true);
+  };
+
+  const handleDragLeave = (e, setDrag) => {
+    e.preventDefault();
+    setDrag(false);
+  };
+
 
   // Inside your Upload component
 
@@ -521,12 +540,13 @@ export default function Upload() {
         </p>
 
         {/* CSV and Image Upload in a Row */}
-        <div className="flex flex-col md:flex-row w-full gap-8 justify-center p-4 items-center">
+        <div className="flex flex-wrap justify-center items-center gap-4 w-full px-4">
+          {/* old one */}
           {/* CSV Upload */}
-          <motion.div
+          {/* <motion.div
             whileHover={{ scale: 0.98 }}
             whileTap={{ scale: 0.98 }}
-            className={`flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 transition h-48 cursor-pointer bg-white shadow-sm w-full md:w-1/2 ${csvDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+            className={`flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 transition h-68 cursor-pointer bg-white shadow-sm w-full md:w-1/2 ${csvDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
               }`}
             onDragOver={handleCsvDragOver}
             onDragLeave={handleCsvDragLeave}
@@ -552,13 +572,13 @@ export default function Upload() {
                 {csvFile.name}
               </motion.p>
             )}
-          </motion.div>
+          </motion.div> */}
 
           {/* Image Upload */}
-          <motion.div
+          {/* <motion.div
             whileHover={{ scale: 0.98 }}
             whileTap={{ scale: 0.98 }}
-            className={`flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 transition h-48 cursor-pointer bg-white shadow-sm w-full md:w-1/2 ${imgDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+            className={`flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 transition h-68 cursor-pointer bg-white shadow-sm w-full md:w-1/2 ${imgDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
               }`}
             onDragOver={handleImgDragOver}
             onDragLeave={handleImgDragLeave}
@@ -585,7 +605,267 @@ export default function Upload() {
               </motion.p>
             )}
           </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 transition h-68 cursor-pointer bg-white shadow-sm w-full md:w-1/2 ${imgDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+              }`}
+            onDragOver={handleImgDragOver}
+            onDragLeave={handleImgDragLeave}
+            onDrop={handleImgDrop}
+            onClick={() => document.getElementById('img-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Upload Certificate Image</p>
+            <p className="text-xs text-gray-500">Click or drag file to this area to upload</p>
+            <input
+              id="img-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            {imageFile && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-gray-600 mt-2"
+              >
+                {imageFile.name}
+              </motion.p>
+            )}
+          </motion.div> */}
+
+          {/* <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 transition h-68 cursor-pointer bg-white shadow-sm w-full md:w-1/2 ${imgDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+              }`}
+            onDragOver={handleImgDragOver}
+            onDragLeave={handleImgDragLeave}
+            onDrop={handleImgDrop}
+            onClick={() => document.getElementById('img-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Upload Certificate Image</p>
+            <p className="text-xs text-gray-500">Click or drag file to this area to upload</p>
+            <input
+              id="img-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            {imageFile && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-gray-600 mt-2"
+              >
+                {imageFile.name}
+              </motion.p>
+            )}
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 transition h-68 cursor-pointer bg-white shadow-sm w-full md:w-1/2 ${imgDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+              }`}
+            onDragOver={handleImgDragOver}
+            onDragLeave={handleImgDragLeave}
+            onDrop={handleImgDrop}
+            onClick={() => document.getElementById('img-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Upload Certificate Image</p>
+            <p className="text-xs text-gray-500">Click or drag file to this area to upload</p>
+            <input
+              id="img-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            {imageFile && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-gray-600 mt-2"
+              >
+                {imageFile.name}
+              </motion.p>
+            )}
+          </motion.div> */}
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`w-[350px] flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-2 transition cursor-pointer bg-white shadow-sm ${csvDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+              }`}
+            onDragOver={handleCsvDragOver}
+            onDragLeave={handleCsvDragLeave}
+            onDrop={handleCsvDrop}
+            onClick={() => document.getElementById('csv-upload').click()}
+          >
+            <FileSpreadsheet className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Upload CSV/Excel</p>
+            <p className="text-xs text-gray-500">Click or drag file here</p>
+            <input
+              id="csv-upload"
+              type="file"
+              accept=".csv,.xls,.xlsx"
+              onChange={handleCsvChange}
+              className="hidden"
+            />
+            {csvFile && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-gray-600 mt-2">
+                {csvFile.name}
+              </motion.p>
+            )}
+          </motion.div>
+
+          {/* Certificate Image Upload */}
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`w-[350px] flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-2 transition cursor-pointer bg-white shadow-sm ${imgDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+              }`}
+            onDragOver={handleImgDragOver}
+            onDragLeave={handleImgDragLeave}
+            onDrop={handleImgDrop}
+            onClick={() => document.getElementById('img-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Upload Certificate Image</p>
+            <p className="text-xs text-gray-500">Click or drag file here</p>
+            <input
+              id="img-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            {imageFile && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-gray-600 mt-2">
+                {imageFile.name}
+              </motion.p>
+            )}
+          </motion.div>
+
+          {/* Signature of HOD */}
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`w-[350px] flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-2 transition cursor-pointer bg-white shadow-sm ${hodDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}
+            onDragOver={(e) => handleDragOver(e, setHodDragActive)}
+            onDragLeave={(e) => handleDragLeave(e, setHodDragActive)}
+            onDrop={(e) => handleSignatureDrop(e, setHodSignature, setHodDragActive)}
+            onClick={() => document.getElementById('hod-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Signature of HOD</p>
+            <p className="text-xs text-gray-500">Click or drag file here</p>
+            <input
+              id="hod-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={(e) => handleSignatureChange(e, setHodSignature)}
+              className="hidden"
+            />
+            {hodSignature && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-gray-600 mt-2">
+                {hodSignature.name}
+              </motion.p>
+            )}
+          </motion.div>
+
+
+          {/* Signature of Club Coordinator */}
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`w-[350px] flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-2 transition cursor-pointer bg-white shadow-sm ${clubCoordinatorDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}
+            onDragOver={(e) => handleDragOver(e, setClubCoordinatorDragActive)}
+            onDragLeave={(e) => handleDragLeave(e, setClubCoordinatorDragActive)}
+            onDrop={(e) => handleSignatureDrop(e, setClubCoordinatorSignature, setClubCoordinatorDragActive)}
+            onClick={() => document.getElementById('club-coordinator-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Signature of Club Coordinator</p>
+            <p className="text-xs text-gray-500">Click or drag file here</p>
+            <input
+              id="club-coordinator-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={(e) => handleSignatureChange(e, setClubCoordinatorSignature)}
+              className="hidden"
+            />
+            {clubCoordinatorSignature && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-gray-600 mt-2">
+                {clubCoordinatorSignature.name}
+              </motion.p>
+            )}
+          </motion.div>
+
+
+          {/* Signature of Club Head */}
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`w-[350px] flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-2 transition cursor-pointer bg-white shadow-sm ${clubHeadDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}
+            onDragOver={(e) => handleDragOver(e, setClubHeadDragActive)}
+            onDragLeave={(e) => handleDragLeave(e, setClubHeadDragActive)}
+            onDrop={(e) => handleSignatureDrop(e, setClubHeadSignature, setClubHeadDragActive)}
+            onClick={() => document.getElementById('club-head-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Signature of Club Head</p>
+            <p className="text-xs text-gray-500">Click or drag file here</p>
+            <input
+              id="club-head-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={(e) => handleSignatureChange(e, setClubHeadSignature)}
+              className="hidden"
+            />
+            {clubHeadSignature && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-gray-600 mt-2">
+                {clubHeadSignature.name}
+              </motion.p>
+            )}
+          </motion.div>
+
+
+          {/* Signature of Club  */}
+          <motion.div
+            whileHover={{ scale: 0.98 }}
+            whileTap={{ scale: 0.98 }}
+            className={`w-[350px] flex flex-col justify-center items-center text-center gap-2 border-2 border-dashed rounded-xl px-6 py-2 transition cursor-pointer bg-white shadow-sm ${clubDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}
+            onDragOver={(e) => handleDragOver(e, setClubDragActive)}
+            onDragLeave={(e) => handleDragLeave(e, setClubDragActive)}
+            onDrop={(e) => handleSignatureDrop(e, setClubSignature, setClubDragActive)}
+            onClick={() => document.getElementById('club-upload').click()}
+          >
+            <ImageIcon className="w-8 h-8 text-blue-500" />
+            <p className="font-medium text-gray-800">Signature of Club</p>
+            <p className="text-xs text-gray-500">Click or drag file here</p>
+            <input
+              id="club-upload"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              onChange={(e) => handleSignatureChange(e, setClubSignature)}
+              className="hidden"
+            />
+            {clubSignature && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-gray-600 mt-2">
+                {clubSignature.name}
+              </motion.p>
+            )}
+          </motion.div>
+
         </div>
+
+
 
         {/* Submit Button */}
         <motion.button

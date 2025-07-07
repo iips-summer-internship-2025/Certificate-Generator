@@ -17,7 +17,7 @@ import Home from './components/home/Home'
 import Validation from './components/home/Validation/Validation'
 import './App.css'
 import CertificatePreview from './components/Certi_preview/Certi_preview'
-
+import ClubEventForm from './components/Club/club'
  
 
 
@@ -30,12 +30,14 @@ function App() {
     
       <Routes>
         <Route path='/' element={<Home/>}/>
-        {token && <Route path="/Login" element={<Login />}/>}
+        <Route path='Login' element={<Login/>}/>
+        {/* {token && <Route path="/Login" element={<Login />}/>} */}
         {token && <Route path="/upload" element={<Upload />}/>}
         {/* <Route path="/upload" element={<Upload />}/>
         <Route path="/Login" element={<Login/>} /> */}
         <Route path="/editor" element={<Editor/>}/>
         <Route path="/CertificateSearch" element={<CertificateSearch />}/>
+        <Route path="/club" element={<ClubEventForm/>} />
 
 
          {/* Admin Routes */}
