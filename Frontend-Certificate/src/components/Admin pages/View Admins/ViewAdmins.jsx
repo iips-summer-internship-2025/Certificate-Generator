@@ -314,7 +314,7 @@ export default function ViewAdmins() {
       </Table>
 
       {/* Statistics */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 ">
         <Card>
           <CardContent className="m-3 flex flex-col items-center gap-2">
             <div className="text-4xl font-bold text-blue-600">{admins.length}</div>
@@ -331,14 +331,7 @@ export default function ViewAdmins() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="m-3 flex flex-col items-center gap-2">
-            <div className="text-2xl font-bold text-green-600">
-              {admins.filter((admin) => admin.role === "Admin").length}
-            </div>
-            <div className="text-gray-600">Regular Admins</div>
-          </CardContent>
-        </Card>
+        
       </div>
     </div>
   );
