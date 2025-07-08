@@ -14,7 +14,7 @@
 //                             <h2>Empowering Every Achievement, Digitally</h2>
 //                         </div>
 //                         <div class="redirect_button">
-//                             <a href='https://iips.edu.in/sampoorna/Sampoorna.php' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
+//                             <a href='#' className='Redirect_anchor with_span'><span className='Span_left'></span>Explore More!<span className='Span_Right'></span></a>
 //                         </div>
 //                     </div>
 //                 </div>
@@ -77,7 +77,7 @@
 //                                 <img src={template_image} alt="Design Template" />
 //                             </div>
 //                             <div class="redirect_button">
-//                                 <a href='/Login' className='Redirect_anchor '>Get Start</a>
+//                                 <a href='/' className='Redirect_anchor '>Get Start</a>
 //                             </div>
 //                         </div>
 //                     </div>
@@ -201,7 +201,7 @@
 //                         </div>
 //                         <div className='text-center mt-5'>
 //                             <div class="redirect_button">
-//                                 <a href='/Login' className='Redirect_anchor'>Login to continue</a>
+//                                 <a href='/' className='Redirect_anchor'>Login to continue</a>
 //                             </div>
 //                         </div>
 //                     </div>
@@ -211,6 +211,255 @@
 //     </>
 // }
 // export default Home;
+// import { useEffect, useRef } from 'react';
+// import { Award, Rocket, UploadCloud, Palette, Send, Sparkles, Feather, PenTool, Star } from 'lucide-react';
+// import './Home.css';
+
+// const Home = () => {
+//   const particlesRef = useRef(null);
+
+//   useEffect(() => {
+//     if (typeof window !== 'undefined' && window.particlesJS) {
+//       window.particlesJS("particles-js", {
+//         "particles": {
+//           "number": { "value": 80, "density": { "enable": true, "value_area": 1200 } },
+//           "color": { "value": ["#7dd3fc", "#bae6fd", "#e0f2fe", "#38bdf8"] },
+//           "shape": { "type": "circle" },
+//           "opacity": { "value": 0.22, "random": true },
+//           "size": { "value": 5, "random": true, "anim": { "enable": true, "speed": 3, "size_min": 1 } },
+//           "line_linked": { "enable": true, "distance": 150, "color": "#7dd3fc", "opacity": 0.2, "width": 1 },
+//           "move": { 
+//             "enable": true, 
+//             "speed": 1.5, 
+//             "direction": "none", 
+//             "random": true, 
+//             "straight": false, 
+//             "out_mode": "out",
+//             "bounce": false,
+//             "attract": { "enable": true, "rotateX": 600, "rotateY": 1200 }
+//           }
+//         },
+//         "interactivity": {
+//           "detect_on": "canvas",
+//           "events": {
+//             "onhover": { "enable": true, "mode": "grab" },
+//             "onclick": { "enable": true, "mode": "push" }
+//           },
+//           "modes": {
+//             "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } },
+//             "push": { "particles_nb": 4 }
+//           }
+//         },
+//         "retina_detect": true
+//       });
+//     }
+
+//     return () => {
+//       if (particlesRef.current) {
+//         particlesRef.current.destroy();
+//       }
+//     };
+//   }, []);
+
+//   return (
+//     <div className="home-container">
+//       {/* Animated Background Elements */}
+//       <div id="particles-js" ref={particlesRef} className="particles-background" />
+
+//       {/* Floating gradient circles */}
+//       <div className="floating-circle floating-circle-1" />
+//       <div className="floating-circle floating-circle-2" />
+//       <div className="floating-circle floating-circle-3" />
+
+//       {/* Navbar */}
+//       <nav className="navbar">
+//         <div className="logo-container">
+//           <div className="logo-icon">
+//             <Award className="icon" />
+//           </div>
+//           <span className="logo-text">SkyCerts</span>
+//         </div>
+//         <div className="nav-links">
+//           <a href="#" className="nav-link">Home</a>
+//           <a href="#features" className="nav-link">Features</a>
+//           <a href="#how-it-works" className="nav-link">How It Works</a>
+//           <a href="#pricing" className="nav-link">Pricing</a>
+//         </div>
+//       </nav>
+
+//       {/* Hero Section */}
+//       <section className="hero-section">
+//         <div className="hero-content">
+//           <h1 className="hero-title">
+//             Elevate Your <span className="gradient-text">Certification</span> <br className="hero-line-break" />
+//             Process to New Heights
+//           </h1>
+//           <p className="hero-subtitle">
+//             SkyCerts revolutionizes certificate generation with cloud-powered automation, stunning designs, and seamless distribution.
+//           </p>
+//           <div className="hero-buttons">
+//             <button className="primary-button">
+//               <Rocket className="button-icon" />
+//               Start Generating Now
+//             </button>
+//             <button className="secondary-button">
+//               See Live Demo
+//             </button>
+//           </div>
+//           <div className="trusted-by">
+//             <div className="avatar-group">
+//               {[1, 2, 3, 4].map((i) => (
+//                 <div key={i} className="avatar" />
+//               ))}
+//             </div>
+//             <span>Trusted by 5,000+ organizations worldwide</span>
+//           </div>
+//         </div>
+
+//         {/* Animated Certificate Card */}
+//         <div className="certificate-container">
+//           <div className="certificate-card">
+//             <div className="certificate-background" />
+//             <div className="certificate-content">
+//               <div className="certificate-header">
+//                 <Award className="certificate-icon" />
+//                 <span className="certificate-label">Certificate of Achievement</span>
+//               </div>
+//               <div className="certificate-title">
+//                 <span className="gradient-text">Presented To</span>
+//               </div>
+//               <div className="recipient-name">
+//                 Alexandra Chen
+//               </div>
+//               <div className="certificate-description">
+//                 For exceptional performance and dedication in completing the <span className="highlight">Advanced Cloud Architecture</span> course with honors
+//               </div>
+//               {/* Seal */}
+//               <div className="certificate-seal">
+//                 <div className="seal-circle">
+//                   <Star className="seal-icon" />
+//                 </div>
+//               </div>
+//             </div>
+//             {/* Floating Decorations */}
+//             <div className="decoration decoration-1">
+//               <div className="decoration-circle">
+//                 <Sparkles className="decoration-icon" />
+//               </div>
+//             </div>
+//             <div className="decoration decoration-2">
+//               <div className="decoration-circle">
+//                 <Feather className="decoration-icon" />
+//               </div>
+//             </div>
+//             <div className="decoration decoration-3">
+//               <div className="decoration-circle">
+//                 <PenTool className="decoration-icon" />
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Features Section */}
+//       <section id="features" className="features-section">
+//         <div className="section-header">
+//           <h2 className="section-title">Powerful Features for Seamless Certification</h2>
+//           <p className="section-subtitle">
+//             SkyCerts provides everything you need to create, manage, and distribute professional certificates at scale.
+//           </p>
+//         </div>
+
+//         <div className="features-grid">
+//           {[
+//             {
+//               icon: <UploadCloud className="feature-icon" />,
+//               title: "Bulk Generation",
+//               description: "Generate hundreds of certificates in minutes with our batch processing system.",
+//               color: "blue-gradient"
+//             },
+//             {
+//               icon: <Palette className="feature-icon" />,
+//               title: "Custom Templates",
+//               description: "Choose from beautiful templates or design your own with our drag-and-drop editor.",
+//               color: "cyan-gradient"
+//             },
+//             {
+//               icon: <Send className="feature-icon" />,
+//               title: "Instant Delivery",
+//               description: "Send certificates via email, download links, or print directly from the platform.",
+//               color: "sky-gradient"
+//             }
+//           ].map((feature, index) => (
+//             <div 
+//               key={index} 
+//               className={`feature-card ${feature.color}`}
+//             >
+//               <div className="feature-icon-container">
+//                 {feature.icon}
+//               </div>
+//               <h3 className="feature-title">{feature.title}</h3>
+//               <p className="feature-description">{feature.description}</p>
+//             </div>
+//           ))}
+//         </div>
+//       </section>
+
+//       {/* How It Works Section */}
+//       <section id="how-it-works" className="how-it-works-section">
+//         <h2 className="section-title">Simple Three-Step Process</h2>
+//         <div className="process-container">
+//           {/* Behind Left Card */}
+//           <div className="process-card process-card-left">
+//             <div className="process-icon-container blue-gradient">
+//               <UploadCloud className="process-icon" />
+//             </div>
+//             <div className="process-title">Upload Data</div>
+//             <div className="process-description">Import participant details via CSV, Excel, or connect directly to your database.</div>
+//           </div>
+//           {/* Behind Right Card */}
+//           <div className="process-card process-card-right">
+//             <div className="process-icon-container cyan-gradient">
+//               <Palette className="process-icon" />
+//             </div>
+//             <div className="process-title">Customize Design</div>
+//             <div className="process-description">Personalize templates with your branding, colors, and security features.</div>
+//           </div>
+//           {/* Center Pop Out Card */}
+//           <div className="process-card process-card-center">
+//             <div className="process-icon-container sky-gradient">
+//               <Send className="process-icon" />
+//             </div>
+//             <div className="process-title">Distribute Certificates</div>
+//             <div className="process-description">Deliver certificates via email, download links, or print in bulk with tracking.</div>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* CTA Section */}
+//       <section className="cta-section">
+//         <div className="cta-card">
+//           <h2 className="cta-title">Ready to Transform Your Certification Process?</h2>
+//           <p className="cta-subtitle">
+//             Join thousands of organizations saving time and elevating their credentials with SkyCerts.
+//           </p>
+//           <div className="cta-buttons">
+//             <button className="primary-button">
+//               <Rocket className="button-icon" />
+//               Start Your Free Trial
+//             </button>
+//             <button className="secondary-button">
+//               Schedule a Demo
+//             </button>
+//           </div>
+//         </div>
+//       </section>
+//     </div>
+//   );
+// };
+
+// export default Home;
+
 import { useEffect, useRef } from 'react';
 import './Home.css';
 import sampoorn_logo from '../../../public/assets/sampoorn_logo.png';
@@ -237,13 +486,13 @@ function Home() {
       ease: "power3.out"
     });
 
-    gsap.from(".explore-btn", {
-      duration: 1,
-      y: 30,
-      opacity: 0,
-      delay: 0.8,
-      ease: "back.out(1.7)"
-    });
+    // gsap.from(".explore-btn", {
+    //   duration: 1,
+    //   y: 30,
+    //   opacity: 0,
+    //   delay: 0.8,
+    //   ease: "back.out(1.7)"
+    // });
 
     // Certificate image 3D effect
     gsap.to(certificateRef.current, {
@@ -296,7 +545,7 @@ function Home() {
         <div className="container">
           <div className="hero-content">
             <div className="hero-text">
-              <h1 className="gradient-text">Welcome to IIPS Sampoorn</h1>
+              <h1 className="gradient-text">Welcome to IIPS Sampoorna</h1>
               <h2>Empowering Every Achievement, Digitally</h2>
               <p className="subtext">Create stunning, professional certificates with just a few clicks</p>
             </div>

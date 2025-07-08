@@ -713,7 +713,7 @@ class AdminUserAPIView(APIView):
 
     def post(self, request):
          data = request.data.copy()
-         data['is_staff'] = True  # Ensure the created user is marked as admin
+        #  data['is_staff'] = True  # Ensure the created user is marked as admin
 
          serializer = AdminUserSerializer(data=data)
          if serializer.is_valid():
@@ -809,9 +809,9 @@ class CheckSuperuserStatusView(APIView):
         if user is not None:
             return Response({
             'is_superuser': user.is_superuser,
-                'is_staff': user.is_staff,
-                'email': user.email,
-                'username': user.username,
+                # 'is_staff': user.is_staff,
+                # 'email': user.email,
+                # 'username': user.username,
             }, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
