@@ -824,7 +824,37 @@ class ClubListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]  # Only logged-in users
 
 # Events
-class EventListCreateView(generics.ListCreateAPIView):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
-    permission_classes = [IsAdminUser]  # Only admins can add/view
+class EventUploadView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        data = request.data.copy()
+        pdf_file = request.FILES.get('event_pdf')
+        image_file = request.FILES.get('event_image')
+
+        # Upload PDF to Cloudinary
+        if pdf_file:
+            pdf_upload = cloudinary.uploader.upload(
+                pdf_file, 
+                resource_type="auto", 
+                folder="events_pdfs"
+            )
+            data['event_pdf'] = pdf_upload.get("secure_url")
+
+        # Upload Image to Cloudinary
+        if image_file:
+            image_upload = cloudinary.uploader.upload(
+                image_file, 
+                folder="events_images"
+            )
+            data['event_image'] = image_upload.get("secure_url")
+        print("PDF URL:", data.get('event_pdf'))
+        print("Image URL:", data.get('event_image'))
+
+
+        # Now validate and save using the serializer
+        serializer = EventSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

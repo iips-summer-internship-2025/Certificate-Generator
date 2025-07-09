@@ -264,6 +264,14 @@ useEffect(() => {
               {/* <AwardIcon className="mr-2 flex " size={24} /> */}
               Register Event
             </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.5)" }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 mx-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-3 px-3 rounded font-bold text-lg shadow-xl hover:shadow-2xl transition-all items-center no-underline"
+            >
+              {/* <AwardIcon className="mr-2 flex " size={24} /> */}
+              <a className="text-white font-bold no-underline DownloadReportCSS" href="/DownloadReport">Download Report</a>
+              </motion.button>
 
 
           </motion.div>
@@ -673,6 +681,10 @@ useEffect(() => {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
+        .DownloadReportCSS{
+        font-weight: 700;
+        text-decoration: none;
+        }
       `}</style>
     </div>
   );
@@ -684,3 +696,4 @@ useEffect(() => {
 //     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
 //   </svg>
 // );
+
