@@ -205,3 +205,5 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'
+        #read_only_fields = ['event_pdf', 'event_image']  # These are filled after Cloudinary upload
+
