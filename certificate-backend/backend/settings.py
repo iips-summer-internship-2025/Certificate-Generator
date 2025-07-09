@@ -14,8 +14,8 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-
-load_dotenv()  # Load environment variables from .env file
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")  # Load environment variables from .env file
 
 import cloudinary
 import cloudinary.uploader
@@ -36,7 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rx_qyy5wzq&37p5_q+-wn!1qvxl%e@my53i*yz-$m&07y@!oli'
+#SECRET_KEY = 'django-insecure-rx_qyy5wzq&37p5_q+-wn!1qvxl%e@my53i*yz-$m&07y@!oli'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -216,7 +216,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 from datetime import timedelta
 
 SIMPLE_JWT = {

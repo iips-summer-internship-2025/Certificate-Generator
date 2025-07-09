@@ -134,7 +134,10 @@ a.Redirect_anchor:hover{
 .Right_menu li{
     display: inline-block;
     list-style: none;
+    position: relative;
+    transition: all 0.3s linear;
 }
+
 .Right_menu a
  {
     display: inline-block;
@@ -144,6 +147,26 @@ a.Redirect_anchor:hover{
     font-weight: 700;
     text-decoration: none;
     color: #143d69;
+}
+.Right_menu  li ul.Clubs_Drop_Down{
+    position: absolute;
+    visibility: hidden;
+    background-color: #fff;
+    width: fit-content;
+    top:100%;
+    left: 60%;
+    transition: all 0.3s linear;
+    z-index: 1;
+    border-radius: 0 0 10px 10px;
+}
+.Right_menu  li ul.Clubs_Drop_Down li{
+    margin-bottom: 2px;
+    width: max-content;
+    display: inline-block;
+}
+.Right_menu li:hover ul.Clubs_Drop_Down{
+    visibility: visible;
+    left:0;
 }
 /*****************event*********************/
 

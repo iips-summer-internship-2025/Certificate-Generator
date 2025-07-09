@@ -13,7 +13,8 @@ from authority.views import ViewAdminUsersPost
 from django.urls import path
 from authority.views import ViewCertificatesAPI
 from authority.views import CheckSuperuserStatusView  
-#from authority.views import AdminListView, ChangePasswordView,
+from django.urls import path
+from authority.views import ClubListCreateView, EventListCreateView
 
 # certificate_list = CertificateViewSet.as_view({'get': 'list'})
 
@@ -46,4 +47,7 @@ urlpatterns = [
     # path for checking superuser status
     # This endpoint can be used to check if the user is a superuser
     path('api/check-superuser/', CheckSuperuserStatusView.as_view(), name='check-superuser'),
+    path('api/clubs/', ClubListCreateView.as_view(), name='club-list-create'),
+    path('api/events/', EventListCreateView.as_view(), name='event-list-create'),
+
 ]
