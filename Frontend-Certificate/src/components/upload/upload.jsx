@@ -892,7 +892,7 @@ export default function Upload() {
           </ul>
         </div>
       </motion.div>
-    </div >
+    </div>
   );
 }
 

@@ -486,13 +486,13 @@ function Home() {
       ease: "power3.out"
     });
 
-    gsap.from(".explore-btn", {
-      duration: 1,
-      y: 30,
-      opacity: 0,
-      delay: 0.8,
-      ease: "back.out(1.7)"
-    });
+    // gsap.from(".explore-btn", {
+    //   duration: 1,
+    //   y: 30,
+    //   opacity: 0,
+    //   delay: 0.8,
+    //   ease: "back.out(1.7)"
+    // });
 
     // Certificate image 3D effect
     gsap.to(certificateRef.current, {

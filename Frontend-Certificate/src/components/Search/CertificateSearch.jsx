@@ -766,6 +766,8 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import Header from '../home/Header';
+import Footer from '../home/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Eye, Download, X, AlertCircle } from 'lucide-react';
 
