@@ -16,6 +16,7 @@ import Footer from './components/home/Footer'
 import Home from './components/home/Home'
 import Validation from './components/home/Validation/Validation'
 import './App.css'
+import DownloadReport from './components/Club/DownloadReport'
 import CertificatePreview from './components/Certi_preview/Certi_preview'
 import ClubEventForm from './components/Club/club'
  
@@ -30,6 +31,7 @@ function App() {
     
       <Routes>
         <Route path='/' element={<Home/>}/>
+        <Route path="/DownloadReport" element={<DownloadReport/>}/>
         <Route path='Login' element={<Login/>}/>
         {/* {token && <Route path="/Login" element={<Login />}/>} */}
         {token && <Route path="/upload" element={<Upload />}/>}
