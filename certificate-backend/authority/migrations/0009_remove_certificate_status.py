@@ -6,7 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authority', '0008_delete_mymodel_alter_certificate_certificate_id'),
+       # ('authority', '0008_delete_mymodel_alter_certificate_certificate_id'),
+       ('authority', '0008_merge_20250605_1623'),
     ]
 
     operations = [

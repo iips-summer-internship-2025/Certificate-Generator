@@ -35,10 +35,20 @@ from rest_framework import viewsets, permissions, status
 from .serializers import AdminUserSerializer,UserSerializer
 from django.contrib.auth import update_session_auth_hash
 from .models import CustomUser
+
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets
+from django.contrib.auth import get_user_model
+from rest_framework import permissions
+from .serializers import AdminUserSerializer
 from django.core.paginator import Paginator
 from django.db.models import Q
 from .utils import send_bulk_emails
-
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from.serializers import CertificateSerializer
+from django.contrib.auth import authenticate, get_user_model
 
 def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
     
@@ -46,9 +56,6 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     width, height = image.size
     
     draw = ImageDraw.Draw(image)
-    # for field in ['name','event']:
-    #     coord = next((item for item in coordinates if item['title'].lower() == field), None)
-
     for item in coordinates:
         field_key = item.get('title', '')
         #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
@@ -59,25 +66,98 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
         #text = item.get('title', '')
         x_percent= item.get('x', 0)
         y_percent= item.get('y', 0)
-        # Convert percent to actual pixel values
-        x = int((x_percent / 100) * width)
-        y = int((y_percent / 100) * height)
-        font_color = item.get('font_color')#, '#000000')
-        font_size_str = str(item.get('fontSize', 20))
         
-
+        # Convert percent to actual pixel values
+        
+        x = int((x_percent / 100) * (width))
+        y = int((y_percent / 100) * (height))    # Adjust y to avoid clipping at the bottom
+        font_color = item.get('font_color')#, '#000000')
+        font_size_percent = item.get('fontSize', '10px')
+        fonts=item.get('font', 'ARIAL.TTF')
+        print(f"font_size_percent: {font_size_percent}")
+        font_weight = item.get('font_weight', 'normal')
+        #font_size = int((font_size_percent / 100) * height)
+        
         # Remove 'px' and convert to int
-        try:
-            based_font_size = int(font_size_str.replace('px', ''))
-        except:
-            based_font_size = 5
-        font_size = int((based_font_size/ 100) * height)
+        
         
         # Load a font — make sure 'arial.ttf' exists or use full path
         try:
-            font = ImageFont.truetype("arial.ttf", font_size)
+            if isinstance(font_size_percent, str) and 'px' in font_size_percent:
+                # Remove 'px' and convert to int
+                based_font_size = int(str(font_size_percent.replace('px', '')))
+            else:
+                print (f"font_size_percent: {font_size_percent} in try block")
+                based_font_size = float(font_size_percent)
+            
+            print(f"Based font size: {based_font_size}in try block")
+            font_size = int((font_size_percent / 100) * width)
         except:
+            based_font_size = 10
+            print(f"Based font size: {based_font_size} in except block")
+            font_size = int((based_font_size/ 100) * width)
+        try:
+            if(fonts== 'Arial'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("ARIALBD.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("ARIALI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("ARIALBI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("ARIAL.TTF", font_size)
+                print(f"{font} in try block")
+            elif(fonts== 'Times New Roman'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("TIMESBD.TTF", font_size) 
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("TIMESI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("TIMESBI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("TIMES.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts== 'Courier New'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("COURBD.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("COURI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("COURBI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("COUR.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts== 'Verdana'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("VERDANAB.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("VERDANAI.TTF", font_size)
+                elif(font_weight == 'bold italic'):
+                    font = ImageFont.truetype("VERDANABI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("VERDANA.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts== 'Georgia'):
+                if(font_weight == 'bold'):
+                    font = ImageFont.truetype("GEORGIAB.TTF", font_size)
+                elif(font_weight == 'italic'):
+                    font = ImageFont.truetype("GEORGIAI.TTF", font_size)
+                else:
+                    font = ImageFont.truetype("GEORGIA.TTF", font_size)
+                print(f"{font}  in try block")
+            elif(fonts=='Helvetica'):
+                font = ImageFont.truetype("HELVETICA.TTF", font_size)
+                print(f"{font} in try block")
+            else:
+                font = ImageFont.truetype(font, font_size)
+                print(f"{font} in try block")
+            print(f"Using font size: {font_size}px and font: {font}{font_weight}")
+        except:
+            print(" Falling back to default font!")
             font = ImageFont.load_default()
+        print(f"Rendering '{text}' at ({x},{y}) with font size: {font_size}px {font}")
+        print(f"coordinates:{coordinates}")
+
 
         draw.text((x, y), text, fill=font_color, font=font)
 
@@ -98,11 +178,6 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     image.paste(qr, (image.width - qr_width - padding_x,  padding_y))  # Bottom right corner
 
     image.save(output_path)
-
-
-
-
-
 
 
 # Uploading Files and Generating certificates and sending them 
@@ -149,9 +224,12 @@ def upload_files(request):
                 'title': item.get('title', ''),
                 'x': float(item.get('x', 0)),
                 'y': float(item.get('y', 0)),
-                'fontSize': float(item.get('fontSize',2)),
-                'font_color': item.get('font_color', '#000000')
+                'fontSize':float(item.get('font_size','8')),
+                'font_color': item.get('font_color', '#000000'),
+                'font': item.get('font_family', 'ARIAL.TTF'), # Default font if not provided
+                'font_weight': item.get('font_weight', 'normal')  # Default font weight if not provided
             })
+            print(f"{coordinates} in upload function")
         except (ValueError, TypeError) as e:
             return JsonResponse({'error': f'Invalid coordinate values for field "{item.get("title", "unknown")}": {e}'}, status=400)
 
@@ -289,7 +367,6 @@ def upload_files(request):
 
 #                 # You can now process/save/store this data
                 
-                
 #             # generate_certificate_dynamic(
 #             #     template_path="./uploads/Techno-Geek.png",  # update with actual path
 #             #     output_path="./upload/output.png",      # update with actual path
@@ -302,25 +379,15 @@ def upload_files(request):
 #     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 
-
-
-
-
-
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-
-
 
 class CustomTokenRefreshView(TokenRefreshView):
     pass
 
-
-
 class RegisterView(APIView):
     permission_classes = [AllowAny]
-
+    
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -329,26 +396,35 @@ class RegisterView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# def test_id_generation(request):
-#     row = {
-#     'Name': 'Test User',
-#     'roll_no': '12345',
-#     'email_id': 'test@example.com',
-#     # other fields
-# }
-#     name_slug = "test_name"  # or some default value
-#     certificate_id = generate_unique_id()
 
-    # obj = Certificate.objects.create(
-
-    #         name=name_slug,
-    #         roll_no=row.get('Roll No', ''),
-    #         email_id=row.get('Email', ''),
-    #         certificate_id=certificate_id,
-    #         certificate=f"https://yourdomain.com/verify/{certificate_id}"
-        
-    # )
-    # return JsonResponse({'unique_id': obj.certificate_id})
+# searching certificate:
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_certificates(request):
+    search_query = request.GET.get('q', '')
+    
+    if not search_query:
+        return Response({'error': 'Search query is required'}, status=400)
+    
+    # Search by name or email (case insensitive)
+    certificates = Certificate.objects.filter(
+        Q(name__icontains=search_query) | 
+        Q(email_id__icontains=search_query)
+    )
+    
+    results = [
+        {
+            'name': cert.name,
+            'roll_no': cert.roll_no,
+            'certificate': cert.certificate,
+            'certificate_id': cert.certificate_id,
+            'email_id': cert.email_id,
+            'timestamp': cert.timestamp
+        }
+        for cert in certificates
+    ]
+    
+    return Response({'results': results})
 
 def generate_unique_id():
      while True:
@@ -390,8 +466,256 @@ class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
      queryset = Certificate.objects.all()
      serializer_class = CertificateSerializer
 
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
 User = get_user_model()
-#for change password of user
+#for change password of user 2. admin functionality
 class SuperuserChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -419,7 +743,7 @@ class SuperuserChangePasswordView(APIView):
             return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
  # for admin view
- 
+# for viewing admin users and their roles 3 functionality 
 class ViewAdminUsersPost(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -443,8 +767,26 @@ class ViewAdminUsersPost(APIView):
 
         paginator = Paginator(users, page_size)
         page = paginator.get_page(page_number)
+        
+        # Build the result list with dynamic role
+        results = []
+        for user in page:
+            if user.is_superuser:
+                role = "Super Admin"
+            elif user.is_staff:
+                role = "Admin"
+            else:
+                role = "User"  # fallback, not expected here
+            results.append({
+                "username": user.username,
+                "email": user.email,
+                "role": role,
+                "dateCreated": user.date_joined.strftime("%Y-%m-%d"),
+            })
+
+                
         #Serialize the page data
-        serializer = AdminUserSerializer(page, many=True)
+        # serializer = AdminUserSerializer(page, many=True)
         
         #  Return paginated, serialized response
         
@@ -452,7 +794,7 @@ class ViewAdminUsersPost(APIView):
             'total_users': paginator.count,
             'total_pages': paginator.num_pages,
             'current_page': page.number,
-            'results': serializer.data
+            'results': results
         }, status=status.HTTP_200_OK)
 
 User = get_user_model()
@@ -462,10 +804,7 @@ User = get_user_model()
 class IsSuperAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_superuser)
-       
-        
     
-
 class AdminUserAPIView(APIView):
     permission_classes = [IsSuperAdmin]
 
@@ -565,4 +904,34 @@ class AdminUserDeleteAPIView(APIView):
 
 #        update_session_auth_hash(request, user)
 
-#        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    
+    
+User = get_user_model()
+    #to check whether the user is superuser or not
+class CheckSuperuserStatusView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return Response({'error': 'Email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Try to authenticate using email (custom user model must support email-based auth)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            return Response({
+            'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff,
+                'email': user.email,
+                'username': user.username,
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)

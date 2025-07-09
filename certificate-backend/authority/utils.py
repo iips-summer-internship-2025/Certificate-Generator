@@ -8,6 +8,7 @@ from email.mime.application import MIMEApplication
 from email.mime.image import MIMEImage
 import os
 import requests
+from dotenv import load_dotenv
 
 
 def generate_unique_id():
@@ -18,8 +19,9 @@ def generate_unique_id():
 def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    smtp_username = 'roshniverma93409@gmail.com'
-    smtp_password = ''#'#rverma_05'  # Use app password here
+    smtp_username = os.getenv('Apna_Apna_Email')
+    load_dotenv()
+    smtp_password = os.getenv('SMTP_PASSWORD')  # Set SMTP_PASSWORD in your .env file
 
     # Load HTML template
     try:
@@ -39,7 +41,7 @@ def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list
 
     # Handle Cloudinary attachment
     try:
-        print(f" Downloading image from Cloudinary: {cloudinary_url}")
+        print(f"Downloading image from Cloudinary: {cloudinary_url}")
         response = requests.get(cloudinary_url)
         response.raise_for_status()
         
@@ -63,9 +65,9 @@ def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list
                            'attachment', 
                            filename=f"certificate_{certificate_id}.{ext}")
         msg.attach(attachment)
-        print(" Image attached successfully")
+        print("Image attached successfully")
     except Exception as e:
-        print(f" Failed to attach Cloudinary image: {e}")
+        print(f"Failed to attach Cloudinary image: {e}")
         return
 
     # Send email
@@ -74,7 +76,7 @@ def send_bulk_emails(emails_id, certificate_id, cloudinary_url, subject, cc_list
             server.starttls()
             server.login(smtp_username, smtp_password)
             server.sendmail(smtp_username, [emails_id] + cc_list, msg.as_string())
-        print(f" Email sent to {emails_id}")
+        print(f"Email sent to {emails_id}")
     except Exception as e:
         print(f"Failed to send email: {e}")
 

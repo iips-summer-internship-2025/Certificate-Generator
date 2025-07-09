@@ -26,11 +26,21 @@ class CustomUser(AbstractUser):
         ('user', 'User'),
     )
      role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
-     can_manage_users = models.BooleanField(default=False)  # permission to add/delete users
+    #  can_manage_users = models.BooleanField(default=False)  # permission to add/delete users
      email = models.EmailField(unique=True)
     # Add any additional fields here
      USERNAME_FIELD = 'email'
      REQUIRED_FIELDS = ['username']
+     
+     def save(self, *args, **kwargs):
+        # Auto-set role based on is_superuser and is_staff
+        if self.is_superuser:
+            self.role = 'superadmin'
+        elif self.is_staff:
+            self.role = 'admin'
+        else:
+            self.role = 'user'
+        super().save(*args, **kwargs)
 
      def __str__(self):
         return self.email

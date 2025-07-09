@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import './App.css'
 import Login from './components/Login/Login'
 import Upload from './components/upload/upload'
 import Editor from './components/Editor/Editor'
-import Header from './components/home/header'
 import { AdminLayout } from './components/Admin pages/Admin'
 import Dashboard from './components/Admin pages/Dashboard/adminDashboard'
 import ChangePassword from './components/Admin pages/Change Password/changePassword'
@@ -13,6 +11,11 @@ import CrudAdmins from './components/Admin pages/CRUD admins/CRUDAdmins'
 import ViewAdmins from './components/Admin pages/View Admins/ViewAdmins'
 import Loader from './components/Loader/Loader'
 import ErrorPage from './components/Error page/ErrorPage'
+import CertificateSearch from './components/Search/CertificateSearch'
+import Footer from './components/home/Footer'
+import Home from './components/home/Home'
+import Validation from './components/home/Validation/Validation'
+import './App.css'
 
 
 
@@ -22,14 +25,15 @@ function App() {
   const token=localStorage.getItem('token');
   return (
     <>
+    
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path='/header' element={<Header/>}/>
-        {/* <Route path="/upload" element={<Upload />} /> */}
-        <Route path="/loader" element={<Loader />} />
+        <Route path='/' element={<Home/>}/>
+        {token && <Route path="/Login" element={<Login />}/>}
         {token && <Route path="/upload" element={<Upload />}/>}
-        {token && <Route path="/editor" element={<Editor />}/>}
-        {/* <Route path="/editor" element={<Editor/>}/> */}
+        {/* <Route path="/upload" element={<Upload />}/>
+        <Route path="/Login" element={<Login/>} /> */}
+        <Route path="/editor" element={<Editor/>}/>
+        <Route path="/CertificateSearch" element={<CertificateSearch />}/>
 
 
          {/* Admin Routes */}
@@ -41,9 +45,10 @@ function App() {
             <Route path="view-admins" element={<ViewAdmins />} />
           </Route>
 
-      </Routes>
+          {/* Search Page */}
+          <Route path="/search" element={<CertificateSearch />} />
 
-      
+      </Routes>
     </>
   )
 }

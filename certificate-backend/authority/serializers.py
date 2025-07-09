@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ( 'username','email','role,' 'password','is_superuser')
+        fields = ( 'username','email','role', 'password','is_superuser')
         read_only_fields = []  
 
 
@@ -34,9 +34,15 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 # for testing purpose 
-#class CertificateUploadSerializer(serializers.Serializer):
- #    csv = serializers.FileField()
-  #   template = serializers.ImageField()    
+# class CertificateSerializer(serializers.Serializer):
+#     csv = serializers.FileField()
+#     template = serializers.ImageField()  
+class CertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certificate
+        fields = ['certificate_id', 'name', 'email_id', 'roll_no', 'certificate', 'timestamp']
+
+      
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
