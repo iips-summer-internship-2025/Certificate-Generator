@@ -72,6 +72,9 @@ class Event(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     coordinator_name = models.CharField(max_length=100)
+    event_pdf = models.URLField(blank=True, null=True)    # PDF Cloudinary URL
+    event_image = models.URLField(blank=True, null=True)  # Image Cloudinary URL
+
 
     def __str__(self):
         return f"{self.event_name} ({self.club.name})"

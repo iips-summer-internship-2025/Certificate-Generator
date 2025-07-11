@@ -971,6 +971,7 @@ useEffect(() => {
               {/* <AwardIcon className="mr-2 flex " size={24} /> */}
               Register Event
             </motion.button>
+            
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.5)" }}
               whileTap={{ scale: 0.95 }}
@@ -1409,3 +1410,11 @@ useEffect(() => {
     </div>
   );
 }
+
+// // Custom ChevronDownIcon component
+// const ChevronDown = () => (
+//   <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+//     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+//   </svg>
+// );
+
