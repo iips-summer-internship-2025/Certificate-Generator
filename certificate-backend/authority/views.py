@@ -328,7 +328,7 @@ def upload_files(request):
 
         cc_list = [
 
-            'shubhanshsharmagreat@gmail.com',
+            'ashwinchouhan567@gmail.com',
         ]
 
         # # Ensure output_path is a string, not a list
