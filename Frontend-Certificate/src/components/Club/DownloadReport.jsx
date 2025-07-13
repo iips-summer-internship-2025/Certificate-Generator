@@ -520,7 +520,7 @@ const DownloadReport = () => {
     "Finance Club",
     "Fine Arts Club",
     "HR Club",
-    "Literary Cell",
+    "Literary club",
     "Marketing Club",
     "Meditation and Self Development Club",
     "Performing Arts & Theater Club",
@@ -539,7 +539,7 @@ const DownloadReport = () => {
     }
 
     try {
-      const response = await axios.get(`/api/events/`, {
+      const response = await axios.get(`/api/events/filter/`, {
         params: {
           club: selectedClub,
           start_date: startDate,
