@@ -829,8 +829,8 @@ class EventUploadView(APIView):
 
     def post(self, request):
         data = request.data.copy()
-        pdf_file = request.FILES.get('event_pdf')
-        image_file = request.FILES.get('event_image')
+        pdf_file = request.FILES.get('reportFile')
+        image_file = request.FILES.get('imageFile')
 
         # Upload PDF to Cloudinary
         if pdf_file:
@@ -857,4 +857,80 @@ class EventUploadView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print("Serializer Errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class EventFilterView(APIView):
+    def get(self, request):
+        club_name = request.query_params.get('club')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+
+        # Validate inputs
+        if not all([club_name, start_date, end_date]):
+            return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get club by name (case-insensitive)
+        try:
+            club = Club.objects.get(club_name__iexact=club_name)
+        except Club.DoesNotExist:
+            return Response({"error": "Invalid club name"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter events under the selected club and date range
+        events = Event.objects.filter(
+            Q(club_id=club.club_code),
+            Q(start_date__gte=start_date),
+            Q(end_date__lte=end_date)
+        )
+
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.http import HttpResponseRedirect, Http404
+from .serializers import EventDetailSerializer
+
+# 1. fetch full details of ONE event (JSON)
+class EventDetailView(RetrieveAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset           = Event.objects.all()
+    serializer_class   = EventDetailSerializer
+    lookup_field       = 'pk'
+
+# 2. redirect browser straight to the Cloudinary PDF
+class EventReportRedirect(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, pk):
+        try:
+            event = Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            raise Http404("Event not found")
+
+        if not event.event_pdf:
+            return Response(
+                {"error": "PDF not uploaded for this event."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return HttpResponseRedirect(event.event_pdf)
+
+# 3. return every image URL as JSON (or you could render HTML)
+class EventPhotosView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, pk):
+        try:
+            event = Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            raise Http404("Event not found")
+
+        images = [
+            url for url in [
+                event.event_image,
+                event.event_image1,
+                event.event_image2,
+                event.event_image3
+            ] if url
+        ]
+        return Response({"images": images}, status=200)

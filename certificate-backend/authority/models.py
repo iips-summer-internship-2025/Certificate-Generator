@@ -59,24 +59,30 @@ class Certificate(models.Model):
 
 class Club(models.Model):
     club_code = models.CharField(max_length=10, primary_key=True)  # Custom PK
-    name = models.CharField(max_length=100, unique=True)
-    head = models.CharField(max_length=100)
+    club_name = models.CharField(max_length=100, unique=True)
+    club_head = models.CharField(max_length=100)
     
 
     def __str__(self):
         return self.name
 
 class Event(models.Model):
-    club = models.ForeignKey(Club, to_field='club_code', on_delete=models.CASCADE)
+    club_id = models.ForeignKey(Club, to_field='club_code', on_delete=models.CASCADE)
     event_name = models.CharField(max_length=100)
     start_date = models.DateField()
     end_date = models.DateField()
     coordinator_name = models.CharField(max_length=100)
+    coordinator_name1 = models.CharField(max_length=100,null=True)
+    coordinator_name2 = models.CharField(max_length=100,null=True)
     event_pdf = models.URLField(blank=True, null=True)    # PDF Cloudinary URL
-    event_image = models.URLField(blank=True, null=True)  # Image Cloudinary URL
+    event_image = models.URLField(blank=True)
+    event_image1 = models.URLField(blank=True, null=True)
+    event_image2 = models.URLField(blank=True, null=True)
+    event_image3 = models.URLField(blank=True, null=True) 
+    # Image Cloudinary URL
 
 
     def __str__(self):
-        return f"{self.event_name} ({self.club.name})"
+        return f"{self.event_name} ({self.club_id.club_name})"
   
     

@@ -191,19 +191,48 @@ class AdminUserSerializer(serializers.ModelSerializer):
 from rest_framework import serializers
 from .models import Club, Event
 
+
 class ClubSerializer(serializers.ModelSerializer):
     class Meta:
         model = Club
         fields = '__all__'
 
 class EventSerializer(serializers.ModelSerializer):
-    club = serializers.SlugRelatedField(
+    club_id= serializers.SlugRelatedField(
         queryset=Club.objects.all(),
         slug_field='club_code'  # since club_code is the primary key
     )
+    club_name = serializers.CharField(source='club_id.club_name', read_only=True)
+    eventName = serializers.CharField(source='event_name')
+    startDate = serializers.DateField(source='start_date')
+    endDate = serializers.DateField(source='end_date')
+    organizerName = serializers.CharField(source='coordinator_name')
 
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = [
+            'id',
+            'club_id',         # keep as is
+            'eventName',       # maps to event_name
+            'startDate',       # maps to start_date
+            'endDate',         # maps to end_date
+            'organizerName',   # maps to coordinator_name
+            'event_pdf',
+            'event_image',
+            'club_name'
+        ]
         #read_only_fields = ['event_pdf', 'event_image']  # These are filled after Cloudinary upload
+        
+class EventDetailSerializer(serializers.ModelSerializer):
+    club_name = serializers.CharField(source='club_id.club_name', read_only=True)
+
+    class Meta:
+        model  = Event
+        fields = [
+            'id', 'club_name', 'event_name',
+            'start_date', 'end_date',
+            'event_pdf',
+            'event_image', 'event_image1', 'event_image2', 'event_image3',
+        ]
+
 

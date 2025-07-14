@@ -778,7 +778,7 @@ const DownloadReport = () => {
     }
 
     try {
-      const response = await axios.get(`/api/events/`, {
+      const response = await axios.get(`/api/events/filter/`, {
         params: {
           club: selectedClub,
           start_date: startDate,

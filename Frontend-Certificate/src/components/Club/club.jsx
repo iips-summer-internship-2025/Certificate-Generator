@@ -740,7 +740,7 @@ export default function ClubEventForm() {
   const [formStep, setFormStep] = useState(1);
   const [formData, setFormData] = useState({
     clubName: '',
-    club:'',
+    club_id:'',
     startDate: '',
     endDate: '',
     organizerName: '',
@@ -781,7 +781,7 @@ export default function ClubEventForm() {
   //       autoClose: 3000,
   //       hideProgressBar: false,
   //       closeOnClick: true,
-  //       pauseOnHover: true,
+  //       pauseOnHover: true,http
   //       draggable: true,
   //       theme: "colored",
   //       style: {
@@ -812,9 +812,11 @@ export default function ClubEventForm() {
   const handleSubmit = async (e) => {
   e.preventDefault();
 
+  const token = localStorage.getItem('token');
+
   const formPayload = new FormData();
   formPayload.append('clubName', formData.clubName);
-  formPayload.append('club',formData.club)
+  formPayload.append('club_id',formData.club_id)
   formPayload.append('startDate', formData.startDate);
   formPayload.append('endDate', formData.endDate);
   formPayload.append('organizerName', formData.organizerName);
@@ -823,10 +825,10 @@ export default function ClubEventForm() {
   formPayload.append('imageFile', formData.imageFile);
 
   try {
-    const response = await fetch('https://your-backend-api.com/api/events/uploads', {
+    const response = await fetch('http://127.0.0.1:8000/api/events/upload/', {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json',
+          // 'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       body: formPayload
@@ -855,7 +857,7 @@ export default function ClubEventForm() {
 
     // Reset form and close modal
     setFormData({
-      club: '',
+      club_id: '',
       clubName: '',
       startDate: '',
       endDate: '',
@@ -1151,7 +1153,10 @@ useEffect(() => {
                         <div>
                           <label className="block text-sky-700 font-medium flex items-center ">Club_id</label>
                           <input type='text'
-                          value={formData.club}
+                          name="club_id"
+                          placeholder='Enter club id'
+                          value={formData.club_id}
+                          onChange={handleChange}
                           className='border-1 block'
                           ></input>
                         </div>
