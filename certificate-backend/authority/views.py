@@ -829,8 +829,8 @@ class EventUploadView(APIView):
 
     def post(self, request):
         data = request.data.copy()
-        pdf_file = request.FILES.get('event_pdf')
-        image_file = request.FILES.get('event_image')
+        pdf_file = request.FILES.get('reportFile')
+        image_file = request.FILES.get('imageFile')
 
         # Upload PDF to Cloudinary
         if pdf_file:
@@ -857,6 +857,7 @@ class EventUploadView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print("Serializer Errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class EventFilterView(APIView):
