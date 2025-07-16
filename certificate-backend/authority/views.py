@@ -865,6 +865,8 @@ class EventFilterView(APIView):
         club_name = request.query_params.get('club')
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
+        
+        print("Received:", club_name, start_date, end_date)
 
         # Validate inputs
         if not all([club_name, start_date, end_date]):
@@ -882,6 +884,8 @@ class EventFilterView(APIView):
             Q(start_date__gte=start_date),
             Q(end_date__lte=end_date)
         )
+        print("Filtering events for:", club_name, start_date, end_date)
+        print("Filtered events:", events)
 
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -933,4 +937,5 @@ class EventPhotosView(APIView):
                 event.event_image3
             ] if url
         ]
+
         return Response({"images": images}, status=200)

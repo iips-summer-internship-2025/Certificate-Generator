@@ -766,7 +766,7 @@ const DownloadReport = () => {
   const clubs = [
     "Advertising & PR Club", "AI and Robotics Club", "Business & Analytics Club", "Coding Club",
     "Commerce Club", "Computing Club", "Entrepreneurship Cell", "Environment Club",
-    "Festival Club", "Finance Club", "Fine Arts Club", "HR Club", "Literary Cell", "Marketing Club",
+    "Festival Club", "Finance Club", "Fine Arts Club", "HR Club", "Literary club", "Marketing Club",
     "Meditation and Self Development Club", "Performing Arts & Theater Club", "Photography Club",
     "Setu-Social Connect Club", "Sports Club", "Student Research Cell", "Tourism Club", "Yoga & Fitness"
   ];
@@ -778,33 +778,128 @@ const DownloadReport = () => {
     }
 
     try {
-      const response = await axios.get(`/api/events/filter/`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+      alert("You must be logged in to access this resource");
+      return;
+        }
+      const response = await axios.get(`http://127.0.0.1:8000/events/filter/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          
+        },
         params: {
           club: selectedClub,
           start_date: startDate,
           end_date: endDate,
         }
       });
+      // Log the API response to see what your backend is returning
+      console.log("API response:", response.data);
 
-      setEvents(response.data || []);
+      if (Array.isArray(response.data)) {
+      setEvents(response.data);
+      } 
+      else {
+      setEvents([]);  // fallback to empty array
+      alert(response.data?.error || 'Unexpected response format.');
+      }
+
+      // setEvents(response.data || []);
       setShowEvents(true);
       setSelectedEvent('');
       setShowActions(false);
     } catch (error) {
       console.error('Error fetching events:', error);
       alert('Failed to fetch events.');
+      setEvents([]); // ensure no map error next time
     }
   };
 
-  const handleDownloadReport = () => {
+  const handleDownloadReport = async() => {
     if (!selectedEvent) return;
-    window.location.href = `/api/events/${selectedEvent}/report/`;
-  };
+    const token = localStorage.getItem("token");
+    if (!token) {
+    alert("Login required.");
+    return;
+    }
+    try {
+    const response = await axios.get(`http://127.0.0.1:8000/events/${selectedEvent}/report/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      // responseType: 'blob'  // Important: tells axios to expect binary (PDF) data
+    });
 
-  const handleViewPhotos = () => {
+    const pdfUrl = response.data?.pdf_url || response.request?.responseURL;
+
+    if (pdfUrl) {
+      window.open(pdfUrl, "_blank");
+    } else {
+      alert("PDF URL not found.");
+    }
+  } catch (error) {
+    console.error("Error fetching report:", error);
+    alert("Failed to download report.");
+  }
+};
+    // window.location.href = `http://127.0.0.1:8000/events/${selectedEvent}/report/`;
+  // };
+
+  const handleViewPhotos = async() => {
     if (!selectedEvent) return;
-    window.open(`/api/events/${selectedEvent}/photos/`, '_blank');
-  };
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+    alert("Login required.");
+    return;
+    }
+
+     try {
+    const response = await axios.get(
+      `http://127.0.0.1:8000/events/${selectedEvent}/photos/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+     const images = response.data.images || [];
+
+    if (images.length === 0) {
+      alert("No images available.");
+      return;
+    }
+
+    const newWindow = window.open();
+    const html = `
+      <html>
+        <head><title>Event Photos</title></head>
+        <body style="padding: 20px; font-family: sans-serif;">
+          <h2>Event Photos</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            ${images.map(url => `
+              <div>
+                <img src="${url}" style="max-width: 300px; max-height: 300px;" />
+              </div>
+            `).join('')}
+          </div>
+        </body>
+      </html>
+    `;
+
+    newWindow.document.write(html);
+    newWindow.document.close();
+
+  } catch (error) {
+    console.error("Error loading photos:", error);
+    alert("Failed to load photos.");
+  }
+};
+
+  //   window.open(`http://127.0.0.1:8000/events/${selectedEvent}/photos/`, '_blank');
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-indigo-50 to-blue-100 py-10 px-4 sm:px-8 lg:px-20 items-center content-center">
