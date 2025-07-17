@@ -207,6 +207,9 @@ class EventSerializer(serializers.ModelSerializer):
     startDate = serializers.DateField(source='start_date')
     endDate = serializers.DateField(source='end_date')
     organizerName = serializers.CharField(source='coordinator_name')
+    #  These are only for frontend dropdown compatibility
+    name = serializers.CharField(source='event_name', read_only=True)
+    date = serializers.DateField(source='start_date', read_only=True)
 
     class Meta:
         model = Event
@@ -219,7 +222,9 @@ class EventSerializer(serializers.ModelSerializer):
             'organizerName',   # maps to coordinator_name
             'event_pdf',
             'event_image',
-            'club_name'
+            'club_name',
+            'name',  #  Add for dropdown
+            'date',
         ]
         #read_only_fields = ['event_pdf', 'event_image']  # These are filled after Cloudinary upload
         
