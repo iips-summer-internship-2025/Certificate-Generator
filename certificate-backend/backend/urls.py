@@ -14,6 +14,16 @@ from django.urls import path
 from authority.views import ViewCertificatesAPI
 from authority.views import CheckSuperuserStatusView  
 from django.urls import path
+from authority.views import ClubListCreateView 
+from authority.views import EventUploadView
+from authority.views import EventFilterView
+from authority.views import EventDetailView
+from authority.views import EventReportRedirect
+from authority.views import EventPhotosView
+
+
+
+
 from authority.views import ClubListCreateView, EventListCreateView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -51,6 +61,12 @@ urlpatterns = [
     # This endpoint can be used to check if the user is a superuser
     path('api/check-superuser/', CheckSuperuserStatusView.as_view(), name='check-superuser'),
     path('api/clubs/', ClubListCreateView.as_view(), name='club-list-create'),
-    path('api/events/', EventListCreateView.as_view(), name='event-list-create'),
-    
-] 
+    path('api/events/upload/', EventUploadView.as_view(), name='event-upload'),
+    path('events/filter/', EventFilterView.as_view(), name='event-filter'),
+    path('events/<int:pk>/', EventDetailView.as_view(),      name='event-detail'),
+    path('events/<int:pk>/report/', EventReportRedirect.as_view(), name='event-report'),
+    path('events/<int:pk>/photos/', EventPhotosView.as_view(),     name='event-photos'),
+   # path('api/events/', EventListCreateView.as_view(), name='event-list-create'),
+
+]
+   
