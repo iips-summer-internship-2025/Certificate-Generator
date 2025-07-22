@@ -15,6 +15,9 @@ from authority.views import ViewCertificatesAPI
 from authority.views import CheckSuperuserStatusView  
 from django.urls import path
 from authority.views import ClubListCreateView, EventListCreateView
+from django.conf import settings
+from django.conf.urls.static import static
+from authority.views import verify_certificate
 
 # certificate_list = CertificateViewSet.as_view({'get': 'list'})
 
@@ -26,7 +29,7 @@ urlpatterns = [
     path('api/register/', RegisterView.as_view(), name='register'),
     path('api/upload/', views.upload_files, name='upload_files'),
     #path('test-id/', test_id_generation, name='test_id_generation'),
-    path('verify/<str:certificate_id>/', views.verify_certificate, name='verify_certificate'),
+    path('api/verify/<str:certificate_id>/', views.verify_certificate, name='verify_certificate'),
     #path('show-qr/<str:certificate_id>/', views.show_qr, name='show-qr'),
     #path('api/coords', accept_coords, name='accept_coords'),
     #path('api/certificates/', include(router.urls)),
@@ -49,5 +52,5 @@ urlpatterns = [
     path('api/check-superuser/', CheckSuperuserStatusView.as_view(), name='check-superuser'),
     path('api/clubs/', ClubListCreateView.as_view(), name='club-list-create'),
     path('api/events/', EventListCreateView.as_view(), name='event-list-create'),
-
-]
+    
+] 

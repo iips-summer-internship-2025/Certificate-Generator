@@ -33,8 +33,10 @@ from rest_framework import viewsets, permissions, status
 from .serializers import AdminUserSerializer,UserSerializer
 from django.contrib.auth import update_session_auth_hash
 from .models import CustomUser
-
-
+from .serializers import ClubSerializer, EventSerializer
+from .models import Event
+from .models import Club
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
@@ -162,8 +164,10 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 
 
     #  Generate QR code based on unique ID
-    qr_data = f"http://127.0.0.1:8000/verify/{certificate_id}"
-    qr = qrcode.make(qr_data)
+   # qr_data = f"http://127.0.0.1:8000/verify/{certificate_id}"
+    qr_url = f"{settings.FRONTEND_BASE_URL}/verify/{certificate_id}"
+   # qr = qrcode.make(qr_data)
+    qr = qrcode.make(qr_url)
     qr = qr.resize((150, 150))
     # Padding from top and right edges
     padding_x = 20
@@ -322,7 +326,8 @@ def upload_files(request):
 
         cc_list = [
 
-            'shubhanshsharmagreat@gmail.com',
+            'ashvinchouhan567@gmail.com',
+            ''
         ]
 
         # # Ensure output_path is a string, not a list
@@ -444,6 +449,8 @@ def verify_certificate(request, certificate_id):
             'name': cert.name,
             #'roll_no': cert.roll_no,
             #'email': cert.email_id
+            #'certificate_url': cert.certificate,
+            'certificate_id': cert.certificate_id,
             'certificate_url': cert.certificate,
          })
      except Certificate.DoesNotExist:
@@ -897,6 +904,7 @@ class AdminUserDeleteAPIView(APIView):
 #        if len(new_password) < 6:
 #            return Response({"detail": "New password must be at least 6 characters."}, status=status.HTTP_400_BAD_REQUEST)
 
+
 #        user.set_password(new_password)
 #        user.save()
 
@@ -933,3 +941,16 @@ class CheckSuperuserStatusView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+# Clubs
+class ClubListCreateView(generics.ListCreateAPIView):
+    queryset = Club.objects.all()
+    serializer_class = ClubSerializer
+    permission_classes = [IsAuthenticated]  # Only logged-in users
+
+# Events
+class EventListCreateView(generics.ListCreateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAdminUser]  # Only admins can add/view        
