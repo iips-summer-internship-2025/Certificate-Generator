@@ -768,7 +768,7 @@ const DownloadReport = () => {
     "Commerce Club", "Computing Club", "Entrepreneurship Cell", "Environment Club",
     "Festival Club", "Finance Club", "Fine Arts Club", "HR Club", "Literary club", "Marketing Club",
     "Meditation and Self Development Club", "Performing Arts & Theater Club", "Photography Club",
-    "Setu-Social Connect Club", "Sports Club", "Student Research Cell", "Tourism Club", "Yoga & Fitness"
+    "Setu-Social Connect Club", "Sports Club", "Student Research Cell", "Tourism Club", "Yoga & Fitness,abc"
   ];
 
   const handleFetchEvents = async () => {
