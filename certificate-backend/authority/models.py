@@ -55,6 +55,8 @@ class Certificate(models.Model):
     certificate_id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False)
     email_id = models.EmailField(max_length=150)
     timestamp = models.DateTimeField(auto_now_add=True)
+   # certificate_file = models.FileField(upload_to='certificates/')
+    certificate_url = models.URLField(null=True, blank=True)
     #suser_type= models.BooleanField(default=False)
 
 class Club(models.Model):

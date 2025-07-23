@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'authority.apps.AuthorityConfig',
     'corsheaders',
+    'certificates',
 ]
 
 MIDDLEWARE = [
@@ -240,3 +241,10 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")
