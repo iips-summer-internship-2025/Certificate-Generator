@@ -733,9 +733,10 @@ import Footer from '../home/Footer';
 // Club data with icons
 const clubs = [
   // { name: 'Avertising & PR Club', image: <img src={advertisment} alt='Advertising & PR Club'/>, color: "bg-blue-500" },
-  { name: 'Avertising & PR Club', image: "../../../public/assets/advertisment.png", color: "bg-blue-500" },
+  { name: 'Others', image: "../../../public/assets/others.png", color: "bg-gray-500" },
+  { name: 'Advertising & PR Club', image: "../../../public/assets/advertisment.png", color: "bg-blue-500" },
   { name: 'AI and Robotics Club', image: "../../../public/assets/AI and Robotics Club _logo.png" , color: "bg-purple-500" },
-  { name: 'Business & analystics Club', image: "../../../public/assets/business.png", color: "bg-pink-500" },
+  { name: 'Business & Analystics Club', image: "../../../public/assets/business.png", color: "bg-pink-500" },
   { name: 'Coding Club', image: "../../../public/assets/coding.png", color: "bg-amber-500" },
   { name: 'Commerce Club', image: "../../../public/assets/commerce.png", color: "bg-red-500" },
   { name: 'Computing Club', image: "../../../public/assets/computer.png", color: "bg-fuchsia-500" },
@@ -751,10 +752,11 @@ const clubs = [
   { name: 'Performing Arts & Theater Club', image: "../../../public/assets/performing2.png", color: "bg-lime-500" },
   { name: 'Photography Club', image: "../../../public/assets/photography.png", color: "bg-violet-500" },
   { name: 'Setu-Social Connect Club', image: "../../../public/assets/Setu -Social Connect Club_logo.png", color: "bg-rose-500" },
-  { name: 'Sprots Club', image: "../../../public/assets/advertisment.png", color: "bg-pink-500" },
+  { name: 'Sports Club', image: "../../../public/assets/advertisment.png", color: "bg-pink-500" },
   { name: 'Student Research Cell', image: "../../../public/assets/student_research.png", color: "bg-blue-500" },
   { name: 'Tourism Club', image: "../../../public/assets/tourism.png", color: "bg-green-500" },
   { name: 'Yoga & Fitness', image: "../../../public/assets/Yoga and Fitness_logo.png", color: "bg-indigo-500" },
+  { name: 'Others', image: "../../../public/assets/others.png", color: "bg-gray-500" },
 ];
 
 

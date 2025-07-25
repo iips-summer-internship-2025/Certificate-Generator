@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(
-            model_name='certificate',
+            model_name='Certificate',
             name='status',
         ),
     ]
