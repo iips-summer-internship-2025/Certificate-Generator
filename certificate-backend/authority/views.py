@@ -180,7 +180,6 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     # Calculate position for top right corner with padding
       # Resize as needed
     image.paste(qr, (image.width - qr_width - padding_x,  padding_y))  # Bottom right corner
-
     image.save(output_path)
 
 
@@ -830,7 +829,12 @@ class EventUploadView(APIView):
     def post(self, request):
         data = request.data.copy()
         pdf_file = request.FILES.get('reportFile')
-        image_file = request.FILES.get('imageFile')
+        image1 = request.FILES.get('image1')
+        image2 = request.FILES.get('image2')
+        image3 = request.FILES.get('image3') 
+        image4 = request.FILES.get('image4')    
+         
+        
 
         # Upload PDF to Cloudinary
         if pdf_file:
@@ -842,12 +846,37 @@ class EventUploadView(APIView):
             data['event_pdf'] = pdf_upload.get("secure_url")
 
         # Upload Image to Cloudinary
-        if image_file:
+        if image1:
             image_upload = cloudinary.uploader.upload(
-                image_file, 
+                image1, 
                 folder="events_images"
             )
             data['event_image'] = image_upload.get("secure_url")
+            
+            #image2
+            
+        if image2:
+            image_upload = cloudinary.uploader.upload(
+                image2, 
+                folder="events_images"
+            )
+            data['event_image1'] = image_upload.get("secure_url")
+        #image3
+        if image3:
+            image_upload = cloudinary.uploader.upload(
+                image3, 
+                folder="events_images"
+            )
+            data['event_image2'] = image_upload.get("secure_url")
+        #image4
+        if image4:
+            image_upload = cloudinary.uploader.upload(
+                image4, 
+                folder="events_images"
+            )
+            data['event_image3'] = image_upload.get("secure_url")
+            
+        #image4
         print("PDF URL:", data.get('event_pdf'))
         print("Image URL:", data.get('event_image'))
 

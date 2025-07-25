@@ -206,8 +206,11 @@ class EventSerializer(serializers.ModelSerializer):
     eventName = serializers.CharField(source='event_name')
     startDate = serializers.DateField(source='start_date')
     endDate = serializers.DateField(source='end_date')
-    organizerName = serializers.CharField(source='coordinator_name')
-    #  These are only for frontend dropdown compatibility
+    #organizerName = serializers.CharField(source='coordinator_name')
+    #coordinator2 = serializers.CharField(source='coordinator_name1')
+    #coordinator3 = serializers.CharField(source='coordinator_name2')
+    
+    #These are only for frontend dropdown compatibility
     name = serializers.CharField(source='event_name', read_only=True)
     date = serializers.DateField(source='start_date', read_only=True)
 
@@ -219,9 +222,15 @@ class EventSerializer(serializers.ModelSerializer):
             'eventName',       # maps to event_name
             'startDate',       # maps to start_date
             'endDate',         # maps to end_date
-            'organizerName',   # maps to coordinator_name
+            'coordinator1',
+            'coordinator2',
+            'coordinator3',
+            'coordinator4',# maps to coordinator_name
             'event_pdf',
             'event_image',
+            'event_image1',
+            'event_image2',  
+            'event_image3',   
             'club_name',
             'name',  #  Add for dropdown
             'date',

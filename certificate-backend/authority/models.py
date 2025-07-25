@@ -71,9 +71,10 @@ class Event(models.Model):
     event_name = models.CharField(max_length=100)
     start_date = models.DateField()
     end_date = models.DateField()
-    coordinator_name = models.CharField(max_length=100)
-    coordinator_name1 = models.CharField(max_length=100,null=True)
-    coordinator_name2 = models.CharField(max_length=100,null=True)
+    coordinator1 = models.CharField(max_length=100)
+    coordinator2 = models.CharField(max_length=100,null=True)
+    coordinator3= models.CharField(max_length=100,null=True)
+    coordinator4= models.CharField(max_length=100,null=True)
     event_pdf = models.URLField(blank=True, null=True)    # PDF Cloudinary URL
     event_image = models.URLField(blank=True)
     event_image1 = models.URLField(blank=True, null=True)
