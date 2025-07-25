@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect, useRef } from 'react';
 // import { motion, AnimatePresence, px } from 'framer-motion';
 // import { CalendarIcon, UsersIcon, UserIcon, LayoutListIcon, FileTextIcon, ImageIcon, XIcon, SparklesIcon, ChevronDown, ChevronRight, ChevronLeft, AwardIcon, PaletteIcon, MusicIcon, CodeIcon, CameraIcon, BookOpenIcon, GamepadIcon, LockIcon, LightbulbIcon } from 'lucide-react';
@@ -6,31 +5,31 @@
 // import 'react-toastify/dist/ReactToastify.css';
 // import Header from '../home/Header';
 // import Footer from '../home/Footer';
-
 // // Club data with icons
 // const clubs = [
-//   { name: 'Avertising & PR Club', icon: <CodeIcon className="text-white" />, color: "bg-blue-500" },
-//   { name: 'AI and Robotics Club', icon: <PaletteIcon className="text-white" />, color: "bg-purple-500" },
-//   { name: 'Business & analystics Club', icon: <div className="text-white">🤖</div>, color: "bg-pink-500" },
-//   { name: 'Coding Club', icon: <div className="text-white">🎭</div>, color: "bg-amber-500" },
-//   { name: 'Commerce Club', icon: <MusicIcon className="text-white" />, color: "bg-red-500" },
-//   { name: 'Computing Club', icon: <div className="text-white">💃</div>, color: "bg-fuchsia-500" },
-//   { name: 'Enterprenuership Cell', icon: <CameraIcon className="text-white" />, color: "bg-cyan-500" },
-//   { name: 'Environment Club', icon: <BookOpenIcon className="text-white" />, color: "bg-emerald-500" },
-//   { name: 'Festival Club', icon: <GamepadIcon className="text-white" />, color: "bg-green-500" },
-//   { name: 'Finance Club', icon: <div className="text-white">🧠</div>, color: "bg-indigo-500" },
-//   { name: 'Fine Arts Club', icon: <LockIcon className="text-white" />, color: "bg-yellow-500" },
-//   { name: 'HR Club', icon: <LightbulbIcon className="text-white" />, color: "bg-orange-500" },
-//   { name: 'Literary Cell', icon: <LightbulbIcon className="text-white" />, color: "bg-teal-500" },
-//   { name: 'Marketing Club', icon: <LightbulbIcon className="text-white" />, color: "bg-rose-500" },
-//   { name: 'Meditation and Self Development Club', icon: <LightbulbIcon className="text-white" />, color: "bg-sky-500" },
-//   { name: 'Performing Arts & Theater Club', icon: <LightbulbIcon className="text-white" />, color: "bg-lime-500" },
-//   { name: 'Photography Club', icon: <LightbulbIcon className="text-white" />, color: "bg-violet-500" },
-//   { name: 'Setu-Social Connect Club', icon: <LightbulbIcon className="text-white" />, color: "bg-rose-500" },
-//   { name: 'Sprots Club', icon: <LightbulbIcon className="text-white" />, color: "bg-pink-500" },
-//   { name: 'Student Research Cell', icon: <LightbulbIcon className="text-white" />, color: "bg-blue-500" },
-//   { name: 'Tourism Club', icon: <LightbulbIcon className="text-white" />, color: "bg-green-500" },
-//   { name: 'Yoga & Fitness', icon: <LightbulbIcon className="text-white" />, color: "bg-indigo-500" },
+//   // { name: 'Avertising & PR Club', image: <img src={advertisment} alt='Advertising & PR Club'/>, color: "bg-blue-500" },
+//   { name: 'Avertising & PR Club', image: "../../../public/assets/advertisment.png", color: "bg-blue-500" },
+//   { name: 'AI and Robotics Club', image: "../../../public/assets/AI and Robotics Club _logo.png" , color: "bg-purple-500" },
+//   { name: 'Business & analystics Club', image: "../../../public/assets/business.png", color: "bg-pink-500" },
+//   { name: 'Coding Club', image: "../../../public/assets/coding.png", color: "bg-amber-500" },
+//   { name: 'Commerce Club', image: "../../../public/assets/commerce.png", color: "bg-red-500" },
+//   { name: 'Computing Club', image: "../../../public/assets/computer.png", color: "bg-fuchsia-500" },
+//   { name: 'Enterprenuership Cell', image: "../../../public/assets/enterprenurship.png", color: "bg-cyan-500" },
+//   { name: 'Environment Club', image: "../../../public/assets/env.png", color: "bg-emerald-500" },
+//   { name: 'Festival Club', image: "../../../public/assets/Festival Club_logo.png", color: "bg-green-500" },
+//   { name: 'Finance Club', image: "../../../public/assets/Finance Club_logo.png", color: "bg-indigo-500" },
+//   { name: 'Fine Arts Club', image: "../../../public/assets/finearts.png", color: "bg-yellow-500" },
+//   { name: 'HR Club', image: "../../../public/assets/hr.png", color: "bg-orange-500" },
+//   { name: 'Literary Club', image: "../../../public/assets/litrary.png", color: "bg-teal-500" },
+//   { name: 'Marketing Club', image: "../../../public/assets/marketing.png", color: "bg-rose-500" },
+//   { name: 'Meditation and Self Development Club', image: "../../../public/assets/meditation.png", color: "bg-sky-500" },
+//   { name: 'Performing Arts & Theater Club', image: "../../../public/assets/performing2.png", color: "bg-lime-500" },
+//   { name: 'Photography Club', image: "../../../public/assets/photography.png", color: "bg-violet-500" },
+//   { name: 'Setu-Social Connect Club', image: "../../../public/assets/Setu -Social Connect Club_logo.png", color: "bg-rose-500" },
+//   { name: 'Sprots Club', image: "../../../public/assets/advertisment.png", color: "bg-pink-500" },
+//   { name: 'Student Research Cell', image: "../../../public/assets/student_research.png", color: "bg-blue-500" },
+//   { name: 'Tourism Club', image: "../../../public/assets/tourism.png", color: "bg-green-500" },
+//   { name: 'Yoga & Fitness', image: "../../../public/assets/Yoga and Fitness_logo.png", color: "bg-indigo-500" },
 // ];
 
 
@@ -40,6 +39,7 @@
 //   const [formStep, setFormStep] = useState(1);
 //   const [formData, setFormData] = useState({
 //     clubName: '',
+//     club_id:'',
 //     startDate: '',
 //     endDate: '',
 //     organizerName: '',
@@ -80,7 +80,7 @@
 //   //       autoClose: 3000,
 //   //       hideProgressBar: false,
 //   //       closeOnClick: true,
-//   //       pauseOnHover: true,
+//   //       pauseOnHover: true,http
 //   //       draggable: true,
 //   //       theme: "colored",
 //   //       style: {
@@ -111,8 +111,11 @@
 //   const handleSubmit = async (e) => {
 //   e.preventDefault();
 
+//   const token = localStorage.getItem('token');
+
 //   const formPayload = new FormData();
 //   formPayload.append('clubName', formData.clubName);
+//   formPayload.append('club_id',formData.club_id)
 //   formPayload.append('startDate', formData.startDate);
 //   formPayload.append('endDate', formData.endDate);
 //   formPayload.append('organizerName', formData.organizerName);
@@ -121,8 +124,12 @@
 //   formPayload.append('imageFile', formData.imageFile);
 
 //   try {
-//     const response = await fetch('https://your-backend-api.com/api/events', {
+//     const response = await fetch('http://127.0.0.1:8000/api/events/upload/', {
 //       method: 'POST',
+//       headers: {
+//           // 'Content-Type': 'application/json',
+//           'Authorization': `Bearer ${token}`,
+//         },
 //       body: formPayload
 //     });
 
@@ -149,6 +156,7 @@
 
 //     // Reset form and close modal
 //     setFormData({
+//       club_id: '',
 //       clubName: '',
 //       startDate: '',
 //       endDate: '',
@@ -264,14 +272,17 @@
 //               {/* <AwardIcon className="mr-2 flex " size={24} /> */}
 //               Register Event
 //             </motion.button>
+            
 //             <motion.button
 //               whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.5)" }}
 //               whileTap={{ scale: 0.95 }}
-//               className="mt-4 mx-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-3 px-3 rounded font-bold text-lg shadow-xl hover:shadow-2xl transition-all items-center no-underline"
+//               className="mt-4 mx-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-3 px-3 rounded font-bold text-lg shadow-xl hover:shadow-2xl transition-all items-center"
 //             >
 //               {/* <AwardIcon className="mr-2 flex " size={24} /> */}
-//               <a className="text-white font-bold no-underline DownloadReportCSS" href="/DownloadReport">Download Report</a>
-//               </motion.button>
+//               <a href="/DownloadReport" className="DownloadReportCSS text-white">
+//               Download Report
+//               </a>
+//             </motion.button>
 
 
 //           </motion.div>
@@ -324,8 +335,8 @@
 //                   <div className={`relative h-80 rounded-3xl overflow-hidden shadow-xl group ${club.color} bg-gradient-to-br`}>
 //                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
 
-//                     <div className="absolute top-30 right-30 bg-white/20 backdrop-blur-sm p-3 rounded-full">
-//                       {club.icon}
+//                     <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-[60%] bg-white/20 backdrop-blur-sm p-3 rounded-full">
+//                       <img src={club.image} alt={club.name}/>
 //                     </div>
 
 //                     <div className="absolute bottom-0 left-0 p-6 w-full text-center items-center text-white">
@@ -436,6 +447,19 @@
 //                       transition={{ duration: 0.3 }}
 //                       className="space-y-6"
 //                     >
+//                       {/* club id */}
+//                       <div>
+//                         <div>
+//                           <label className="block text-sky-700 font-medium flex items-center ">Club_id</label>
+//                           <input type='text'
+//                           name="club_id"
+//                           placeholder='Enter club id'
+//                           value={formData.club_id}
+//                           onChange={handleChange}
+//                           className='border-1 block'
+//                           ></input>
+//                         </div>
+//                       </div>
 //                       {/* Club Name */}
 //                       <div className="space-y-2 mx-2">
 //                         <label className="block text-sky-700 font-medium flex items-center ">
@@ -682,22 +706,21 @@
 //           scrollbar-width: none;
 //         }
 //         .DownloadReportCSS{
-//         font-weight: 700;
-//         text-decoration: none;
+//           text-decoration: none;
+//           color: white;
+//           font-weight: bold;
 //         }
 //       `}</style>
 //     </div>
 //   );
 // }
 
-// // // Custom ChevronDownIcon component
-// // const ChevronDown = () => (
-// //   <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-// //     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-// //   </svg>
-// // );
-
-
+// // Custom ChevronDownIcon component
+// const ChevronDown = () => (
+//   <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+//     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+//   </svg>
+// );
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, px } from 'framer-motion';
@@ -706,12 +729,14 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from '../home/Header';
 import Footer from '../home/Footer';
+
 // Club data with icons
 const clubs = [
   // { name: 'Avertising & PR Club', image: <img src={advertisment} alt='Advertising & PR Club'/>, color: "bg-blue-500" },
-  { name: 'Avertising & PR Club', image: "../../../public/assets/advertisment.png", color: "bg-blue-500" },
+  { name: 'Others', image: "../../../public/assets/others.png", color: "bg-gray-500" },
+  { name: 'Advertising & PR Club', image: "../../../public/assets/advertisment.png", color: "bg-blue-500" },
   { name: 'AI and Robotics Club', image: "../../../public/assets/AI and Robotics Club _logo.png" , color: "bg-purple-500" },
-  { name: 'Business & analystics Club', image: "../../../public/assets/business.png", color: "bg-pink-500" },
+  { name: 'Business & Analystics Club', image: "../../../public/assets/business.png", color: "bg-pink-500" },
   { name: 'Coding Club', image: "../../../public/assets/coding.png", color: "bg-amber-500" },
   { name: 'Commerce Club', image: "../../../public/assets/commerce.png", color: "bg-red-500" },
   { name: 'Computing Club', image: "../../../public/assets/computer.png", color: "bg-fuchsia-500" },
@@ -727,10 +752,11 @@ const clubs = [
   { name: 'Performing Arts & Theater Club', image: "../../../public/assets/performing2.png", color: "bg-lime-500" },
   { name: 'Photography Club', image: "../../../public/assets/photography.png", color: "bg-violet-500" },
   { name: 'Setu-Social Connect Club', image: "../../../public/assets/Setu -Social Connect Club_logo.png", color: "bg-rose-500" },
-  { name: 'Sprots Club', image: "../../../public/assets/advertisment.png", color: "bg-pink-500" },
+  { name: 'Sports Club', image: "../../../public/assets/advertisment.png", color: "bg-pink-500" },
   { name: 'Student Research Cell', image: "../../../public/assets/student_research.png", color: "bg-blue-500" },
   { name: 'Tourism Club', image: "../../../public/assets/tourism.png", color: "bg-green-500" },
   { name: 'Yoga & Fitness', image: "../../../public/assets/Yoga and Fitness_logo.png", color: "bg-indigo-500" },
+  { name: 'Others', image: "../../../public/assets/others.png", color: "bg-gray-500" },
 ];
 
 
@@ -740,13 +766,21 @@ export default function ClubEventForm() {
   const [formStep, setFormStep] = useState(1);
   const [formData, setFormData] = useState({
     clubName: '',
-    club_id:'',
     startDate: '',
     endDate: '',
-    organizerName: '',
+    // organizerName: '',
     eventName: '',
     reportFile: null,
-    imageFile: null,
+    // imageFile: null,
+    coordinator1: '',
+    coordinator2: '',
+    coordinator3: '',
+    coordinator4: '',
+    image1: null,
+    image2: null,
+    image3: null,
+    image4: null,
+    participantList: null,
   });
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselRef = useRef(null);
@@ -754,7 +788,10 @@ export default function ClubEventForm() {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Handle file input changes
@@ -781,7 +818,7 @@ export default function ClubEventForm() {
   //       autoClose: 3000,
   //       hideProgressBar: false,
   //       closeOnClick: true,
-  //       pauseOnHover: true,http
+  //       pauseOnHover: true,
   //       draggable: true,
   //       theme: "colored",
   //       style: {
@@ -808,97 +845,118 @@ export default function ClubEventForm() {
   //     toast.error('Failed to register event. Please try again.');
   //   }
   // };
-//submit form with API call
+  //submit form with API call
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const formPayload = new FormData();
+    formPayload.append('clubName', formData.clubName);
+    formPayload.append('club_id', formData.club_id);
+    formPayload.append('startDate', formData.startDate);
+    formPayload.append('endDate', formData.endDate);
+    // formPayload.append('organizerName', formData.organizerName);
+    formPayload.append('eventName', formData.eventName);
+    formPayload.append('reportFile', formData.reportFile);
+    // formPayload.append('imageFile', formData.imageFile);
+    // Append coordinator names
+    formPayload.append('coordinator1', formData.coordinator1);
+    formPayload.append('coordinator2', formData.coordinator2);
+    formPayload.append('coordinator3', formData.coordinator3);
+    formPayload.append('coordinator4', formData.coordinator4);
 
-  const token = localStorage.getItem('token');
+    // Append image uploads
+    formPayload.append('image1', formData.image1);
+    formPayload.append('image2', formData.image2);
+    formPayload.append('image3', formData.image3);
+    formPayload.append('image4', formData.image4);
 
-  const formPayload = new FormData();
-  formPayload.append('clubName', formData.clubName);
-  formPayload.append('club_id',formData.club_id)
-  formPayload.append('startDate', formData.startDate);
-  formPayload.append('endDate', formData.endDate);
-  formPayload.append('organizerName', formData.organizerName);
-  formPayload.append('eventName', formData.eventName);
-  formPayload.append('reportFile', formData.reportFile);
-  formPayload.append('imageFile', formData.imageFile);
+    // Append summary image and participant list
+    formPayload.append('participantsList', formData.participantsList);
 
-  try {
-    const response = await fetch('http://127.0.0.1:8000/api/events/upload/', {
-      method: 'POST',
-      headers: {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/events/upload/', {
+        method: 'POST',
+        headers: {
           // 'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-      body: formPayload
-    });
+        body: formPayload
+      });
 
-    if (!response.ok) {
-      throw new Error('API call failed');
-    }
-
-    // Show success toast
-    toast.success('Successfully registered the event!', {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "colored",
-      style: {
-        background: 'linear-gradient(to right, #0ea5e9, #6366f1)',
-        color: '#fff',
-        fontWeight: 'bold',
-        borderRadius: '12px'
+      if (!response.ok) {
+        throw new Error('API call failed');
       }
-    });
 
-    // Reset form and close modal
-    setFormData({
-      club_id: '',
-      clubName: '',
-      startDate: '',
-      endDate: '',
-      organizerName: '',
-      eventName: '',
-      reportFile: null,
-      imageFile: null,
-    });
-    setFormStep(1);
-    setIsFormOpen(false);
-  } catch (error) {
-    toast.error('Failed to register event. Please try again.');
-    console.error('Submit error:', error);
-  }
-};
+      // Show success toast
+      toast.success('Successfully registered the event!', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+        style: {
+          background: 'linear-gradient(to right, #0ea5e9, #6366f1)',
+          color: '#fff',
+          fontWeight: 'bold',
+          borderRadius: '12px'
+        }
+      });
+
+      // Reset form and close modal
+      setFormData({
+        clubName: '',
+        club_id: '',
+        startDate: '',
+        endDate: '',
+        // organizerName: '',
+        eventName: '',
+        reportFile: null,
+        imageFile: null,
+        coordinator1: '',
+        coordinator2: '',
+        coordinator3: '',
+        coordinator4: '',
+        // image1: null,
+        image2: null,
+        image3: null,
+        image4: null,
+        participantsList: null
+      });
+      setFormStep(1);
+      setIsFormOpen(false);
+    } catch (error) {
+      toast.error('Failed to register event. Please try again.');
+      console.error('Submit error:', error);
+    }
+  };
 
   // Auto-advance carousel
   useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentSlide(prev => (prev + 1) % clubs.length);
-  }, 2000); // Slide every 5 seconds
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % clubs.length);
+    }, 2000); // Slide every 5 seconds
 
-  return () => clearInterval(interval);
-}, [clubs.length]);
+    return () => clearInterval(interval);
+  }, [clubs.length]);
 
-// Smooth scroll to current slide
-useEffect(() => {
-  if (!carouselRef.current) return;
+  // Smooth scroll to current slide
+  useEffect(() => {
+    if (!carouselRef.current) return;
 
-  const container = carouselRef.current;
-  const containerWidth = container.offsetWidth;
-  const slideWidth = container.scrollWidth / clubs.length;
+    const container = carouselRef.current;
+    const containerWidth = container.offsetWidth;
+    const slideWidth = container.scrollWidth / clubs.length;
 
-  const scrollTo = (slideWidth * currentSlide) - (containerWidth / 2) + (slideWidth / 2);
+    const scrollTo = (slideWidth * currentSlide) - (containerWidth / 2) + (slideWidth / 2);
 
-  // Only scroll if needed
-  container.scrollTo({
-    left: scrollTo,
-    behavior: 'smooth'
-  });
-}, [currentSlide, clubs.length]);
+    // Only scroll if needed
+    container.scrollTo({
+      left: scrollTo,
+      behavior: 'smooth'
+    });
+  }, [currentSlide, clubs.length]);
 
 
 
@@ -973,7 +1031,7 @@ useEffect(() => {
               {/* <AwardIcon className="mr-2 flex " size={24} /> */}
               Register Event
             </motion.button>
-            
+
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.5)" }}
               whileTap={{ scale: 0.95 }}
@@ -981,10 +1039,9 @@ useEffect(() => {
             >
               {/* <AwardIcon className="mr-2 flex " size={24} /> */}
               <a href="/DownloadReport" className="DownloadReportCSS text-white">
-              Download Report
+                Download Report
               </a>
             </motion.button>
-
 
           </motion.div>
         </div>
@@ -1030,14 +1087,14 @@ useEffect(() => {
                   }}
                   transition={{
                     duration: 0.2,
-                    
+
                   }}
                 >
                   <div className={`relative h-80 rounded-3xl overflow-hidden shadow-xl group ${club.color} bg-gradient-to-br`}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
 
                     <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-[60%] bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                      <img src={club.image} alt={club.name}/>
+                      <img src={club.image} alt={club.name} />
                     </div>
 
                     <div className="absolute bottom-0 left-0 p-6 w-full text-center items-center text-white">
@@ -1118,6 +1175,7 @@ useEffect(() => {
                 {/* Stepper */}
                 <div className="flex items-center justify-center gap-4">
                   <div className="flex items-center justify-center my-4">
+                    {/* Step 1 */}
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${formStep === 1
                       ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md'
                       : 'bg-white/20 text-white'
@@ -1126,11 +1184,33 @@ useEffect(() => {
                     </div>
                     <div className={`w-16 h-1 mx-2 transition-all ${formStep >= 2 ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-white/30'
                       }`}></div>
+
+                    {/* Step 2 */}
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${formStep === 2
                       ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md'
                       : 'bg-white/20 text-white'
                       }`}>
-                      2
+                      {formStep > 2 ? "✓" : "2"}
+                    </div>
+                    <div className={`w-16 h-1 mx-2 transition-all ${formStep >= 3 ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-white/30'
+                      }`}></div>
+
+                    {/* Step 3 */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${formStep === 3
+                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md'
+                      : 'bg-white/20 text-white'
+                      }`}>
+                      {formStep > 3 ? "✓" : "3"}
+                    </div>
+                    <div className={`w-16 h-1 mx-2 transition-all ${formStep >= 4 ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-white/30'
+                      }`}></div>
+
+                    {/* Step 4 */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${formStep === 4
+                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md'
+                      : 'bg-white/20 text-white'
+                      }`}>
+                      4
                     </div>
                   </div>
                 </div>
@@ -1148,19 +1228,6 @@ useEffect(() => {
                       transition={{ duration: 0.3 }}
                       className="space-y-6"
                     >
-                      {/* club id */}
-                      <div>
-                        <div>
-                          <label className="block text-sky-700 font-medium flex items-center ">Club_id</label>
-                          <input type='text'
-                          name="club_id"
-                          placeholder='Enter club id'
-                          value={formData.club_id}
-                          onChange={handleChange}
-                          className='border-1 block'
-                          ></input>
-                        </div>
-                      </div>
                       {/* Club Name */}
                       <div className="space-y-2 mx-2">
                         <label className="block text-sky-700 font-medium flex items-center ">
@@ -1172,7 +1239,7 @@ useEffect(() => {
                             name="clubName"
                             value={formData.clubName}
                             onChange={handleChange}
-                            className="w-full p-3 border border-sky-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white appearance-none"
+                            className="w-full text-sky-800 placeholder-sky-300 p-3 border border-sky-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white appearance-none"
                             required
                           >
                             <option value="">Select your club</option>
@@ -1183,6 +1250,40 @@ useEffect(() => {
                           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-sky-600">
                             <ChevronDown />
                           </div>
+                        </div>
+                      </div>
+
+                      {/* {Club id} */}
+                      <div className="space-y-2 mx-2 my-2">
+                        <label className="block text-sky-700 font-medium flex items-center ">
+                          <UsersIcon className="mr-2 text-indigo-500" size={18} />
+                          Club Id
+                        </label>
+                        <div className="relative">
+                          {/* removed the select option and added input field for club id */}
+                          {/* <select
+                            name="clubId"
+                            value={formData.club_id}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-sky-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white appearance-none"
+                            required
+                          >
+                            <option value="">Select your club</option>
+                            {clubs.map((club, index) => (
+                              <option key={index} value={club.id}>{club.name}</option>
+                            ))}
+                          </select> */}
+
+                          <input
+                            type="text"
+                            name="club_id"
+                            value={formData.club_id}
+                            onChange={handleChange}
+                            className="w-full text-sky-800 placeholder-sky-300 p-3 border border-sky-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white appearance-none"
+                            placeholder="Enter Club Id"
+                            required
+                          />
+                          
                         </div>
                       </div>
 
@@ -1222,19 +1323,20 @@ useEffect(() => {
                         </div>
                       </div>
 
-                      {/* Organizer Name */}
+                      {/* event name */}
+                      {/* changed from Organizer Name to Event name*/}
                       <div className="space-y-2">
                         <label className="block text-sky-700 font-medium flex items-center">
                           <UserIcon className="mr-2 text-indigo-500" size={18} />
-                          Organizer Name
+                          Event Name
                         </label>
                         <div className="flex items-center border border-sky-200 rounded-xl p-3 bg-white">
                           <input
                             type="text"
-                            name="organizerName"
-                            value={formData.organizerName}
+                            name="eventName"
+                            value={formData.eventName}
                             onChange={handleChange}
-                            placeholder="Organizer's name"
+                            placeholder="Enter Event Name"
                             className="w-full focus:outline-none text-sky-800 placeholder-sky-300"
                             required
                           />
@@ -1254,7 +1356,7 @@ useEffect(() => {
                         </motion.button>
                       </div>
                     </motion.div>
-                  ) : (
+                  ) : formStep === 2 ? (
                     <motion.div
                       key="step2"
                       initial={{ opacity: 0, x: 20 }}
@@ -1263,35 +1365,145 @@ useEffect(() => {
                       transition={{ duration: 0.3 }}
                       className="space-y-6 mx-4 gap-4"
                     >
-                      {/* Event Name */}
-                      <div className="space-y-2 mx-4  ">
-                        <label className="block text-sky-700 font-medium flex items-center">
-                          <LayoutListIcon className="mr-2 text-indigo-500" size={18} />
-                          Event Name
-                        </label>
-                        <div className="flex items-center border border-sky-200 rounded-xl p-3 bg-white">
-                          <input
-                            type="text"
-                            name="eventName"
-                            value={formData.eventName}
-                            onChange={handleChange}
-                            placeholder="Enter event name"
-                            className="w-full focus:outline-none text-sky-800 placeholder-sky-300"
-                            required
-                          />
+                      {/* Coordinator Names */}
+                      {[1, 2, 3, 4].map((num) => (
+                        <div key={num} className="space-y-2 my-4">
+                          <label className="block text-sky-700 font-medium flex items-center">
+                            <UserIcon className="mr-2 text-indigo-500" size={18} />
+                            Coordinator Name {num}
+                          </label>
+                          <div className="flex items-center border border-sky-200 rounded-xl p-3 bg-white">
+                            <input
+                              type="text"
+                              name={`coordinator${num}`}
+                              value={formData[`coordinator${num}`] || ''}
+                              onChange={handleChange}
+                              placeholder={`Enter Coordinator Name ${num}`}
+                              className="w-full focus:outline-none text-sky-800 placeholder-sky-300"
+                            />
+                          </div>
                         </div>
+                      ))}
+
+                      <div className="flex justify-between items-center">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="button"
+                          onClick={() => setFormStep(1)}
+                          className="bg-sky-100 hover:bg-sky-200 text-sky-700 py-2 px-1 rounded-2xl m-4 font-semibold transition-all flex items-center shadow-md"
+                        >
+                          <ChevronLeft className="mr-4" size={18} />
+                          Back
+                        </motion.button>
+
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="button"
+                          onClick={() => setFormStep(3)}
+                          className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white py-2 px-2 rounded-xl font-medium transition-all flex items-center"
+                        >
+                          Next Step
+                          <ChevronRight className="ml-2" size={20} />
+                        </motion.button>
                       </div>
 
+                    </motion.div>
+                  ) : formStep === 3 ? (
+                    <motion.div
+                      key="step3"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-6 mx-4 gap-4"
+                    >
+                      {/* 4 Image Upload Fields */}
+                      {[1, 2, 3, 4].map((num) => (
+                        <div key={num} className="my-4">
+                          <label className="block text-sky-700 font-medium mb-2 flex items-center">
+                            <ImageIcon className="mr-2 text-indigo-500" size={18} />
+                            Upload Image {num}
+                          </label>
+                          {formData[`image${num}`] ? (
+                            <div className="flex items-center justify-between bg-sky-50 border border-sky-200 rounded-2xl px-4 py-3 shadow-sm">
+                              <div className="flex items-center">
+                                <ImageIcon className="text-sky-600 mr-3" size={20} />
+                                <span className="text-sky-800 truncate max-w-xs">{formData[`image${num}`].name}</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeFile(`image${num}`)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <XIcon size={20} />
+                              </button>
+                            </div>
+                          ) : (
+                            <motion.div
+                              whileHover={{ scale: 1.02 }}
+                              className="border-2 border-dashed border-sky-300 rounded-2xl min-h-[60px] flex items-center justify-center bg-sky-50 hover:bg-sky-100 transition-all duration-200 cursor-pointer"
+                            >
+                              <label className="flex flex-col mx-4 items-center justify-center cursor-pointer w-full h-full py-6">
+                                <span className="text-sky-700 font-medium">Click to upload image {num}</span>
+                                <span className="text-sm text-sky-500 mt-1">(JPG, JPEG, PNG)</span>
+                                <input
+                                  type="file"
+                                  className="hidden"
+                                  accept="image/*"
+                                  onChange={(e) => handleFileChange(e, `image${num}`)}
+                                />
+                              </label>
+                            </motion.div>
+                          )}
+                        </div>
+                      ))}
+
+                      <div className="flex justify-between items-center">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="button"
+                          onClick={() => setFormStep(2)}
+                          className="bg-sky-100 hover:bg-sky-200 text-sky-700 py-2 px-1 rounded-2xl m-4 font-semibold transition-all flex items-center shadow-md"
+                        >
+                          <ChevronLeft className="mr-4" size={18} />
+                          Back
+                        </motion.button>
+
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="button"
+                          onClick={() => setFormStep(4)}
+                          className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white py-2 px-2 rounded-xl font-medium transition-all flex items-center"
+                        >
+                          Next Step
+                          <ChevronRight className="ml-2" size={20} />
+                        </motion.button>
+                      </div>
+                    </motion.div>
+
+                  ) : formStep === 4 && (
+                    <motion.div
+                      key="step4"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-6 mx-4 gap-4"
+                    >
                       {/* Upload Report */}
-                      <div className="mx-4 my-4">
+                      <div className="my-4">
                         <label className="block text-sky-700 font-medium mb-2 flex items-center">
-                          <FileTextIcon className="mr-2 text-indigo-500" size={18} />
-                          Upload Report (PDF/DOC)
+                          <ImageIcon className="mr-2 text-indigo-500" size={18} />
+                          Upload Event Report
                         </label>
                         {formData.reportFile ? (
                           <div className="flex items-center justify-between bg-sky-50 border border-sky-200 rounded-2xl px-4 py-3 shadow-sm">
                             <div className="flex items-center">
-                              <FileTextIcon className="text-sky-600 mr-3" size={20} />
+                              <ImageIcon className="text-sky-600 mr-3" size={20} />
                               <span className="text-sky-800 truncate max-w-xs">{formData.reportFile.name}</span>
                             </div>
                             <button
@@ -1308,8 +1520,7 @@ useEffect(() => {
                             className="border-2 border-dashed border-sky-300 rounded-2xl min-h-[60px] flex items-center justify-center bg-sky-50 hover:bg-sky-100 transition-all duration-200 cursor-pointer"
                           >
                             <label className="flex flex-col mx-4 items-center justify-center cursor-pointer w-full h-full py-6">
-                              <span className="text-sky-700 font-medium">Click to upload report </span>
-                              <span className="text-sm text-sky-500 mt-1"> (PDF, DOC, DOCX (max 5MB))</span>
+                              <span className="text-sky-700 font-medium">Click to Event report</span>
                               <input
                                 type="file"
                                 className="hidden"
@@ -1321,21 +1532,21 @@ useEffect(() => {
                         )}
                       </div>
 
-                      {/* Upload Image */}
-                      <div className="mx-4 my-6">
+                      {/* Upload Participants List */}
+                      <div className="my-4">
                         <label className="block text-sky-700 font-medium mb-2 flex items-center">
-                          <ImageIcon className="mr-2 text-indigo-500" size={18} />
-                          Upload Event Image
+                          <FileTextIcon className="mr-2 text-indigo-500" size={18} />
+                          Upload Participant List
                         </label>
-                        {formData.imageFile ? (
+                        {formData.participantList ? (
                           <div className="flex items-center justify-between bg-sky-50 border border-sky-200 rounded-2xl px-4 py-3 shadow-sm">
                             <div className="flex items-center">
-                              <ImageIcon className="text-sky-600 mr-3" size={20} />
-                              <span className="text-sky-800 truncate max-w-xs">{formData.imageFile.name}</span>
+                              <FileTextIcon className="text-sky-600 mr-3" size={20} />
+                              <span className="text-sky-800 truncate max-w-xs">{formData.participantList.name}</span>
                             </div>
                             <button
                               type="button"
-                              onClick={() => removeFile('imageFile')}
+                              onClick={() => removeFile('participantList')}
                               className="text-red-500 hover:text-red-700"
                             >
                               <XIcon size={20} />
@@ -1346,49 +1557,44 @@ useEffect(() => {
                             whileHover={{ scale: 1.02 }}
                             className="border-2 border-dashed border-sky-300 rounded-2xl min-h-[60px] flex items-center justify-center bg-sky-50 hover:bg-sky-100 transition-all duration-200 cursor-pointer"
                           >
-                            <label className="flex flex-col  mx-4 items-center justify-center cursor-pointer w-full h-full py-6">
-                              <span className="text-sky-700 font-medium ">Click to upload image </span>
-                              <span className="text-sm text-sky-500 mt-1"> (JPG, JPEG, PNG, HEIC (max 10MB))</span>
+                            <label className="flex flex-col mx-4 items-center justify-center cursor-pointer w-full h-full py-6">
+                              <span className="text-sky-700 font-medium">Click to upload Participant list</span>
                               <input
                                 type="file"
                                 className="hidden"
-                                accept="image/*"
-                                onChange={(e) => handleFileChange(e, 'imageFile')}
+                                accept=".xlsx,.xls,.csv"
+                                onChange={(e) => handleFileChange(e, 'participantList')}
                               />
                             </label>
                           </motion.div>
                         )}
                       </div>
 
-
-                      <div className="flex justify-between items-center ">
-                        {/* Back Button */}
+                      <div className="flex justify-between items-center">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           type="button"
-                          onClick={() => setFormStep(1)}
+                          onClick={() => setFormStep(3)}
                           className="bg-sky-100 hover:bg-sky-200 text-sky-700 py-2 px-1 rounded-2xl m-4 font-semibold transition-all flex items-center shadow-md"
                         >
                           <ChevronLeft className="mr-4" size={18} />
-                          <span className='mx-2'>Back</span>
+                          Back
                         </motion.button>
 
-                        {/* Submit Button */}
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           type="submit"
                           className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-2 px-1 rounded-xl font-semibold transition-all flex items-center shadow-md"
                         >
-
-                          <span className='mx-2'>Submit Event</span>
+                          <span className="mx-2">Submit Event</span>
                           <SparklesIcon className="ml-2" size={18} />
                         </motion.button>
                       </div>
-
                     </motion.div>
                   )}
+
                 </AnimatePresence>
               </form>
             </motion.div>
@@ -1407,10 +1613,10 @@ useEffect(() => {
           scrollbar-width: none;
         }
         .DownloadReportCSS{
-          text-decoration: none;
-          color: white;
+            text-decoration: none;
+           color: white;
           font-weight: bold;
-        }
+         }
       `}</style>
     </div>
   );
@@ -1422,4 +1628,3 @@ useEffect(() => {
 //     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
 //   </svg>
 // );
-

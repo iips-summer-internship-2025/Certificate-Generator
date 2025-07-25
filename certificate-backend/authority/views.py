@@ -326,7 +326,7 @@ def upload_files(request):
 
         cc_list = [
 
-            'ashwinchouhan567@gmail.com',
+            'vaciips2023@gmail.com',
         ]
 
         # # Ensure output_path is a string, not a list
@@ -955,7 +955,8 @@ class EventUploadView(APIView):
     def post(self, request):
         data = request.data.copy()
         pdf_file = request.FILES.get('reportFile')
-        image_file = request.FILES.get('imageFile')
+        image_file = request.FILES.get('image1')
+        participantList = request.FILES.get('participantList')
 
         # Upload PDF to Cloudinary
         if pdf_file:
@@ -973,8 +974,17 @@ class EventUploadView(APIView):
                 folder="events_images"
             )
             data['event_image'] = image_upload.get("secure_url")
+        # Upload PDF to Cloudinary
+        if participantList:
+            participant_upload = cloudinary.uploader.upload(
+                participantList, 
+                resource_type="auto", 
+                folder="participantlist_pdfs"
+            )
+            data['participantlist_pdfs'] = pdf_upload.get("secure_url")
         print("PDF URL:", data.get('event_pdf'))
         print("Image URL:", data.get('event_image'))
+        print("Participant List URL:", data.get('participantlist_pdfs'))
 
 
         # Now validate and save using the serializer

@@ -24,7 +24,7 @@ from authority.views import EventPhotosView
 
 
 
-from authority.views import ClubListCreateView, EventListCreateView
+from authority.views import ClubListCreateView
 from django.conf import settings
 from django.conf.urls.static import static
 from authority.views import verify_certificate

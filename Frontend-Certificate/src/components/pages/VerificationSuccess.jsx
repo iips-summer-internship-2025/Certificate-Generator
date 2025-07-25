@@ -41,7 +41,8 @@ const VerificationSuccess = () => {
       </div>
     );
 
-  return (
+  return(
+  
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-4 m-4 text-center space-y-6">
         

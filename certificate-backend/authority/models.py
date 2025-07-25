@@ -81,6 +81,7 @@ class Event(models.Model):
     event_image1 = models.URLField(blank=True, null=True)
     event_image2 = models.URLField(blank=True, null=True)
     event_image3 = models.URLField(blank=True, null=True) 
+    participantList = models.URLField(blank=True, null=True)  # Participants list Cloudinary URL
     # Image Cloudinary URL
 
 
