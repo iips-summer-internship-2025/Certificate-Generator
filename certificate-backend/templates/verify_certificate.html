@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate Verification</title>
+    
+    <!-- LinkedIn link preview meta tags -->
+    {% if certificate %}
+        <meta property="og:title" content="Certificate Verification - {{ certificate.name }}">
+        <meta property="og:description" content="Verified certificate for {{ certificate.name }}.">
+        <meta property="og:url" content="{{ request.build_absolute_uri }}">
+        <meta property="og:type" content="website">
+    {% endif %}
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            color: #28a745;
+        }
+
+        .error {
+            color: red;
+            font-size: 18px;
+        }
+
+        .info {
+            margin: 20px 0;
+        }
+
+        .share-btn {
+            display: inline-block;
+            background-color: #0077b5;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background-color: #005983;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if error %}
+            <p class="error">❌ {{ error }}</p>
+        {% else %}
+            <h1 class="title">✅ Certificate Verified</h1>
+
+            <div class="info">
+                <p><strong>Name:</strong> {{ certificate.name }}</p>
+                <p><strong>Email:</strong> {{ certificate.email_id }}</p>
+                <p><strong>Certificate ID:</strong> {{ certificate.certificate_id }}</p>
+            </div>
+
+            <!-- Share on LinkedIn -->
+            <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank">
+                Share on LinkedIn
+            </a>
+        {% endif %}
+    </div>
+</body>
+</html>

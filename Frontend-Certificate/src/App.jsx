@@ -19,7 +19,8 @@ import './App.css'
 import DownloadReport from './components/Club/DownloadReport'
 import CertificatePreview from './components/Certi_preview/Certi_preview'
 import ClubEventForm from './components/Club/club'
- 
+import VerificationSuccess from './components/pages/VerificationSuccess.jsx'
+
 
 
 
@@ -30,11 +31,13 @@ function App() {
     <>
     
       <Routes>
+      
         <Route path='/' element={<Home/>}/>
-        <Route path="/DownloadReport" element={<DownloadReport/>}/>
-        <Route path='Login' element={<Login/>}/>
-        {/* {token && <Route path="/Login" element={<Login />}/>} */}
+        {/* <Route path="/DownloadReport" element={<DownloadReport/>}/> */}
+        {/* <Route path='Login' element={<Login/>}/> */}
+        {token && <Route path="/Login" element={<Login />}/>} 
         {token && <Route path="/upload" element={<Upload />}/>}
+        {token && <Route path="/DownloadReport" element={<DownloadReport/>}/>} 
         {/* <Route path="/upload" element={<Upload />}/>
         <Route path="/Login" element={<Login/>} /> */}
         <Route path="/editor" element={<Editor/>}/>
@@ -53,6 +56,9 @@ function App() {
 
           {/* Search Page */}
           <Route path="/search" element={<CertificateSearch />} />
+
+          {/*verification page*/}
+           <Route path="/verify/:id" element={<VerificationSuccess />} /> 
 
       </Routes>
     </>

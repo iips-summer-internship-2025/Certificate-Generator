@@ -82,7 +82,9 @@
 #         def create(self, validated_data):
 #             password = validated_data.pop('password')
 #             user = CustomUser(**validated_data)
-#             user.set_password(password)
+#       
+# 
+#       user.set_password(password)
 #             user.is_staff = True
 #             user.save()
 #             return user
@@ -234,6 +236,7 @@ class EventSerializer(serializers.ModelSerializer):
             'club_name',
             'name',  #  Add for dropdown
             'date',
+            'participantList',  # Add for participant list
         ]
         #read_only_fields = ['event_pdf', 'event_image']  # These are filled after Cloudinary upload
         
