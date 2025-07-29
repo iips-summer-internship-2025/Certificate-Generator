@@ -764,11 +764,11 @@ const DownloadReport = () => {
   }, []);
 
   const clubs = [
-    "Advertising & PR Club", "AI and Robotics Club", "Business & Analytics Club", "Coding Club",
+    "Value Added Course", "Advertising & PR Club", "AI and Robotics Club", "Business & Analytics Club", "Coding Club",
     "Commerce Club", "Computing Club", "Entrepreneurship Cell", "Environment Club",
     "Festival Club", "Finance Club", "Fine Arts Club", "HR Club", "Literary club", "Marketing Club",
     "Meditation and Self Development Club", "Performing Arts & Theater Club", "Photography Club",
-    "Setu-Social Connect Club", "Sports Club", "Student Research Cell", "Tourism Club", "Yoga & Fitness,abc"
+    "Setu-Social Connect Club", "Sports Club", "Student Research Cell", "Tourism Club", "Yoga & Fitness","abc","Others"
   ];
 
   const handleFetchEvents = async () => {
@@ -993,14 +993,14 @@ const DownloadReport = () => {
           <div className="flex flex-col md:flex-row gap-4 justify-center pt-4">
             <button
               onClick={handleDownloadReport}
-              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all"
+              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all px-3"
             >
               <DownloadIcon size={18} />
               Download Report (PDF)
             </button>
             <button
               onClick={handleViewPhotos}
-              className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all"
+              className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all px-3"
             >
               <ImageIcon size={18} />
               View Event Photos

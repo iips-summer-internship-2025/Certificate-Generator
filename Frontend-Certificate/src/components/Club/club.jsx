@@ -733,7 +733,7 @@ import Footer from '../home/Footer';
 // Club data with icons
 const clubs = [
   // { name: 'Avertising & PR Club', image: <img src={advertisment} alt='Advertising & PR Club'/>, color: "bg-blue-500" },
-  { name: 'Others', image: "../../../public/assets/others.png", color: "bg-gray-500" },
+  { name: 'Value Added Course', image: "../../../public/assets/vac.png", color: "bg-gray-500" },
   { name: 'Advertising & PR Club', image: "../../../public/assets/advertisment.png", color: "bg-blue-500" },
   { name: 'AI and Robotics Club', image: "../../../public/assets/AI and Robotics Club _logo.png" , color: "bg-purple-500" },
   { name: 'Business & Analystics Club', image: "../../../public/assets/business.png", color: "bg-pink-500" },
