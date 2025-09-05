@@ -57,12 +57,12 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     
     draw = ImageDraw.Draw(image)
     
-    pasted_roles = set()
-     # Normalize signature_files keys for robust matching
-    normalized_signature_files = {
-        k.replace("_", "").replace("Signature", "").replace("signature", "").lower(): v
-        for k, v in (signature_files or {}).items()
-    }
+    #pasted_roles = set()
+    # Normalize signature_files keys for robust matching
+    # normalized_signature_files = {
+    #     k.replace("_", "").replace("Signature", "").replace("signature", "").lower(): v
+    #     for k, v in (signature_files or {}).items()
+    #}
     for item in coordinates:
         field_key = item.get('title', '')
         x_percent= item.get('x', 0)
@@ -74,51 +74,23 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
         y = int((y_percent / 100) * (height))    # Adjust y to avoid clipping at the bottom
         
         if 'signature' in field_key.lower():
-            # Normalize role_key from coordinate title
-            role_key = (
-                field_key.replace("_signature", "")
-                .replace("Signature", "")
-                .replace("signature", "")
-                .replace("_", "")
-                .lower()
-                .strip()
-            )
-            sig_file = normalized_signature_files.get(role_key)
-            print(f"Processing signature for role: {role_key} at ({x}, {y})")
-            print(f"Signature file: {sig_file}")
-            if sig_file:
-                try:
-                    sig_img = Image.open(sig_file).convert("RGBA")
-                    sig_img = sig_img.resize((150, 60))  # Resize as needed
-                    image.paste(sig_img, (x, y), sig_img)
-                    pasted_roles.add(role_key)
-                    print(f" Pasted signature for '{role_key}' at ({x}, {y})")
-                except Exception as e:
-                    print(f" Failed to paste signature '{field_key}': {e}")
-            else:
-                print(f" Signature file for '{role_key}' not found in uploaded files")
+            
+            # sig_file = signature_files.get(field_key)
+            # print(f"Processing signature for role: {field_key} at ({x}, {y})")
+            # print(f"Signature file: {sig_file}")
+            # if sig_file:
+            #     try:
+            #         sig_img = Image.open(sig_file).convert("RGBA")
+            #         sig_img = sig_img.resize((250, 180))  # Resize as needed
+            #         image.paste(sig_img, (x, y),sig_img)
+            #         # pasted_roles.add(field_key)
+            #         print(f" Pasted signature for '{field_key}' at ({x}, {y})")
+            #     except Exception as e:
+            #         print(f" Failed to paste signature '{field_key}': {e}")
+            # else:
+            #     print(f" Signature file for '{field_key}' not found in uploaded files")
             continue  # Skip text rendering for signature fields
 
-        
-        # if 'signature' in field_key:
-        #     role_key = field_key.replace("_signature", '').strip()
-        #     sig_file = signature_files.get(role_key) if signature_files else None
-        #     print(f"Processing signature for role: {role_key} at ({x}, {y})")
-        #     print(f"Signature file: {sig_file}")
-        #     if sig_file:
-        #         try:
-        #             sig_img = Image.open(sig_file).convert("RGBA")
-        #             sig_img = sig_img.resize((150, 60))  # Resize as needed
-        #             image.paste(sig_img, (x, y), sig_img)
-        #             print(f" Pasted signature for '{role_key}' at ({x}, {y})")
-        #         except Exception as e:
-        #             print(f" Failed to paste signature '{field_key}': {e}")
-        #     else:
-        #         print(f" Signature file for '{role_key}' not found in uploaded files")
-        #     continue  #  Skip text rendering for signature fields
-        
-        
-        
         #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
         # Find the matching key in row (case-insensitive)
         matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.strip().lower()), None)
@@ -215,20 +187,20 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 
         draw.text((x, y), text, fill=font_color, font=font)
         
-        # Draw signature images (if provided)
-        if signature_files and signature_positions:
-            for role, file_obj in signature_files.items():
-                position = signature_positions.get(role)
-                if position:
-                    try:
-                        sig_img = Image.open(file_obj).convert("RGBA")
-                        sig_img = sig_img.resize((150, 60))  # Optional resize
-                        x_sig = int((position['x'] / 100) * image.width)
-                        y_sig = int((position['y'] / 100) * image.height)
-                        image.paste(sig_img, (x_sig, y_sig), sig_img)
-                        print(f"Pasted signature for {role} at ({x_sig}, {y_sig})")
-                    except Exception as e:
-                        print(f"Failed to paste signature for {role}: {e}")
+    # Draw signature images (if provided)
+    if signature_files and signature_positions:
+        for role, file_obj in signature_files.items():
+            position = signature_positions.get(role)
+            if position:
+                try:
+                    sig_img = Image.open(file_obj).convert("RGBA")
+                    sig_img = sig_img.resize((250, 170))  # Optional resize
+                    x_sig = int((position['x'] / 100) * image.width)
+                    y_sig = int((position['y'] / 100) * image.height)
+                    image.paste(sig_img, (x_sig, y_sig), sig_img)
+                    print(f"Pasted signature for {role} at ({x_sig}, {y_sig}) in signature position")
+                except Exception as e:
+                    print(f"Failed to paste signature for {role}: {e}")
 
         
 
@@ -282,18 +254,18 @@ def upload_files(request):
         # else:
         #     print(f"Signature file for '{role}' not found in uploaded files")
         if key.endswith("Signature"):
-            role = key.replace("Signature", "") # "signatures_hod" -> "hod"
-            signature_files[role] = request.FILES[key]
+            # role = key.replace("Signature", "") # "signatures_hod" -> "hod"
+            signature_files[key] = request.FILES[key]
     # Signature positions (sent from frontend as JSON)
     # Parse JSON string from POST once
-    signature_positions = json.loads(request.POST.get("signature_positions", "{}"))
+    signature_positions = json.loads(request.POST.get("signaturePositions", "{}"))
 
     try:
-        signature_positions = json.loads(request.POST.get("signature_positions", "{}"))
+        signature_positions = json.loads(request.POST.get("signaturePositions", "{}"))
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON for signature positions'}, status=400)
 
-
+    print(f"Signature positions: {signature_positions}")
       # getting and processing  coordinates from request
       
     if request.content_type == 'application/json':
