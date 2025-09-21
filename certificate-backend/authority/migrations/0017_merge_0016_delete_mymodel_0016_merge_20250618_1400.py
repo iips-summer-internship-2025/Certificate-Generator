@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authority', '0016_delete_mymodel'),
+       # ('authority', '0016_delete_mymodel'),
         ('authority', '0016_merge_20250618_1400'),
     ]
 

@@ -20,20 +20,23 @@ from io import StringIO
 from .models import CustomUser
 import cloudinary
 import cloudinary.uploader
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 import json
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.cache import cache
+
+from .serializers import CertificateSerializer
+
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, permissions, status
 from .serializers import AdminUserSerializer, UserSerializer, CertificateSerializer
 from django.contrib.auth import update_session_auth_hash
 from .models import CustomUser
-
-
+from .serializers import ClubSerializer, EventSerializer
+from .models import Event
+from .models import Club
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
@@ -48,28 +51,80 @@ from rest_framework.decorators import api_view, permission_classes
 from .serializers import CertificateSerializer
 
 
-def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id):
+def generate_certificate_dynamic(template_path, output_path, coordinates,row, certificate_id,signature_files=None, signature_positions=None):
     
     image = Image.open(template_path).convert("RGB")
     width, height = image.size
     
     draw = ImageDraw.Draw(image)
-    # for field in ['name','event']:
-    #     coord = next((item for item in coordinates if item['title'].lower() == field), None)
-
+    
+    pasted_roles = set()
+     # Normalize signature_files keys for robust matching
+    normalized_signature_files = {
+        k.replace("_", "").replace("Signature", "").replace("signature", "").lower(): v
+        for k, v in (signature_files or {}).items()
+    }
     for item in coordinates:
         field_key = item.get('title', '')
+        x_percent= item.get('x', 0)
+        y_percent= item.get('y', 0)
+        # Convert percent to actual pixel values
+        
+        x = int((x_percent / 100) * (width))
+        y = int((y_percent / 100) * (height))    # Adjust y to avoid clipping at the bottom
+        
+        if 'signature' in field_key.lower():
+            # Normalize role_key from coordinate title
+            role_key = (
+                field_key.replace("_signature", "")
+                .replace("Signature", "")
+                .replace("signature", "")
+                .replace("_", "")
+                .lower()
+                .strip()
+            )
+            sig_file = normalized_signature_files.get(role_key)
+            print(f"Processing signature for role: {role_key} at ({x}, {y})")
+            print(f"Signature file: {sig_file}")
+            if sig_file:
+                try:
+                    sig_img = Image.open(sig_file).convert("RGBA")
+                    sig_img = sig_img.resize((150, 60))  # Resize as needed
+                    image.paste(sig_img, (x, y), sig_img)
+                    pasted_roles.add(role_key)
+                    print(f" Pasted signature for '{role_key}' at ({x}, {y})")
+                except Exception as e:
+                    print(f" Failed to paste signature '{field_key}': {e}")
+            else:
+                print(f" Signature file for '{role_key}' not found in uploaded files")
+            continue  # Skip text rendering for signature fields
+
+        
+        # if 'signature' in field_key:
+        #     role_key = field_key.replace("_signature", '').strip()
+        #     sig_file = signature_files.get(role_key) if signature_files else None
+        #     print(f"Processing signature for role: {role_key} at ({x}, {y})")
+        #     print(f"Signature file: {sig_file}")
+        #     if sig_file:
+        #         try:
+        #             sig_img = Image.open(sig_file).convert("RGBA")
+        #             sig_img = sig_img.resize((150, 60))  # Resize as needed
+        #             image.paste(sig_img, (x, y), sig_img)
+        #             print(f" Pasted signature for '{role_key}' at ({x}, {y})")
+        #         except Exception as e:
+        #             print(f" Failed to paste signature '{field_key}': {e}")
+        #     else:
+        #         print(f" Signature file for '{role_key}' not found in uploaded files")
+        #     continue  #  Skip text rendering for signature fields
+        
+        
+        
         #matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.lower()), None)
         # Find the matching key in row (case-insensitive)
         matched_key = next((k for k in row.keys() if k.strip().lower() == field_key.strip().lower()), None)
         text = row.get(matched_key, '') if matched_key else ''
 
-        #text = item.get('title', '')
-        x_percent= item.get('x', 0)
-        y_percent= item.get('y', 0)
-        # Convert percent to actual pixel values
-        x = int((x_percent / 100) * width)
-        y = int((y_percent / 100) * height)
+
         font_color = item.get('font_color')#, '#000000')
         font_size_percent = float(item.get('fontSize', 2))
         font_size = int((font_size_percent / 100) * height)
@@ -77,11 +132,8 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
 
 
         # Remove 'px' and convert to int
-        # try:
-        #     font_size = int(font_size_str.replace('px', ''))
-        # except:
-        #     font_size = 16
-
+        
+        
         # Load a font — make sure 'arial.ttf' exists or use full path
         try:
             font = ImageFont.truetype("arial.ttf", font_size)
@@ -89,12 +141,31 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
             font = ImageFont.load_default()
 
         draw.text((x, y), text, fill=font_color, font=font)
+        
+        # Draw signature images (if provided)
+        if signature_files and signature_positions:
+            for role, file_obj in signature_files.items():
+                position = signature_positions.get(role)
+                if position:
+                    try:
+                        sig_img = Image.open(file_obj).convert("RGBA")
+                        sig_img = sig_img.resize((150, 60))  # Optional resize
+                        x_sig = int((position['x'] / 100) * image.width)
+                        y_sig = int((position['y'] / 100) * image.height)
+                        image.paste(sig_img, (x_sig, y_sig), sig_img)
+                        print(f"Pasted signature for {role} at ({x_sig}, {y_sig})")
+                    except Exception as e:
+                        print(f"Failed to paste signature for {role}: {e}")
+
+        
 
 
 
     #  Generate QR code based on unique ID
-    qr_data = f"http://127.0.0.1:8000/verify/{certificate_id}"
-    qr = qrcode.make(qr_data)
+   # qr_data = f"http://127.0.0.1:8000/verify/{certificate_id}"
+    qr_url = f"{settings.FRONTEND_BASE_URL}/verify/{certificate_id}"
+   # qr = qrcode.make(qr_data)
+    qr = qrcode.make(qr_url)
     qr = qr.resize((150, 150))
     # Padding from top and right edges
     padding_x = 20
@@ -105,7 +176,6 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     # Calculate position for top right corner with padding
       # Resize as needed
     image.paste(qr, (image.width - qr_width - padding_x,  padding_y))  # Bottom right corner
-
     image.save(output_path)
 
 
@@ -132,6 +202,30 @@ def upload_files(request):
     image_file = request.FILES.get('imagefile')
     user_type = request.POST.get('userType')
     
+    
+    #Signature files (sent from frontend as form-data)
+    # roles = ['hod', 'coordinator', 'head', 'club']
+    signature_files = {}
+    for key in request.FILES:
+        print(f"{key} in for loop")
+        # file = request.FILES.get(f"signatures_{role}")
+        # if file:
+        #     signature_files[role] = file
+        # else:
+        #     print(f"Signature file for '{role}' not found in uploaded files")
+        if key.endswith("Signature"):
+            role = key.replace("Signature", "") # "signatures_hod" -> "hod"
+            signature_files[role] = request.FILES[key]
+    # Signature positions (sent from frontend as JSON)
+    # Parse JSON string from POST once
+    signature_positions = json.loads(request.POST.get("signature_positions", "{}"))
+
+    try:
+        signature_positions = json.loads(request.POST.get("signature_positions", "{}"))
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON for signature positions'}, status=400)
+
+
       # getting and processing  coordinates from request
       
     if request.content_type == 'application/json':
@@ -221,7 +315,8 @@ def upload_files(request):
         #     {'title': 'Name', 'x': 100, 'y': 150, 'font_color': '#000000', 'fontSize': '100px'},
         #     {'title': 'event', 'x': 100, 'y': 200, 'font_color': '#000000', 'fontSize': '100px'}
         # ] 
-        generate_certificate_dynamic(template_path, output_path, coordinates,row,certificate_id)
+        generate_certificate_dynamic(template_path, output_path, coordinates,row,certificate_id,signature_files=signature_files,
+    signature_positions=signature_positions)
         
         #  Upload to Cloudinary
         cloudinary_result = cloudinary.uploader.upload(output_path)
@@ -255,7 +350,7 @@ def upload_files(request):
 
         cc_list = [
 
-            'shubhanshsharmagreat@gmail.com',
+            'vaciips2023@gmail.com',
         ]
 
         # # Ensure output_path is a string, not a list
@@ -399,6 +494,8 @@ def verify_certificate(request, certificate_id):
             'name': cert.name,
             #'roll_no': cert.roll_no,
             #'email': cert.email_id
+            #'certificate_url': cert.certificate,
+            'certificate_id': cert.certificate_id,
             'certificate_url': cert.certificate,
          })
      except Certificate.DoesNotExist:
@@ -416,8 +513,256 @@ def verify_certificate(request, certificate_id):
 #     return response
 
 class CertificateViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Certificate.objects.all()
-    serializer_class = CertificateSerializer
+     queryset = Certificate.objects.all()
+     serializer_class = CertificateSerializer
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+#admin functinality:view certificate
+class ViewCertificatesAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can view certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        search_query = request.data.get('search', '').strip()
+        page_number = int(request.data.get('page', 1))
+        page_size = int(request.data.get('page_size', 10))
+
+        queryset = Certificate.objects.all().order_by('-timestamp')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(roll_no__icontains=search_query) |
+                Q(email_id__icontains=search_query) |
+                Q(certificate_id__icontains=search_query)
+                #Q(title__icontains=search_query) 
+            )
+
+        paginator = Paginator(queryset, page_size)
+        page = paginator.get_page(page_number)
+
+        serialized_data = CertificateSerializer(page.object_list, many=True).data
+
+        result = []
+        for cert in serialized_data:
+            result.append({
+                "id": cert['certificate_id'],
+                "recipient": cert['email_id'],
+                #"title": cert.get('title', "Certificate of Achievement"),
+                "title": "Certificate of Achievement",  # static or change if dynamic
+                "dateSent": cert['timestamp'][:10],
+                "cloudinaryUrl": cert['certificate'],
+            })
+
+        return Response({
+            "total": paginator.count,
+            "totalPages": paginator.num_pages,
+            "currentPage": page.number,
+            "results": result
+        }, status=status.HTTP_200_OK)
+        
+    def delete(self, request):
+        #""Delete Certificate (Superuser only)"""
+        if not request.user.is_superuser:
+            return Response({'error': 'Only superusers can delete certificates.'}, status=status.HTTP_403_FORBIDDEN)
+
+        certificate_id = request.data.get('certificate_id')
+        if not certificate_id:
+            return Response({'error': 'certificate_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cert = Certificate.objects.get(certificate_id=certificate_id)
+            cert.delete()
+            return Response({'message': 'Certificate deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Certificate.DoesNotExist:
+            return Response({'error': 'Certificate not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 User = get_user_model()
 #for change password of user
@@ -545,61 +890,250 @@ class AdminUserDeleteAPIView(APIView):
     
 
 #User.objects.filter(is_staff=True) |
-class AdminListView(APIView):
-    permission_classes = [IsSuperAdmin]
+#class AdminListView(APIView):
+#    permission_classes = [IsSuperAdmin]
 
-    def get(self, request):
-        users = User.objects.all()
-        data = []
-        for user in users:
-            if user.is_superuser:
-                role = "superadmin"
-            elif user.is_staff:
-                role = "admin"
-            else:
-                role = "user"  # fallback, shouldn't occur in this list
+#    def get(self, request):
+#        users = User.objects.all()
+#        data = []
+#        for user in users:
+#            if user.is_superuser:
+#                role = "superadmin"
+#            elif user.is_staff:
+#                role = "admin"
+#            else:
+#                role = "user"  # fallback, shouldn't occur in this list
 
-            data.append({
-                "username": user.username,
-                "email": user.email,
-                "role": role,
-                "date_created": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
-            })
+#            data.append({
+#                "username": user.username,
+#                "email": user.email,
+#                "role": role,
+#                "date_created": user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
+#            })
         
-        return Response(data)    
+#        return Response(data)    
     
-class ChangePasswordView(APIView):
-    permission_classes = [IsSuperAdmin]
+#class ChangePasswordView(APIView):
+#    permission_classes = [IsSuperAdmin]
+
+#    def post(self, request):
+#        user = request.user
+#        current_password = request.data.get('current_password')
+#        new_password = request.data.get('new_password')
+#        confirm_password = request.data.get('confirm_password')
+
+#        if not current_password or not new_password or not confirm_password:
+#            return Response({"detail": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+#        if not user.check_password(current_password):
+#            return Response({"detail": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+
+#        if new_password != confirm_password:
+#            return Response({"detail": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+
+#        if len(new_password) < 6:
+#            return Response({"detail": "New password must be at least 6 characters."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#        user.set_password(new_password)
+#        user.save()
+
+#        update_session_auth_hash(request, user)
+
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)    
+    
+User = get_user_model()
+    #to check whether the user is superuser or not
+class CheckSuperuserStatusView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return Response({'error': 'Email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Try to authenticate using email (custom user model must support email-based auth)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            return Response({
+            'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff,
+                'email': user.email,
+                'username': user.username,
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+# Clubs
+class ClubListCreateView(generics.ListCreateAPIView):
+    queryset = Club.objects.all()
+    serializer_class = ClubSerializer
+    permission_classes = [IsAuthenticated]  # Only logged-in users
+
+# Events
+class EventUploadView(APIView):
+    permission_classes = [IsAdminUser]
 
     def post(self, request):
-        user = request.user
-        current_password = request.data.get('current_password')
-        new_password = request.data.get('new_password')
-        confirm_password = request.data.get('confirm_password')
+        data = request.data.copy()
+        pdf_file = request.FILES.get('reportFile')
+        image1 = request.FILES.get('image1')
+        image2 = request.FILES.get('image2')
+        image3 = request.FILES.get('image3') 
+        image4 = request.FILES.get('image4')    
+        participantList = request.FILES.get('participantList')
+        
 
-        if not current_password or not new_password or not confirm_password:
-            return Response({"detail": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+        # Upload PDF to Cloudinary
+        if pdf_file:
+            pdf_upload = cloudinary.uploader.upload(
+                pdf_file, 
+                resource_type="auto", 
+                folder="events_pdfs"
+            )
+            data['event_pdf'] = pdf_upload.get("secure_url")
 
-        if not user.check_password(current_password):
-            return Response({"detail": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+        # Upload Image to Cloudinary
+        if image1:
+            image_upload = cloudinary.uploader.upload(
+                image1, 
+                folder="events_images"
+            )
+            data['event_image'] = image_upload.get("secure_url")
+            
+            #image2
+            
+        if image2:
+            image_upload = cloudinary.uploader.upload(
+                image2, 
+                folder="events_images"
+            )
+            data['event_image1'] = image_upload.get("secure_url")
+        #image3
+        if image3:
+            image_upload = cloudinary.uploader.upload(
+                image3, 
+                folder="events_images"
+            )
+            data['event_image2'] = image_upload.get("secure_url")
+        #image4
+        if image4:
+            image_upload = cloudinary.uploader.upload(
+                image4, 
+                folder="events_images"
+            )
+            data['event_image3'] = image_upload.get("secure_url")
+            
+        if participantList:
+            participant_upload = cloudinary.uploader.upload(
+                participantList, 
+                resource_type="auto", 
+                folder="participantlist_pdfs"
+            )
+            data['participantlist_pdfs'] = participant_upload.get("secure_url")
+            
+        #image4
+        print("PDF URL:", data.get('event_pdf'))
+        print("Image URL:", data.get('event_image'))
+        print("Image URL:", data.get('event_image1'))
+        print("Image URL:", data.get('event_image2'))
+        print("Image URL:", data.get('event_image3'))
+        print("Participant List URL:", data.get('participantlist_pdfs'))
 
-        if new_password != confirm_password:
-            return Response({"detail": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if len(new_password) < 6:
-            return Response({"detail": "New password must be at least 6 characters."}, status=status.HTTP_400_BAD_REQUEST)
-
-        user.set_password(new_password)
-        user.save()
-
-        update_session_auth_hash(request, user)
-
-        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
-
-class latest_certificates(APIView):
-    permission_classes = [IsAuthenticated]
-
+        # Now validate and save using the serializer
+        serializer = EventSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print("Serializer Errors:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class EventFilterView(APIView):
     def get(self, request):
-        certificates = Certificate.objects.order_by('-timestamp')[:50]
-        serializer = CertificateSerializer(certificates, many=True)
-        return Response(serializer.data)
+        club_name = request.query_params.get('club')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        
+        print("Received:", club_name, start_date, end_date)
+
+        # Validate inputs
+        if not all([club_name, start_date, end_date]):
+            return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get club by name (case-insensitive)
+        try:
+            club = Club.objects.get(club_name__iexact=club_name)
+        except Club.DoesNotExist:
+            return Response({"error": "Invalid club name"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter events under the selected club and date range
+        events = Event.objects.filter(
+            Q(club_id=club.club_code),
+            Q(start_date__gte=start_date),
+            Q(end_date__lte=end_date)
+        )
+        print("Filtering events for:", club_name, start_date, end_date)
+        print("Filtered events:", events)
+
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.http import HttpResponseRedirect, Http404
+from .serializers import EventDetailSerializer
+
+# 1. fetch full details of ONE event (JSON)
+class EventDetailView(RetrieveAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset           = Event.objects.all()
+    serializer_class   = EventDetailSerializer
+    lookup_field       = 'pk'
+
+# 2. redirect browser straight to the Cloudinary PDF
+class EventReportRedirect(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, pk):
+        try:
+            event = Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            raise Http404("Event not found")
+
+        if not event.event_pdf:
+            return Response(
+                {"error": "PDF not uploaded for this event."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return HttpResponseRedirect(event.event_pdf)
+
+# 3. return every image URL as JSON (or you could render HTML)
+class EventPhotosView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, pk):
+        try:
+            event = Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            raise Http404("Event not found")
+
+        images = [
+            url for url in [
+                event.event_image,
+                event.event_image1,
+                event.event_image2,
+                event.event_image3
+            ] if url
+        ]
+
+        return Response({"images": images}, status=200)

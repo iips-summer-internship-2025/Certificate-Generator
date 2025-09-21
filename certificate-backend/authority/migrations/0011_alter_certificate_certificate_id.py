@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        #('authority', '0010_merge_20250606_2205'),
+        # ('authority', '0010_merge_20250606_2205'),
         ('authority', '0010_customuser_role')
     ]
 

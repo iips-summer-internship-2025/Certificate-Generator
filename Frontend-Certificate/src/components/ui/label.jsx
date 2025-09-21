@@ -1,9 +1,7 @@
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
+import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import clsx from "clsx";
-
-
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
