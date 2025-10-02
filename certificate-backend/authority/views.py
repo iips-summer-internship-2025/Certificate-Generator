@@ -70,7 +70,7 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
         
         # Convert percent to actual pixel values
         
-        x = int((x_percent / 100) * (width))
+        x = int((x_percent / 100) * (width-600))
         y = int((y_percent / 100) * (height))    # Adjust y to avoid clipping at the bottom
         
         if 'signature' in field_key.lower():
@@ -195,7 +195,7 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
                 try:
                     sig_img = Image.open(file_obj).convert("RGBA")
                     sig_img = sig_img.resize((250, 170))  # Optional resize
-                    x_sig = int((position['x'] / 100) * image.width)
+                    x_sig = int((position['x'] / 100) * image.width-150)
                     y_sig = int((position['y'] / 100) * image.height)
                     image.paste(sig_img, (x_sig, y_sig), sig_img)
                     print(f"Pasted signature for {role} at ({x_sig}, {y_sig}) in signature position")
