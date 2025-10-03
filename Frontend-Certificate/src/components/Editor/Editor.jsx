@@ -509,17 +509,17 @@ export default function Editor() {
 
   // Signature URLs and positions
   const [signatureUrls, setSignatureUrls] = useState({
-    hod: null,
-    coordinator: null,
-    head: null,
-    club: null
+    hodSignature: null,
+    clubCoordinatorSignature: null,
+    clubHeadSignature: null,
+    clubSignature: null
   });
 
   const [signaturePositions, setSignaturePositions] = useState({
-    hod: { x: 100, y: 100 },
-    coordinator: { x: 100, y: 200 },
-    head: { x: 100, y: 300 },
-    club: { x: 100, y: 400 }
+    hodSignature: { x: 100, y: 100 },
+    clubCoordinatorSignature: { x: 100, y: 200 },
+    clubHeadSignature: { x: 100, y: 300 },
+    clubSignature: { x: 100, y: 400 }
   });
 
   const [columns, setColumns] = useState([]);
@@ -534,10 +534,10 @@ export default function Editor() {
   // Generate URLs for signature images
   useEffect(() => {
     const urls = {};
-    if (hodSignature) urls.hod = URL.createObjectURL(hodSignature);
-    if (clubCoordinatorSignature) urls.coordinator = URL.createObjectURL(clubCoordinatorSignature);
-    if (clubHeadSignature) urls.head = URL.createObjectURL(clubHeadSignature);
-    if (clubSignature) urls.club = URL.createObjectURL(clubSignature);
+    if (hodSignature) urls.hodSignature = URL.createObjectURL(hodSignature);
+    if (clubCoordinatorSignature) urls.clubCoordinatorSignature = URL.createObjectURL(clubCoordinatorSignature);
+    if (clubHeadSignature) urls.clubHeadSignature = URL.createObjectURL(clubHeadSignature);
+    if (clubSignature) urls.clubSignature = URL.createObjectURL(clubSignature);
     setSignatureUrls(urls);
 
     return () => {
@@ -555,6 +555,8 @@ export default function Editor() {
   }
 
   const imageUrl = URL.createObjectURL(imageFile);
+
+  
 
   useEffect(() => {
     if (csvFile) {
@@ -659,7 +661,25 @@ export default function Editor() {
       formData.append('imagefile', imageFile);
       formData.append('csvfile', csvFile);
       formData.append('userType', 'merit');
+
+      // Add signature files if present
+      if (hodSignature) formData.append('hodSignature', hodSignature);
+      if (clubCoordinatorSignature) formData.append('clubCoordinatorSignature', clubCoordinatorSignature);
+      if (clubHeadSignature) formData.append('clubHeadSignature', clubHeadSignature);
+      if (clubSignature) formData.append('clubSignature', clubSignature);
+
       
+      
+
+      // Convert signature positions from pixels to percentages
+      const signaturePositionsPercent = {};
+      Object.entries(signaturePositions).forEach(([key, pos]) => {
+        signaturePositionsPercent[key] = {
+          x: (pos.x / imageRef.current.offsetWidth) * 100,
+          y: (pos.y / imageRef.current.offsetHeight) * 100
+        };
+      });
+      // Prepare coordinates for dropped variables and signatures
       const allCoords = [
         ...droppedVariables.map(({ name, x, y, color, fontSize, fontFamily, fontWeight }) => ({
           title: name,
@@ -671,17 +691,18 @@ export default function Editor() {
           font_weight: fontWeight,
           type: 'text'
         })),
-        ...Object.entries(signaturePositions)
-          .filter(([type, pos]) => signatureUrls[type])
-          .map(([type, pos]) => ({
-            title: `${type}_signature`,
-            x: (pos.x / imageRef.current.offsetWidth) * 100,
-            y: (pos.y / imageRef.current.offsetHeight) * 100,
-            type: 'signature'
-          }))
+        // ...Object.entries(signaturePositions)
+        //   .filter(([type, pos]) => signatureUrls[type])
+        //   .map(([type, pos]) => ({
+        //     title: `${type}`,
+        //     x: (pos.x / imageRef.current.offsetWidth) * 100,
+        //     y: (pos.y / imageRef.current.offsetHeight) * 100,
+        //     type: 'Signature'
+        //   }))
       ];
       
       formData.append('coords', JSON.stringify(allCoords));
+      formData.append('signaturePositions', JSON.stringify(signaturePositionsPercent));
 
       const response = await fetch('http://127.0.0.1:8000/api/upload/', {
         method: 'POST',
@@ -918,35 +939,35 @@ export default function Editor() {
               </div>
               
               <div className="h-2/5 w-full flex flex-col items-center gap-2 text-amber-100 py-1 px-4 row add_scroller">
-                {signatureUrls.hod && (
+                {signatureUrls.hodSignature && (
                   <div className="signature-status bg-[floralwhite] p-2 rounded-md border border-gray-300 w-full">
                     <p className="text-black">HOD Signature: Loaded</p>
                     <div className="status-indicator bg-green-500 w-3 h-3 rounded-full inline-block ml-2"></div>
                   </div>
                 )}
                 
-                {signatureUrls.coordinator && (
+                {signatureUrls.clubCoordinatorSignature && (
                   <div className="signature-status bg-[floralwhite] p-2 rounded-md border border-gray-300 w-full">
                     <p className="text-black">Coordinator Signature: Loaded</p>
                     <div className="status-indicator bg-green-500 w-3 h-3 rounded-full inline-block ml-2"></div>
                   </div>
                 )}
                 
-                {signatureUrls.head && (
+                {signatureUrls.clubHeadSignature && (
                   <div className="signature-status bg-[floralwhite] p-2 rounded-md border border-gray-300 w-full">
                     <p className="text-black">Club Head Signature: Loaded</p>
                     <div className="status-indicator bg-green-500 w-3 h-3 rounded-full inline-block ml-2"></div>
                   </div>
                 )}
                 
-                {signatureUrls.club && (
+                {signatureUrls.clubSignature && (
                   <div className="signature-status bg-[floralwhite] p-2 rounded-md border border-gray-300 w-full">
                     <p className="text-black">Club Signature: Loaded</p>
                     <div className="status-indicator bg-green-500 w-3 h-3 rounded-full inline-block ml-2"></div>
                   </div>
                 )}
                 
-                {!signatureUrls.hod && !signatureUrls.coordinator && !signatureUrls.head && !signatureUrls.club && (
+                {!signatureUrls.hodSignature && !signatureUrls.clubCoordinatorSignature && !signatureUrls.clubHeadSignature && !signatureUrls.clubSignature && (
                   <p className="text-black">No signatures uploaded</p>
                 )}
               </div>
@@ -972,71 +993,71 @@ export default function Editor() {
               />
               
               {/* Signature Elements */}
-              {signatureUrls.hod && (
+              {signatureUrls.hodSignature && (
                 <img
-                  src={signatureUrls.hod}
+                  src={signatureUrls.hodSignature}
                   alt="HOD Signature"
                   className="absolute z-20 cursor-move"
                   style={{
-                    left: `${signaturePositions.hod.x}px`,
-                    top: `${signaturePositions.hod.y}px`,
+                    left: `${signaturePositions.hodSignature.x}px`,
+                    top: `${signaturePositions.hodSignature.y}px`,
                     maxWidth: '150px',
                     maxHeight: '80px'
                   }}
                   draggable
-                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "hod_signature")}
-                  onDragEnd={(e) => handleSignatureDrop(e, 'hod')}
+                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "hodSignature")}
+                  onDragEnd={(e) => handleSignatureDrop(e, 'hodSignature')}
                 />
               )}
               
-              {signatureUrls.coordinator && (
+              {signatureUrls.clubCoordinatorSignature && (
                 <img
-                  src={signatureUrls.coordinator}
+                  src={signatureUrls.clubCoordinatorSignature}
                   alt="Coordinator Signature"
                   className="absolute z-20 cursor-move"
                   style={{
-                    left: `${signaturePositions.coordinator.x}px`,
-                    top: `${signaturePositions.coordinator.y}px`,
+                    left: `${signaturePositions.clubCoordinatorSignature.x}px`,
+                    top: `${signaturePositions.clubCoordinatorSignature.y}px`,
                     maxWidth: '150px',
                     maxHeight: '80px'
                   }}
                   draggable
-                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "coordinator_signature")}
-                  onDragEnd={(e) => handleSignatureDrop(e, 'coordinator')}
+                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "clubCoordinatorSignature")}
+                  onDragEnd={(e) => handleSignatureDrop(e, 'clubCoordinatorSignature')}
                 />
               )}
               
-              {signatureUrls.head && (
+              {signatureUrls.clubHeadSignature && (
                 <img
-                  src={signatureUrls.head}
+                  src={signatureUrls.clubHeadSignature}
                   alt="Club Head Signature"
                   className="absolute z-20 cursor-move"
                   style={{
-                    left: `${signaturePositions.head.x}px`,
-                    top: `${signaturePositions.head.y}px`,
+                    left: `${signaturePositions.clubHeadSignature.x}px`,
+                    top: `${signaturePositions.clubHeadSignature.y}px`,
                     maxWidth: '150px',
                     maxHeight: '80px'
                   }}
                   draggable
-                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "head_signature")}
-                  onDragEnd={(e) => handleSignatureDrop(e, 'head')}
+                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "clubHeadSignature")}
+                  onDragEnd={(e) => handleSignatureDrop(e, 'clubHeadSignature')}
                 />
               )}
               
-              {signatureUrls.club && (
+              {signatureUrls.clubSignature && (
                 <img
-                  src={signatureUrls.club}
+                  src={signatureUrls.clubSignature}
                   alt="Club Signature"
                   className="absolute z-20 cursor-move"
                   style={{
-                    left: `${signaturePositions.club.x}px`,
-                    top: `${signaturePositions.club.y}px`,
+                    left: `${signaturePositions.clubSignature.x}px`,
+                    top: `${signaturePositions.clubSignature.y}px`,
                     maxWidth: '150px',
                     maxHeight: '80px'
                   }}
                   draggable
-                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "club_signature")}
-                  onDragEnd={(e) => handleSignatureDrop(e, 'club')}
+                  onDragStart={(e) => e.dataTransfer.setData("text/plain", "clubSignature")}
+                  onDragEnd={(e) => handleSignatureDrop(e, 'clubSignature')}
                 />
               )}
             </div>
@@ -1120,14 +1141,14 @@ export default function Editor() {
               ))}
               
               {/* Signature Previews */}
-              {signatureUrls.hod && (
+              {signatureUrls.hodSignature && (
                 <img
-                  src={signatureUrls.hod}
+                  src={signatureUrls.hodSignature}
                   alt="HOD Signature Preview"
                   style={{
                     position: "absolute",
-                    left: signaturePositions.hod.x,
-                    top: signaturePositions.hod.y,
+                    left: signaturePositions.hodSignature.x,
+                    top: signaturePositions.hodSignature.y,
                     maxWidth: '150px',
                     maxHeight: '80px',
                     pointerEvents: "none"
@@ -1135,14 +1156,14 @@ export default function Editor() {
                 />
               )}
               
-              {signatureUrls.coordinator && (
+              {signatureUrls.clubCoordinatorSignature && (
                 <img
-                  src={signatureUrls.coordinator}
+                  src={signatureUrls.clubCoordinatorSignature}
                   alt="Coordinator Signature Preview"
                   style={{
                     position: "absolute",
-                    left: signaturePositions.coordinator.x,
-                    top: signaturePositions.coordinator.y,
+                    left: signaturePositions.clubCoordinatorSignature.x,
+                    top: signaturePositions.clubCoordinatorSignature.y,
                     maxWidth: '150px',
                     maxHeight: '80px',
                     pointerEvents: "none"
@@ -1150,14 +1171,14 @@ export default function Editor() {
                 />
               )}
               
-              {signatureUrls.head && (
+              {signatureUrls.clubHeadSignature && (
                 <img
-                  src={signatureUrls.head}
+                  src={signatureUrls.clubHeadSignature}
                   alt="Club Head Signature Preview"
                   style={{
                     position: "absolute",
-                    left: signaturePositions.head.x,
-                    top: signaturePositions.head.y,
+                    left: signaturePositions.clubHeadSignature.x,
+                    top: signaturePositions.clubHeadSignature.y,
                     maxWidth: '150px',
                     maxHeight: '80px',
                     pointerEvents: "none"
@@ -1165,14 +1186,14 @@ export default function Editor() {
                 />
               )}
               
-              {signatureUrls.club && (
+              {signatureUrls.clubSignature && (
                 <img
-                  src={signatureUrls.club}
+                  src={signatureUrls.clubSignature}
                   alt="Club Signature Preview"
                   style={{
                     position: "absolute",
-                    left: signaturePositions.club.x,
-                    top: signaturePositions.club.y,
+                    left: signaturePositions.clubSignature.x,
+                    top: signaturePositions.clubSignature.y,
                     maxWidth: '150px',
                     maxHeight: '80px',
                     pointerEvents: "none"
