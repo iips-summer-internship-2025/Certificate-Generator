@@ -780,7 +780,7 @@ export default function ClubEventForm() {
     image2: null,
     image3: null,
     image4: null,
-    participantList: null,
+    participantsList: null,
   });
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselRef = useRef(null);
@@ -872,9 +872,11 @@ export default function ClubEventForm() {
 
     // Append summary image and participant list
     formPayload.append('participantsList', formData.participantsList);
-
+    console.log("before getting env");
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
+    console.log('API URL:', API_URL);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/events/upload/', {
+      const response = await fetch(`${API_URL}/api/events/upload/`, {
         method: 'POST',
         headers: {
           // 'Content-Type': 'application/json',
@@ -1538,15 +1540,15 @@ export default function ClubEventForm() {
                           <FileTextIcon className="mr-2 text-indigo-500" size={18} />
                           Upload Participant List
                         </label>
-                        {formData.participantList ? (
+                        {formData.participantsList ? (
                           <div className="flex items-center justify-between bg-sky-50 border border-sky-200 rounded-2xl px-4 py-3 shadow-sm">
                             <div className="flex items-center">
                               <FileTextIcon className="text-sky-600 mr-3" size={20} />
-                              <span className="text-sky-800 truncate max-w-xs">{formData.participantList.name}</span>
+                              <span className="text-sky-800 truncate max-w-xs">{formData.participantsList.name}</span>
                             </div>
                             <button
                               type="button"
-                              onClick={() => removeFile('participantList')}
+                              onClick={() => removeFile('participantsList')}
                               className="text-red-500 hover:text-red-700"
                             >
                               <XIcon size={20} />
@@ -1563,7 +1565,7 @@ export default function ClubEventForm() {
                                 type="file"
                                 className="hidden"
                                 accept=".xlsx,.xls,.csv"
-                                onChange={(e) => handleFileChange(e, 'participantList')}
+                                onChange={(e) => handleFileChange(e, 'participantsList')}
                               />
                             </label>
                           </motion.div>

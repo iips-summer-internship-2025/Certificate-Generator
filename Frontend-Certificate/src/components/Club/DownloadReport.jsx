@@ -783,7 +783,11 @@ const DownloadReport = () => {
       alert("You must be logged in to access this resource");
       return;
         }
-      const response = await axios.get(`http://127.0.0.1:8000/events/filter/`, {
+
+      console.log("before getting env");
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      console.log('API URL:', API_URL);
+      const response = await axios.get(`${API_URL}/events/filter/`, {
         headers: {
           Authorization: `Bearer ${token}`,
           
@@ -823,8 +827,11 @@ const DownloadReport = () => {
     alert("Login required.");
     return;
     }
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
+      console.log('API URL:', API_URL);
+
     try {
-    const response = await axios.get(`http://127.0.0.1:8000/events/${selectedEvent}/report/`, {
+    const response = await axios.get(`${API_URL}/events/${selectedEvent}/report/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -854,10 +861,11 @@ const DownloadReport = () => {
     alert("Login required.");
     return;
     }
-
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
+      console.log('API URL:', API_URL);
      try {
     const response = await axios.get(
-      `http://127.0.0.1:8000/events/${selectedEvent}/photos/`,
+      `${API_URL}/events/${selectedEvent}/photos/`,
       {
         headers: {
           Authorization: `Bearer ${token}`

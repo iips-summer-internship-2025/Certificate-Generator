@@ -12,7 +12,9 @@ export default function VerifyCertificate() {
     setError('');
     setData(null);
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/verify/${certificateId}/`);
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      console.log('API URL:', API_URL);
+      const response = await axios.get(`${API_URL}/verify/${certificateId}/`);
       setData(response.data);
     } catch (err) {
       setError('Certificate not found or invalid.');

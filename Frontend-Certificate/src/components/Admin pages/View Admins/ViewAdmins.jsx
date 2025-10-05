@@ -236,7 +236,9 @@ export default function ViewAdmins() {
     const fetchAdmins = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://127.0.0.1:8000/api/admin/view-users/', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        console.log('API URL:', API_URL);
+        const res = await fetch(`${API_URL}/api/admin/view-users/`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

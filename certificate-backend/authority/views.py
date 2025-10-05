@@ -1020,23 +1020,29 @@ class EventUploadView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request):
-        data = request.data.copy()
+        data = {key: request.data.get(key) for key in request.data}
+
+
         pdf_file = request.FILES.get('reportFile')
         image1 = request.FILES.get('image1')
         image2 = request.FILES.get('image2')
         image3 = request.FILES.get('image3') 
         image4 = request.FILES.get('image4')    
-        participantList = request.FILES.get('participantList')
+        participantList = request.FILES.get('participantsList')
         
 
         # Upload PDF to Cloudinary
         if pdf_file:
             pdf_upload = cloudinary.uploader.upload(
                 pdf_file, 
+                upload_preset="raw_type",
                 resource_type="auto", 
                 folder="events_pdfs"
             )
-            data['event_pdf'] = pdf_upload.get("secure_url")
+            raw_url = pdf_upload.get("secure_url")
+            viewable_url = raw_url.replace("/upload/", "/upload/fl_attachment/")
+            data['event_pdf'] = viewable_url
+            # data['event_pdf'] = pdf_upload.get("secure_url")
 
         # Upload Image to Cloudinary
         if image1:
@@ -1072,7 +1078,7 @@ class EventUploadView(APIView):
         if participantList:
             participant_upload = cloudinary.uploader.upload(
                 participantList, 
-                resource_type="auto", 
+                resource_type="raw", 
                 folder="participantlist_pdfs"
             )
             data['participantlist_pdfs'] = participant_upload.get("secure_url")
