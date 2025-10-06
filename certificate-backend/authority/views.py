@@ -218,9 +218,13 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     
     # Get QR code dimensions
     qr_width, qr_height = qr.size
-    # Calculate position for top right corner with padding
-      # Resize as needed
-    image.paste(qr, (image.width - qr_width - padding_x,  padding_y))  # Bottom right corner
+    # Calculate position for bottom-right corner with padding
+    qr_x = image.width - qr_width - padding_x
+    qr_y = image.height - qr_height - padding_y
+
+    # Resize as needed
+    image.paste(qr, (qr_x, qr_y))  # Bottom right corner
+    # Save final image
     image.save(output_path)
 
 
