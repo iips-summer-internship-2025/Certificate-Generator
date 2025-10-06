@@ -174,3 +174,6 @@ cython_debug/
 
 # Load environment variable in .env, which should not be committed to version control
 .env
+# Ignore IDE configs
+.idea/
+

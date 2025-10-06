@@ -14,7 +14,9 @@ export default function ValidateCertificate() {
     setCertificateData(null);
 
     try {
-      const response = await axios.get(`https://your-backend-url/api/certificate/${uniqueId}`);
+      const token = localStorage.getItem('token');
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.get(`${API_URL}/api/certificate/${uniqueId}`);
       if (response.data && response.data.valid) {
         setCertificateData(response.data);
       } else {

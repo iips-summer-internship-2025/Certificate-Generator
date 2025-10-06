@@ -65,7 +65,7 @@ export default function Login() {
         // Now check the superuser role
         const token = data.access;
         try {
-          const roleRes = await fetch('http://127.0.0.1:8000/api/check-superuser/', {
+          const roleRes = await fetch(`${API_URL}/api/check-superuser/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

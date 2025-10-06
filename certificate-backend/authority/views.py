@@ -218,9 +218,13 @@ def generate_certificate_dynamic(template_path, output_path, coordinates,row, ce
     
     # Get QR code dimensions
     qr_width, qr_height = qr.size
-    # Calculate position for top right corner with padding
-      # Resize as needed
-    image.paste(qr, (image.width - qr_width - padding_x,  padding_y))  # Bottom right corner
+    # Calculate position for bottom-right corner with padding
+    qr_x = image.width - qr_width - padding_x
+    qr_y = image.height - qr_height - padding_y
+
+    # Resize as needed
+    image.paste(qr, (qr_x, qr_y))  # Bottom right corner
+    # Save final image
     image.save(output_path)
 
 
@@ -1020,23 +1024,29 @@ class EventUploadView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request):
-        data = request.data.copy()
+        data = {key: request.data.get(key) for key in request.data}
+
+
         pdf_file = request.FILES.get('reportFile')
         image1 = request.FILES.get('image1')
         image2 = request.FILES.get('image2')
         image3 = request.FILES.get('image3') 
         image4 = request.FILES.get('image4')    
-        participantList = request.FILES.get('participantList')
+        participantList = request.FILES.get('participantsList')
         
 
         # Upload PDF to Cloudinary
         if pdf_file:
             pdf_upload = cloudinary.uploader.upload(
                 pdf_file, 
+                upload_preset="raw_type",
                 resource_type="auto", 
                 folder="events_pdfs"
             )
-            data['event_pdf'] = pdf_upload.get("secure_url")
+            raw_url = pdf_upload.get("secure_url")
+            viewable_url = raw_url.replace("/upload/", "/upload/fl_attachment/")
+            data['event_pdf'] = viewable_url
+            # data['event_pdf'] = pdf_upload.get("secure_url")
 
         # Upload Image to Cloudinary
         if image1:
@@ -1072,7 +1082,7 @@ class EventUploadView(APIView):
         if participantList:
             participant_upload = cloudinary.uploader.upload(
                 participantList, 
-                resource_type="auto", 
+                resource_type="raw", 
                 folder="participantlist_pdfs"
             )
             data['participantlist_pdfs'] = participant_upload.get("secure_url")
