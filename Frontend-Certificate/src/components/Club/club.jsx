@@ -729,6 +729,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from '../home/Header';
 import Footer from '../home/Footer';
+import { useNavigate } from 'react-router-dom';
 
 // Club data with icons
 const clubs = [
@@ -762,6 +763,7 @@ const clubs = [
 
 // Club Event Registration Form
 export default function ClubEventForm() {
+  const navigate = useNavigate();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formStep, setFormStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -793,6 +795,15 @@ export default function ClubEventForm() {
       [name]: value,
     }));
   };
+  
+
+  // check token
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   // Handle file input changes
   const handleFileChange = (e, field) => {

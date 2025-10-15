@@ -35,7 +35,7 @@ function App() {
         <Route path='/' element={<Home/>}/>
         {/* <Route path="/DownloadReport" element={<DownloadReport/>}/> */}
         {/* <Route path='Login' element={<Login/>}/> */}
-        {token && <Route path="/Login" element={<Login />}/>} 
+        {!token && <Route path="/Login" element={<Login />}/>} 
         {token && <Route path="/upload" element={<Upload />}/>}
         {token && <Route path="/DownloadReport" element={<DownloadReport/>}/>} 
         {/* <Route path="/upload" element={<Upload />}/>
