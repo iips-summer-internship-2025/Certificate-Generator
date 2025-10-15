@@ -208,6 +208,10 @@ class EventSerializer(serializers.ModelSerializer):
     eventName = serializers.CharField(source='event_name')
     startDate = serializers.DateField(source='start_date')
     endDate = serializers.DateField(source='end_date')
+    coordinator2 = serializers.CharField(required=False, allow_blank=True)
+    coordinator3 = serializers.CharField(required=False, allow_blank=True)
+    coordinator4 = serializers.CharField(required=False, allow_blank=True)
+    
     #organizerName = serializers.CharField(source='coordinator_name')
     #coordinator2 = serializers.CharField(source='coordinator_name1')
     #coordinator3 = serializers.CharField(source='coordinator_name2')

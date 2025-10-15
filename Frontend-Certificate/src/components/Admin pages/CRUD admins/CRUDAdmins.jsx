@@ -499,9 +499,10 @@ export default function CrudAdmins() {
     };
 
     const token = localStorage.getItem("token");
-
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
+    console.log('API URL:', API_URL);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
+      const res = await fetch(`${API_URL}/api/crud-admins/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -540,8 +541,9 @@ export default function CrudAdmins() {
     const fetchAdmins = async () => {
       try {
         const token = localStorage.getItem("token");
-
-        const res = await fetch("http://127.0.0.1:8000/api/crud-admins/", {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        console.log('API URL:', API_URL);
+        const res = await fetch(`${API_URL}/api/crud-admins/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

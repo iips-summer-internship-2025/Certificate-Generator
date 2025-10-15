@@ -704,7 +704,9 @@ export default function ChangePassword({ email }) {
     try {
       const token = localStorage.getItem('token');
       console.log('Token:', token);
-      const response = await fetch('http://127.0.0.1:8000/api/admin/change-password/', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      console.log('API URL:', API_URL);
+      const response = await fetch(`${API_URL}/api/admin/change-password/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
